@@ -13,6 +13,13 @@ const DashboardHome = () => {
 
   return (
     <div className="p-6 md:p-10 max-w-5xl">
+      {/* Go to landing */}
+      <Button asChild variant="cta-outline" size="cta" className="w-full mb-8">
+        <Link to="/">
+          Ir a la página principal <ArrowRight size={16} />
+        </Link>
+      </Button>
+
       {/* Welcome */}
       <div className="mb-10">
         <h1 className="text-2xl md:text-3xl text-foreground mb-1">
