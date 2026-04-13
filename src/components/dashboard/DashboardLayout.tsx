@@ -98,13 +98,23 @@ const DashboardLayout = ({ activeTab, onTabChange, children }: DashboardLayoutPr
                 {item.label}
               </button>
             ))}
-            <button
-              onClick={logout}
-              className="w-full flex items-center gap-3 px-3 py-3 rounded-md text-base font-heading text-muted-foreground hover:text-foreground transition-colors mt-4 border-t border-border pt-4"
-            >
-              <LogOut size={20} />
-              Cerrar sesión
-            </button>
+            <div className="mt-4 border-t border-border pt-4 space-y-1">
+              <Link
+                to="/"
+                onClick={() => setSidebarOpen(false)}
+                className="w-full flex items-center gap-3 px-3 py-3 rounded-md text-base font-heading text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ExternalLink size={20} />
+                Ir al sitio
+              </Link>
+              <button
+                onClick={logout}
+                className="w-full flex items-center gap-3 px-3 py-3 rounded-md text-base font-heading text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <LogOut size={20} />
+                Cerrar sesión
+              </button>
+            </div>
           </nav>
         </div>
       )}
