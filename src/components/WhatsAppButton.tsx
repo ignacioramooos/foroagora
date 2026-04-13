@@ -7,7 +7,7 @@ const WhatsAppButton = () => {
 
   return (
     <a
-      href="https://wa.me/59899123456?text=Hola!%20Quiero%20info%20sobre%20InvertíUY"
+      href="https://chat.whatsapp.com/LIyfas9fhGUJzpv62LJTWg?mode=gi_t"
       target="_blank"
       rel="noopener noreferrer"
       className={`fixed right-4 z-50 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-lg hover:scale-105 transition-transform ${
