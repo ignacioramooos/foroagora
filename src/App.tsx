@@ -16,6 +16,7 @@ import ResourcesPage from "./pages/ResourcesPage";
 import PartnersPage from "./pages/PartnersPage";
 import BrokersPage from "./pages/BrokersPage";
 import DashboardPage from "./pages/DashboardPage";
+import AdminPage from "./pages/AdminPage";
 import AuthPage from "./pages/AuthPage";
 import NotFound from "./pages/NotFound";
 
