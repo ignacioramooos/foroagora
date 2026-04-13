@@ -1,9 +1,8 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import SectionFade from "@/components/SectionFade";
-import SectionTag from "@/components/SectionTag";
 import AnimatedCounter from "@/components/AnimatedCounter";
-import { Heart, BookOpen, Users, Globe, Linkedin } from "lucide-react";
+import { Linkedin } from "lucide-react";
 
 const team = [
   { name: "Santiago Pérez", role: "Fundador & Director", bio: "Estudiante de Economía, UdelaR. Apasionado por democratizar las finanzas." },
@@ -17,14 +16,16 @@ const team = [
 const AboutPage = () => (
   <>
     {/* Mission */}
-    <section className="pt-32 md:pt-40 pb-20 bg-navy">
-      <div className="container text-center">
+    <section className="pt-32 md:pt-40 pb-20 bg-secondary">
+      <div className="container">
         <SectionFade>
-          <SectionTag>Nuestra misión</SectionTag>
-          <h1 className="text-3xl md:text-5xl font-extrabold text-cream max-w-3xl mx-auto mb-8 text-balance leading-tight">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary font-medium mb-6">
+            Nuestra misión
+          </p>
+          <h1 className="text-3xl md:text-5xl font-bold text-secondary-foreground max-w-4xl mb-8 leading-tight">
             Que cada joven en Uruguay pueda tomar decisiones financieras con criterio propio.
           </h1>
-          <p className="text-cream/60 text-lg max-w-2xl mx-auto leading-relaxed">
+          <p className="text-secondary-foreground/50 text-lg max-w-2xl leading-relaxed">
             Somos un grupo de jóvenes voluntarios que creemos que la educación financiera
             no debería ser un privilegio. Por eso enseñamos análisis fundamental — gratis,
             presencial y en tu idioma.
@@ -34,132 +35,121 @@ const AboutPage = () => (
     </section>
 
     {/* Our Story */}
-    <section className="py-20 md:py-28 bg-cream">
+    <section className="py-24 md:py-32 bg-background">
       <div className="container">
-        <SectionFade>
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <SectionTag>Nuestra historia</SectionTag>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-navy mb-6">
-                Empezamos porque nadie más lo hacía
-              </h2>
-              <p className="text-slate text-lg leading-relaxed mb-4">
+        <div className="grid md:grid-cols-5 gap-16 items-start">
+          <div className="md:col-span-3">
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary font-medium mb-4">
+              Nuestra historia
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-8">
+              Empezamos porque nadie más lo hacía
+            </h2>
+            <div className="space-y-4 text-muted-foreground text-lg leading-relaxed">
+              <p>
                 En 2024, un grupo de estudiantes universitarios en Montevideo se dieron cuenta de que
                 sabían más de derivadas que de finanzas personales. Y que sus compañeros de liceo
                 estaban aún peor.
               </p>
-              <p className="text-slate text-lg leading-relaxed mb-4">
+              <p>
                 Decidieron armar clases gratuitas de análisis fundamental — la misma metodología que
                 usan inversores como Warren Buffett — adaptada para estudiantes de liceo sin
                 experiencia previa.
               </p>
-              <p className="text-slate text-lg leading-relaxed">
+              <p>
                 Lo que empezó como un taller en un salón prestado se convirtió en un movimiento.
                 Hoy somos un equipo de voluntarios comprometidos con cerrar la brecha de
                 educación financiera en Uruguay.
               </p>
             </div>
-            <div className="bg-navy rounded-2xl aspect-[4/3] flex items-center justify-center">
-              <span className="text-cream/20 font-mono text-sm">[Foto del equipo]</span>
+          </div>
+          <div className="md:col-span-2">
+            <div className="bg-secondary rounded-lg aspect-[3/4] flex items-center justify-center">
+              <span className="text-secondary-foreground/15 font-mono text-xs">[Foto del equipo]</span>
             </div>
           </div>
-        </SectionFade>
+        </div>
       </div>
     </section>
 
     {/* Team */}
-    <section className="py-20 md:py-28 bg-background">
+    <section className="py-24 md:py-32 bg-card border-y border-border">
       <div className="container">
-        <SectionFade>
-          <div className="text-center mb-16">
-            <SectionTag>El equipo</SectionTag>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-navy">
-              Jóvenes que enseñan a jóvenes
-            </h2>
-          </div>
-        </SectionFade>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {team.map((m, i) => (
-            <SectionFade key={m.name} delay={i * 0.05}>
-              <div className="bg-cream border border-border rounded-2xl p-6 hover:border-green/30 transition-colors">
-                <div className="w-16 h-16 rounded-full bg-navy/10 mb-4 flex items-center justify-center">
-                  <span className="font-bold text-navy text-lg">{m.name.split(" ").map(n => n[0]).join("")}</span>
-                </div>
-                <h3 className="font-bold text-navy text-lg">{m.name}</h3>
-                <span className="text-green text-sm font-medium font-mono">{m.role}</span>
-                <p className="text-slate text-sm mt-3 leading-relaxed">{m.bio}</p>
-                <a href="#" className="inline-flex items-center gap-1 text-slate/50 hover:text-green text-sm mt-3 transition-colors">
-                  <Linkedin size={14} /> LinkedIn
-                </a>
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary font-medium mb-4">
+          El equipo
+        </p>
+        <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-12">
+          Jóvenes que enseñan a jóvenes
+        </h2>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border">
+          {team.map((m) => (
+            <div key={m.name} className="bg-card p-8">
+              <div className="w-12 h-12 rounded-full bg-secondary/10 mb-4 flex items-center justify-center">
+                <span className="font-heading font-bold text-foreground text-sm">
+                  {m.name.split(" ").map(n => n[0]).join("")}
+                </span>
               </div>
-            </SectionFade>
+              <h3 className="font-heading font-bold text-foreground text-lg">{m.name}</h3>
+              <span className="text-primary text-sm font-medium">{m.role}</span>
+              <p className="text-muted-foreground text-sm mt-3 leading-relaxed">{m.bio}</p>
+              <a href="#" className="inline-flex items-center gap-1 text-muted-foreground/40 hover:text-primary text-sm mt-3 transition-colors">
+                <Linkedin size={14} /> LinkedIn
+              </a>
+            </div>
           ))}
         </div>
-        <SectionFade delay={0.3}>
-          <div className="text-center mt-12">
-            <Button asChild variant="cta-outline" size="cta">
-              <Link to="/contacto">Sumarte al equipo</Link>
-            </Button>
-          </div>
-        </SectionFade>
+        <div className="mt-12">
+          <Button asChild variant="cta-outline" size="cta">
+            <Link to="/contacto">Sumarte al equipo</Link>
+          </Button>
+        </div>
       </div>
     </section>
 
     {/* Values */}
-    <section className="py-20 md:py-28 bg-cream">
-      <div className="container">
-        <SectionFade>
-          <div className="text-center mb-16">
-            <SectionTag>Nuestros valores</SectionTag>
-          </div>
-        </SectionFade>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+    <section className="py-24 md:py-32 bg-background">
+      <div className="container max-w-3xl">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary font-medium mb-4">
+          Nuestros valores
+        </p>
+        <div className="space-y-0 divide-y divide-border">
           {[
-            { icon: Globe, title: "Acceso universal", desc: "La educación financiera es un derecho, no un privilegio." },
-            { icon: BookOpen, title: "Rigor intelectual", desc: "Enseñamos con la misma seriedad que una universidad, pero sin barreras." },
-            { icon: Users, title: "Comunidad", desc: "Aprender juntos es más poderoso que aprender solo." },
-            { icon: Heart, title: "Impacto local", desc: "Empezamos en Montevideo, con la visión de llegar a todo Uruguay." },
-          ].map((v, i) => (
-            <SectionFade key={v.title} delay={i * 0.1}>
-              <div className="text-center">
-                <div className="w-12 h-12 rounded-xl bg-green/10 flex items-center justify-center mx-auto mb-4">
-                  <v.icon size={24} className="text-green" />
-                </div>
-                <h3 className="font-bold text-navy mb-2">{v.title}</h3>
-                <p className="text-slate text-sm leading-relaxed">{v.desc}</p>
-              </div>
-            </SectionFade>
+            { title: "Acceso universal", desc: "La educación financiera es un derecho, no un privilegio." },
+            { title: "Rigor intelectual", desc: "Enseñamos con la misma seriedad que una universidad, pero sin barreras." },
+            { title: "Comunidad", desc: "Aprender juntos es más poderoso que aprender solo." },
+            { title: "Impacto local", desc: "Empezamos en Montevideo, con la visión de llegar a todo Uruguay." },
+          ].map((v) => (
+            <div key={v.title} className="py-6 first:pt-0 last:pb-0">
+              <h3 className="font-heading font-bold text-foreground text-lg mb-1">{v.title}</h3>
+              <p className="text-muted-foreground leading-relaxed">{v.desc}</p>
+            </div>
           ))}
         </div>
       </div>
     </section>
 
     {/* Impact */}
-    <section className="py-20 md:py-28 bg-navy">
+    <section className="py-24 md:py-32 bg-secondary">
       <div className="container">
-        <SectionFade>
-          <div className="text-center mb-12">
-            <SectionTag>Nuestro impacto</SectionTag>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-cream">
-              Números que importan
-            </h2>
-          </div>
-        </SectionFade>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary font-medium mb-4">
+          Nuestro impacto
+        </p>
+        <h2 className="text-3xl md:text-4xl font-bold text-secondary-foreground mb-12">
+          Números que importan
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
           {[
             { value: 150, suffix: "+", label: "Estudiantes alcanzados" },
             { value: 24, label: "Clases dictadas" },
             { value: 5, label: "Instituciones aliadas" },
             { value: 3, label: "Liceos visitados" },
           ].map((s) => (
-            <SectionFade key={s.label}>
-              <div>
-                <div className="text-4xl md:text-5xl font-extrabold text-green mb-2">
-                  <AnimatedCounter end={s.value} suffix={s.suffix} />
-                </div>
-                <div className="text-cream/50 text-sm">{s.label}</div>
+            <div key={s.label}>
+              <div className="text-4xl md:text-5xl font-heading font-bold text-primary mb-2">
+                <AnimatedCounter end={s.value} suffix={s.suffix} />
               </div>
-            </SectionFade>
+              <div className="text-secondary-foreground/40 text-sm">{s.label}</div>
+            </div>
           ))}
         </div>
       </div>

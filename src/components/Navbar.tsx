@@ -27,12 +27,12 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? "bg-navy/95 backdrop-blur-md shadow-lg" : "bg-transparent"
+        className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-200 ${
+          scrolled ? "bg-secondary shadow-md" : "bg-secondary/80 backdrop-blur-sm"
         }`}
       >
-        <div className="container flex items-center justify-between h-16 md:h-20">
-          <Link to="/" className="text-xl font-extrabold tracking-tight text-cream">
+        <div className="container flex items-center justify-between h-16">
+          <Link to="/" className="text-lg font-heading font-bold tracking-tight text-secondary-foreground">
             InvertíUY
           </Link>
 
@@ -41,8 +41,8 @@ const Navbar = () => {
               <Link
                 key={l.path}
                 to={l.path}
-                className={`text-sm font-medium transition-colors hover:text-green ${
-                  location.pathname === l.path ? "text-green" : "text-cream/80"
+                className={`text-sm font-medium transition-colors ${
+                  location.pathname === l.path ? "text-primary" : "text-secondary-foreground/60 hover:text-secondary-foreground"
                 }`}
               >
                 {l.label}
@@ -51,14 +51,14 @@ const Navbar = () => {
           </div>
 
           <div className="hidden md:block">
-            <Button asChild variant="cta" size="cta">
+            <Button asChild variant="cta" size="sm">
               <Link to="/registro">Anotate gratis</Link>
             </Button>
           </div>
 
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden text-cream p-2"
+            className="md:hidden text-secondary-foreground p-2 -mr-2"
             aria-label="Menu"
           >
             {mobileOpen ? <X size={24} /> : <Menu size={24} />}
@@ -68,14 +68,14 @@ const Navbar = () => {
 
       {/* Mobile overlay */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 bg-navy flex flex-col pt-20 pb-8 px-6 md:hidden">
+        <div className="fixed inset-0 z-40 bg-secondary flex flex-col pt-20 pb-8 px-6 md:hidden">
           <div className="flex flex-col gap-6 flex-1">
             {navLinks.map((l) => (
               <Link
                 key={l.path}
                 to={l.path}
-                className={`text-2xl font-semibold transition-colors ${
-                  location.pathname === l.path ? "text-green" : "text-cream"
+                className={`text-2xl font-heading font-semibold transition-colors ${
+                  location.pathname === l.path ? "text-primary" : "text-secondary-foreground"
                 }`}
               >
                 {l.label}

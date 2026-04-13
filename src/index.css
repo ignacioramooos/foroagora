@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -9,7 +9,7 @@
     --background: 40 33% 97%;
     --foreground: 213 54% 11%;
 
-    --card: 40 33% 97%;
+    --card: 0 0% 100%;
     --card-foreground: 213 54% 11%;
 
     --popover: 0 0% 100%;
@@ -30,7 +30,7 @@
     --destructive: 38 92% 50%;
     --destructive-foreground: 213 54% 11%;
 
-    --border: 220 13% 86%;
+    --border: 220 13% 91%;
     --input: 220 13% 86%;
     --ring: 153 73% 47%;
 
@@ -65,8 +65,13 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading font-bold tracking-tight;
+    @apply font-heading font-bold;
     color: hsl(var(--navy));
+    letter-spacing: -0.02em;
+  }
+
+  h1 {
+    letter-spacing: -0.03em;
   }
 
   p {
