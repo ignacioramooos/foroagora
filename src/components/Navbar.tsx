@@ -17,7 +17,7 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
-  const { isLoggedIn, user, login, logout } = useAuth();
+  const { isLoggedIn, user, logout } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -68,8 +68,8 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <Button variant="ghost" size="sm" onClick={login} className="text-muted-foreground gap-1.5">
-                  <LogIn size={14} /> Log In
+                <Button asChild variant="ghost" size="sm" className="text-muted-foreground gap-1.5">
+                  <Link to="/auth"><LogIn size={14} /> Log In</Link>
                 </Button>
                 <Button asChild variant="cta" size="sm">
                   <Link to="/registro">Inscribite</Link>
@@ -115,8 +115,8 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <Button variant="cta-outline" size="cta" className="w-full" onClick={login}>
-                  Log In
+                <Button asChild variant="cta-outline" size="cta" className="w-full">
+                  <Link to="/auth">Log In</Link>
                 </Button>
                 <Button asChild variant="cta" size="cta" className="w-full">
                   <Link to="/registro">Inscribite</Link>
