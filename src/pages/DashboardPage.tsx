@@ -5,6 +5,7 @@ import LearningRoadmap from "@/components/dashboard/LearningRoadmap";
 import Toolkit from "@/components/dashboard/Toolkit";
 import CommunityFeed from "@/components/dashboard/CommunityFeed";
 import ThesisBuilder from "@/components/dashboard/ThesisBuilder";
+import EventsSection from "@/components/dashboard/EventsSection";
 import DashboardSettings from "@/components/dashboard/DashboardSettings";
 
 const DashboardPage = () => {
@@ -17,6 +18,7 @@ const DashboardPage = () => {
       case "tools": return <Toolkit />;
       case "community": return <CommunityFeed />;
       case "theses": return <ThesisBuilder />;
+      case "events": return <EventsSection />;
       case "settings": return <DashboardSettings />;
       default: return <DashboardHome />;
     }
