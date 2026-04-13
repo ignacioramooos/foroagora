@@ -65,7 +65,7 @@ const AppRoutes = () => {
         <Route path="/recursos" element={<><Navbar /><main><ResourcesPage /></main><Footer /></>} />
         <Route path="/partners" element={<><Navbar /><main><PartnersPage /></main><Footer /></>} />
         <Route path="/brokers" element={<><Navbar /><main><BrokersPage /></main><Footer /></>} />
-        <Route path="/dashboard" element={<Navigate to="/auth" replace />} />
+        <Route path="/dashboard" element={<Navigate to="/" replace />} />
         <Route path="*" element={<><Navbar /><main><NotFound /></main><Footer /></>} />
       </Routes>
       <WhatsAppButton />
