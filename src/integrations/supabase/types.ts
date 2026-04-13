@@ -16,29 +16,53 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          accepted_terms: boolean
+          age_range: string | null
           avatar_url: string | null
           created_at: string
+          department: string | null
           display_name: string | null
           email: string | null
+          full_name: string | null
+          how_found_us: string | null
           id: string
+          institution: string | null
+          interests: string[] | null
+          onboarding_completed: boolean
           updated_at: string
           user_id: string
         }
         Insert: {
+          accepted_terms?: boolean
+          age_range?: string | null
           avatar_url?: string | null
           created_at?: string
+          department?: string | null
           display_name?: string | null
           email?: string | null
+          full_name?: string | null
+          how_found_us?: string | null
           id?: string
+          institution?: string | null
+          interests?: string[] | null
+          onboarding_completed?: boolean
           updated_at?: string
           user_id: string
         }
         Update: {
+          accepted_terms?: boolean
+          age_range?: string | null
           avatar_url?: string | null
           created_at?: string
+          department?: string | null
           display_name?: string | null
           email?: string | null
+          full_name?: string | null
+          how_found_us?: string | null
           id?: string
+          institution?: string | null
+          interests?: string[] | null
+          onboarding_completed?: boolean
           updated_at?: string
           user_id?: string
         }
