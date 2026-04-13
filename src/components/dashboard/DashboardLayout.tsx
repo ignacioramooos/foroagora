@@ -36,7 +36,7 @@ const DashboardLayout = ({ activeTab, onTabChange, children }: DashboardLayoutPr
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-56 border-r border-border bg-background fixed inset-y-0 left-0 z-30">
         <div className="h-16 flex items-center px-5 border-b border-border">
-          <span className="text-lg font-heading font-semibold text-foreground">InvertíUY</span>
+          <Link to="/" className="text-lg font-heading font-semibold text-foreground hover:text-muted-foreground transition-colors">InvertíUY</Link>
         </div>
         <nav className="flex-1 py-4 px-3 space-y-1">
           {navItems.map((item) => (
@@ -74,7 +74,7 @@ const DashboardLayout = ({ activeTab, onTabChange, children }: DashboardLayoutPr
 
       {/* Mobile Header */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-background border-b border-border h-14 flex items-center justify-between px-4">
-        <span className="text-lg font-heading font-semibold text-foreground">InvertíUY</span>
+        <Link to="/" className="text-lg font-heading font-semibold text-foreground">InvertíUY</Link>
         <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-foreground p-1">
           {sidebarOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
