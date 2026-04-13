@@ -44,19 +44,20 @@ const AboutPage = () => (
             </h2>
             <div className="space-y-4 text-muted-foreground text-lg leading-relaxed">
               <p>
-                En 2024, un grupo de estudiantes universitarios en Montevideo se dieron cuenta de que
-                sabían más de derivadas que de finanzas personales. Y que sus compañeros de liceo
-                estaban aún peor.
+                En 2026, dos estudiantes en Montevideo — Nicolás e Ignacio — se dieron cuenta
+                de algo que tenían enfrente: muchos jóvenes a su alrededor mostraban interés
+                por las finanzas, pero casi ninguno conocía las herramientas para informarse.
+                Esa formación simplemente no llegaba en el liceo, como debería.
               </p>
               <p>
-                Decidieron armar clases de análisis fundamental — la misma metodología que
-                usan inversores como Warren Buffett — adaptada para estudiantes de liceo sin
-                experiencia previa.
+                Decidieron tomar el asunto como un problema real y resolverlo ellos mismos,
+                o al menos aportar un granito de arena. Armaron un sistema de clases
+                voluntarias de análisis fundamental — la misma metodología que usan inversores
+                como Warren Buffett — adaptada para estudiantes de liceo sin experiencia previa.
               </p>
               <p>
-                Lo que empezó como un taller en un salón prestado se convirtió en un movimiento.
-                Hoy somos un equipo de voluntarios comprometidos con cerrar la brecha de
-                educación financiera en Uruguay.
+                El objetivo es simple: acercar la educación financiera a la juventud.
+                Sin barreras económicas ni de conocimiento. Puramente por motivación y voluntad.
               </p>
             </div>
           </div>
