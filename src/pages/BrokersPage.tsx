@@ -19,6 +19,8 @@ const BrokersPage = () => {
           <p className="text-muted-foreground mb-8 max-w-lg">
             Opciones reguladas para invertir desde Uruguay. Investigá cada opción antes de abrir una cuenta.
           </p>
+          <p className="text-muted-foreground text-sm mb-8 max-w-lg">
+          </p>
         </SectionFade>
 
         <div className="flex gap-2 mb-6">
