@@ -1,76 +1,226 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Link, Navigate } from "react-router-dom";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, CheckCircle2 } from "lucide-react";
 import { lovable } from "@/integrations/lovable/index";
 
+const departments = [
+  "Artigas", "Canelones", "Cerro Largo", "Colonia", "Durazno", "Flores",
+  "Florida", "Lavalleja", "Maldonado", "Montevideo", "Paysandú", "Río Negro",
+  "Rivera", "Rocha", "Salto", "San José", "Soriano", "Tacuarembó", "Treinta y Tres",
+];
+
+const howFoundOptions = [
+  "Instagram",
+  "Amigo / Boca a boca",
+  "Charla en mi centro educativo",
+  "Otro",
+];
+
+const interestOptions = [
+  "Aprender a invertir",
+  "Entender la economía",
+  "Conocer gente con mis mismos intereses",
+  "Certificar mis conocimientos",
+];
+
+const ageRanges = ["Menor de 15", "15 a 18", "19 a 25", "Más de 25"];
+
+type FlowStep = "login" | "signup" | "step-1" | "step-2" | "step-3" | "email-confirmation";
+
+interface OnboardingData {
+  fullName: string;
+  ageRange: string;
+  department: string;
+  institution: string;
+  howFoundUs: string;
+  interests: string[];
+  acceptedTerms: boolean;
+}
+
 const AuthPage = () => {
-  const { isLoggedIn, login, signup, loading } = useAuth();
-  const [mode, setMode] = useState<"login" | "signup">("login");
+  const { isLoggedIn, user, login, signup, refreshProfile, loading } = useAuth();
+  const [step, setStep] = useState<FlowStep>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [signupSuccess, setSignupSuccess] = useState(false);
+
+  // Google OAuth users who need to complete profile
+  const [completingProfile, setCompletingProfile] = useState(false);
+
+  // Onboarding data
+  const [onboardingData, setOnboardingData] = useState<OnboardingData>({
+    fullName: "",
+    ageRange: "",
+    department: "",
+    institution: "",
+    howFoundUs: "",
+    interests: [],
+    acceptedTerms: false,
+  });
+
+  // Track the newly created user ID for profile updates
+  const [newUserId, setNewUserId] = useState<string | null>(null);
 
   if (loading) return null;
-  if (isLoggedIn) return <Navigate to="/dashboard" replace />;
+
+  // If logged in and onboarding completed, go to dashboard
+  if (isLoggedIn && user?.onboardingCompleted && !completingProfile) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // If logged in but onboarding NOT completed (Google OAuth case), show profile steps
+  if (isLoggedIn && user && !user.onboardingCompleted && !completingProfile) {
+    setCompletingProfile(true);
+    setOnboardingData((prev) => ({
+      ...prev,
+      fullName: user.name || "",
+    }));
+    setStep("step-1");
+  }
+
+  const set = <K extends keyof OnboardingData>(key: K, value: OnboardingData[K]) =>
+    setOnboardingData((prev) => ({ ...prev, [key]: value }));
+
+  const toggleInterest = (interest: string) => {
+    setOnboardingData((prev) => ({
+      ...prev,
+      interests: prev.interests.includes(interest)
+        ? prev.interests.filter((i) => i !== interest)
+        : [...prev.interests, interest],
+    }));
+  };
+
+  const canAdvanceStep = () => {
+    if (step === "step-1") return onboardingData.fullName.trim().length > 0 && onboardingData.ageRange !== "";
+    if (step === "step-2") return onboardingData.department !== "" && onboardingData.institution.trim().length > 0 && onboardingData.howFoundUs !== "";
+    if (step === "step-3") return onboardingData.interests.length > 0 && onboardingData.acceptedTerms;
+    return false;
+  };
+
+  const currentStepNumber = step === "step-1" ? 1 : step === "step-2" ? 2 : step === "step-3" ? 3 : 0;
 
   const handleGoogleLogin = async () => {
     setError("");
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      redirect_uri: window.location.origin + "/auth",
     });
     if (result.error) {
       setError("Error al iniciar sesión con Google");
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSubmitting(true);
-
-    if (mode === "login") {
-      const result = await login(email, password);
-      if (result.error) setError(result.error);
-    } else {
-      if (!name.trim()) {
-        setError("Ingresá tu nombre");
-        setSubmitting(false);
-        return;
-      }
-      if (password.length < 8) {
-        setError("La contraseña debe tener al menos 8 caracteres");
-        setSubmitting(false);
-        return;
-      }
-      if (password !== confirmPassword) {
-        setError("Las contraseñas no coinciden");
-        setSubmitting(false);
-        return;
-      }
-      const result = await signup(email, password, name);
-      if (result.error) {
-        setError(result.error);
-      } else {
-        setSignupSuccess(true);
-      }
-    }
+    const result = await login(email, password);
+    if (result.error) setError(result.error);
     setSubmitting(false);
   };
 
-  if (signupSuccess) {
+  const handleSignupSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    if (!name.trim()) { setError("Ingresá tu nombre"); return; }
+    if (password.length < 8) { setError("La contraseña debe tener al menos 8 caracteres"); return; }
+    if (password !== confirmPassword) { setError("Las contraseñas no coinciden"); return; }
+
+    setSubmitting(true);
+    const result = await signup(email, password, name);
+    if (result.error) {
+      setError(result.error);
+      setSubmitting(false);
+      return;
+    }
+
+    // Get user ID from the newly created session
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (sessionData.session?.user) {
+      setNewUserId(sessionData.session.user.id);
+    }
+
+    // Pre-fill fullName from signup name
+    setOnboardingData((prev) => ({ ...prev, fullName: name }));
+    setSubmitting(false);
+    setStep("step-1");
+  };
+
+  const handleFinishOnboarding = async () => {
+    setSubmitting(true);
+
+    const userId = completingProfile ? user?.id : newUserId;
+    if (!userId) {
+      // Fallback: try session
+      const { data: sessionData } = await supabase.auth.getSession();
+      const uid = sessionData.session?.user?.id;
+      if (!uid) {
+        setError("No se pudo guardar el perfil. Intentá de nuevo.");
+        setSubmitting(false);
+        return;
+      }
+      setNewUserId(uid);
+    }
+
+    const finalUserId = completingProfile ? user?.id : (newUserId || (await supabase.auth.getSession()).data.session?.user?.id);
+
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({
+        full_name: onboardingData.fullName,
+        display_name: onboardingData.fullName,
+        age_range: onboardingData.ageRange,
+        department: onboardingData.department,
+        institution: onboardingData.institution,
+        how_found_us: onboardingData.howFoundUs,
+        interests: onboardingData.interests,
+        accepted_terms: onboardingData.acceptedTerms,
+        onboarding_completed: true,
+      })
+      .eq("user_id", finalUserId!);
+
+    if (updateError) {
+      setError("Error al guardar el perfil. Intentá de nuevo.");
+      setSubmitting(false);
+      return;
+    }
+
+    setSubmitting(false);
+
+    if (completingProfile) {
+      // Google OAuth: refresh profile and redirect
+      await refreshProfile();
+      window.location.href = "/dashboard";
+    } else {
+      // Email signup: show email confirmation
+      setStep("email-confirmation");
+    }
+  };
+
+  const inputClass = "w-full h-12 px-4 rounded-md border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring/50 transition-shadow font-heading";
+
+  // Email confirmation screen
+  if (step === "email-confirmation") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-6">
         <div className="max-w-sm w-full text-center">
-          <h1 className="text-2xl font-heading font-semibold text-foreground mb-4">Revisá tu email</h1>
-          <p className="text-muted-foreground mb-6">
-            Te enviamos un link de confirmación a <strong className="text-foreground">{email}</strong>.
-            Hacé click en el link para activar tu cuenta.
+          <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center mx-auto mb-6">
+            <CheckCircle2 size={40} className="text-foreground" />
+          </div>
+          <h1 className="text-2xl font-heading font-semibold text-foreground mb-3">
+            ¡Bienvenido, {onboardingData.fullName.split(" ")[0]}!
+          </h1>
+          <p className="text-muted-foreground mb-2">
+            Ya sos parte de la nueva generación financiera de Uruguay.
+          </p>
+          <p className="text-sm text-muted-foreground mb-8">
+            Te enviamos un link de confirmación a <strong className="text-foreground">{email}</strong>. Hacé click en el link para activar tu cuenta.
           </p>
           <Button variant="cta-outline" size="cta" asChild>
             <Link to="/">Volver al inicio</Link>
@@ -80,8 +230,129 @@ const AuthPage = () => {
     );
   }
 
-  const inputClass = "w-full h-12 px-4 rounded-md border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring/50 transition-shadow font-heading";
+  // Onboarding steps (step-1, step-2, step-3)
+  if (step === "step-1" || step === "step-2" || step === "step-3") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-6 py-12">
+        <div className="max-w-md w-full">
+          {/* Progress bar */}
+          <div className="flex items-center gap-2 mb-8">
+            {[1, 2, 3].map((s) => (
+              <div
+                key={s}
+                className={`flex-1 h-1.5 rounded-full transition-colors ${
+                  s <= currentStepNumber ? "bg-foreground" : "bg-secondary"
+                }`}
+              />
+            ))}
+          </div>
 
+          <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-2">
+            Paso {currentStepNumber} de 3
+          </p>
+
+          {step === "step-1" && (
+            <div>
+              <h2 className="text-xl font-heading font-semibold text-foreground mb-1">Identidad Personal</h2>
+              <p className="text-sm text-muted-foreground mb-6">Tu nombre aparecerá en tus futuros certificados.</p>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-heading font-medium text-foreground mb-1.5">Nombre y Apellido *</label>
+                  <input className={inputClass} value={onboardingData.fullName} onChange={(e) => set("fullName", e.target.value)} placeholder="Ej: Ignacio Pérez" />
+                </div>
+                <div>
+                  <label className="block text-sm font-heading font-medium text-foreground mb-1.5">Edad *</label>
+                  <select className={inputClass} value={onboardingData.ageRange} onChange={(e) => set("ageRange", e.target.value)}>
+                    <option value="">Seleccionar...</option>
+                    {ageRanges.map((a) => <option key={a} value={a}>{a}</option>)}
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {step === "step-2" && (
+            <div>
+              <h2 className="text-xl font-heading font-semibold text-foreground mb-1">Contexto Educativo</h2>
+              <p className="text-sm text-muted-foreground mb-6">Queremos conocer de dónde venís.</p>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-heading font-medium text-foreground mb-1.5">Departamento *</label>
+                  <select className={inputClass} value={onboardingData.department} onChange={(e) => set("department", e.target.value)}>
+                    <option value="">Seleccionar...</option>
+                    {departments.map((d) => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-heading font-medium text-foreground mb-1.5">Institución educativa *</label>
+                  <input className={inputClass} value={onboardingData.institution} onChange={(e) => set("institution", e.target.value)} placeholder="¿A qué liceo, UTU o facultad vas?" />
+                </div>
+                <div>
+                  <label className="block text-sm font-heading font-medium text-foreground mb-1.5">¿Cómo nos conociste? *</label>
+                  <select className={inputClass} value={onboardingData.howFoundUs} onChange={(e) => set("howFoundUs", e.target.value)}>
+                    <option value="">Seleccionar...</option>
+                    {howFoundOptions.map((o) => <option key={o} value={o}>{o}</option>)}
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {step === "step-3" && (
+            <div>
+              <h2 className="text-xl font-heading font-semibold text-foreground mb-1">Compromiso con el Movimiento</h2>
+              <p className="text-sm text-muted-foreground mb-6">¿Qué te trae acá?</p>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-heading font-medium text-foreground mb-3">¿Qué te interesa? * <span className="text-muted-foreground font-normal">(elegí una o más)</span></label>
+                  <div className="flex flex-wrap gap-2">
+                    {interestOptions.map((interest) => (
+                      <button key={interest} type="button" onClick={() => toggleInterest(interest)}
+                        className={`px-4 py-2.5 rounded-md border text-sm font-heading transition-colors ${
+                          onboardingData.interests.includes(interest)
+                            ? "bg-foreground text-background border-foreground"
+                            : "bg-background text-foreground border-border hover:bg-secondary"
+                        }`}>
+                        {interest}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 pt-2">
+                  <input type="checkbox" checked={onboardingData.acceptedTerms} onChange={(e) => set("acceptedTerms", e.target.checked)} className="mt-1 w-4 h-4" />
+                  <label className="text-sm text-muted-foreground">
+                    Acepto que InvertíUY es un movimiento educativo sin fines de lucro y acepto los términos de uso. *
+                  </label>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {error && <p className="text-destructive text-sm mt-4">{error}</p>}
+
+          <div className="flex items-center gap-3 mt-8">
+            {currentStepNumber > 1 && (
+              <Button variant="cta-outline" size="cta" onClick={() => setStep(currentStepNumber === 2 ? "step-1" : "step-2")}>
+                Atrás
+              </Button>
+            )}
+            {currentStepNumber < 3 ? (
+              <Button variant="cta" size="cta" className="flex-1" disabled={!canAdvanceStep()} onClick={() => setStep(currentStepNumber === 1 ? "step-2" : "step-3")}>
+                Siguiente
+              </Button>
+            ) : (
+              <Button variant="cta" size="cta" className="flex-1" disabled={!canAdvanceStep() || submitting} onClick={handleFinishOnboarding}>
+                {submitting && <Loader2 size={16} className="animate-spin" />}
+                Completar registro
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Login / Signup form
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-6">
       <div className="max-w-sm w-full">
@@ -90,17 +361,14 @@ const AuthPage = () => {
         </Link>
 
         <h1 className="text-2xl font-heading font-semibold text-foreground mb-1">
-          {mode === "login" ? "Iniciar sesión" : "Crear cuenta"}
+          {step === "login" ? "Iniciar sesión" : "Crear cuenta"}
         </h1>
         <p className="text-muted-foreground text-sm mb-8">
-          {mode === "login" ? "Ingresá a tu cuenta de InvertíUY." : "Registrate para acceder al programa."}
+          {step === "login" ? "Ingresá a tu cuenta de InvertíUY." : "Registrate para acceder al programa."}
         </p>
 
-        {/* Google Sign In */}
-        <button
-          onClick={handleGoogleLogin}
-          className="w-full h-12 rounded-md border border-border bg-background text-foreground text-sm font-heading font-medium flex items-center justify-center gap-3 hover:bg-secondary transition-colors mb-6"
-        >
+        <button onClick={handleGoogleLogin}
+          className="w-full h-12 rounded-md border border-border bg-background text-foreground text-sm font-heading font-medium flex items-center justify-center gap-3 hover:bg-secondary transition-colors mb-6">
           <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
             <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
             <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
@@ -116,8 +384,8 @@ const AuthPage = () => {
           <div className="flex-1 h-px bg-border" />
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {mode === "signup" && (
+        <form onSubmit={step === "login" ? handleLoginSubmit : handleSignupSubmit} className="space-y-4">
+          {step === "signup" && (
             <div>
               <label className="block text-sm font-heading font-medium text-foreground mb-1.5">Nombre</label>
               <input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} placeholder="Tu nombre" />
@@ -131,7 +399,7 @@ const AuthPage = () => {
             <label className="block text-sm font-heading font-medium text-foreground mb-1.5">Contraseña</label>
             <input type="password" className={inputClass} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={8} />
           </div>
-          {mode === "signup" && (
+          {step === "signup" && (
             <div>
               <label className="block text-sm font-heading font-medium text-foreground mb-1.5">Confirmar contraseña</label>
               <input type="password" className={inputClass} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="••••••••" required minLength={8} />
@@ -142,15 +410,15 @@ const AuthPage = () => {
 
           <Button type="submit" variant="cta" size="cta" className="w-full" disabled={submitting}>
             {submitting && <Loader2 size={16} className="animate-spin" />}
-            {mode === "login" ? "Entrar" : "Crear cuenta"}
+            {step === "login" ? "Entrar" : "Crear cuenta"}
           </Button>
         </form>
 
         <p className="text-sm text-muted-foreground text-center mt-6">
-          {mode === "login" ? (
-            <>¿No tenés cuenta? <button onClick={() => { setMode("signup"); setError(""); }} className="text-foreground font-medium hover:underline">Registrate</button></>
+          {step === "login" ? (
+            <>¿No tenés cuenta? <button onClick={() => { setStep("signup"); setError(""); }} className="text-foreground font-medium hover:underline">Registrate</button></>
           ) : (
-            <>¿Ya tenés cuenta? <button onClick={() => { setMode("login"); setError(""); }} className="text-foreground font-medium hover:underline">Iniciá sesión</button></>
+            <>¿Ya tenés cuenta? <button onClick={() => { setStep("login"); setError(""); }} className="text-foreground font-medium hover:underline">Iniciá sesión</button></>
           )}
         </p>
       </div>

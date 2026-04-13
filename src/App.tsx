@@ -17,7 +17,6 @@ import PartnersPage from "./pages/PartnersPage";
 import BrokersPage from "./pages/BrokersPage";
 import DashboardPage from "./pages/DashboardPage";
 import AuthPage from "./pages/AuthPage";
-import OnboardingFlow from "./pages/OnboardingFlow";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,26 +26,13 @@ const PublicPage = ({ children }: { children: React.ReactNode }) => (
 );
 
 const AppRoutes = () => {
-  const { isLoggedIn, user, loading } = useAuth();
+  const { isLoggedIn, loading } = useAuth();
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <span className="text-muted-foreground text-sm font-heading">Cargando...</span>
       </div>
-    );
-  }
-
-  // Logged in but hasn't completed onboarding
-  if (isLoggedIn && user && !user.onboardingCompleted) {
-    return (
-      <>
-        <Routes>
-          <Route path="/onboarding" element={<OnboardingFlow />} />
-          <Route path="*" element={<Navigate to="/onboarding" replace />} />
-        </Routes>
-        <WhatsAppButton />
-      </>
     );
   }
 
@@ -63,9 +49,8 @@ const AppRoutes = () => {
           <Route path="/recursos" element={<PublicPage><ResourcesPage /></PublicPage>} />
           <Route path="/partners" element={<PublicPage><PartnersPage /></PublicPage>} />
           <Route path="/brokers" element={<PublicPage><BrokersPage /></PublicPage>} />
-          <Route path="/auth" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/onboarding" element={<Navigate to="/dashboard" replace />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/auth" element={<AuthPage />} />
+          <Route path="*" element={<PublicPage><NotFound /></PublicPage>} />
         </Routes>
         <WhatsAppButton />
       </>
@@ -84,7 +69,7 @@ const AppRoutes = () => {
         <Route path="/recursos" element={<PublicPage><ResourcesPage /></PublicPage>} />
         <Route path="/partners" element={<PublicPage><PartnersPage /></PublicPage>} />
         <Route path="/brokers" element={<PublicPage><BrokersPage /></PublicPage>} />
-        <Route path="/dashboard" element={<Navigate to="/" replace />} />
+        <Route path="/dashboard" element={<Navigate to="/auth" replace />} />
         <Route path="*" element={<PublicPage><NotFound /></PublicPage>} />
       </Routes>
       <WhatsAppButton />
