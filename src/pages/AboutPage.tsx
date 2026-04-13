@@ -15,34 +15,32 @@ const team = [
 
 const AboutPage = () => (
   <>
-    {/* Mission */}
-    <section className="pt-32 md:pt-40 pb-20 bg-secondary">
+    <section className="pt-32 md:pt-40 pb-20">
       <div className="container">
         <SectionFade>
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary font-medium mb-6">
+          <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-6">
             Nuestra misión
           </p>
-          <h1 className="text-3xl md:text-5xl font-bold text-secondary-foreground max-w-4xl mb-8 leading-tight">
+          <h1 className="text-3xl md:text-5xl text-foreground max-w-4xl mb-8 leading-tight">
             Que cada joven en Uruguay pueda tomar decisiones financieras con criterio propio.
           </h1>
-          <p className="text-secondary-foreground/50 text-lg max-w-2xl leading-relaxed">
+          <p className="text-muted-foreground text-lg max-w-2xl leading-relaxed">
             Somos un grupo de jóvenes voluntarios que creemos que la educación financiera
-            no debería ser un privilegio. Por eso enseñamos análisis fundamental — gratis,
+            no debería ser un privilegio. Enseñamos análisis fundamental —
             presencial y en tu idioma.
           </p>
         </SectionFade>
       </div>
     </section>
 
-    {/* Our Story */}
-    <section className="py-24 md:py-32 bg-background">
+    <section className="py-24 md:py-32 border-y border-border">
       <div className="container">
         <div className="grid md:grid-cols-5 gap-16 items-start">
           <div className="md:col-span-3">
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary font-medium mb-4">
+            <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
               Nuestra historia
             </p>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-8">
+            <h2 className="text-3xl md:text-4xl text-foreground mb-8">
               Empezamos porque nadie más lo hacía
             </h2>
             <div className="space-y-4 text-muted-foreground text-lg leading-relaxed">
@@ -52,7 +50,7 @@ const AboutPage = () => (
                 estaban aún peor.
               </p>
               <p>
-                Decidieron armar clases gratuitas de análisis fundamental — la misma metodología que
+                Decidieron armar clases de análisis fundamental — la misma metodología que
                 usan inversores como Warren Buffett — adaptada para estudiantes de liceo sin
                 experiencia previa.
               </p>
@@ -65,34 +63,33 @@ const AboutPage = () => (
           </div>
           <div className="md:col-span-2">
             <div className="bg-secondary rounded-lg aspect-[3/4] flex items-center justify-center">
-              <span className="text-secondary-foreground/15 font-mono text-xs">[Foto del equipo]</span>
+              <span className="text-muted-foreground/30 text-xs font-heading">[Foto del equipo]</span>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    {/* Team */}
-    <section className="py-24 md:py-32 bg-card border-y border-border">
+    <section className="py-24 md:py-32">
       <div className="container">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary font-medium mb-4">
+        <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
           El equipo
         </p>
-        <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-12">
+        <h2 className="text-3xl md:text-4xl text-foreground mb-12">
           Jóvenes que enseñan a jóvenes
         </h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border">
           {team.map((m) => (
-            <div key={m.name} className="bg-card p-8">
-              <div className="w-12 h-12 rounded-full bg-secondary/10 mb-4 flex items-center justify-center">
-                <span className="font-heading font-bold text-foreground text-sm">
+            <div key={m.name} className="bg-background p-8">
+              <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mb-4">
+                <span className="font-heading font-semibold text-foreground text-sm">
                   {m.name.split(" ").map(n => n[0]).join("")}
                 </span>
               </div>
-              <h3 className="font-heading font-bold text-foreground text-lg">{m.name}</h3>
-              <span className="text-primary text-sm font-medium">{m.role}</span>
+              <h3 className="font-heading font-semibold text-foreground text-lg">{m.name}</h3>
+              <span className="text-muted-foreground text-sm">{m.role}</span>
               <p className="text-muted-foreground text-sm mt-3 leading-relaxed">{m.bio}</p>
-              <a href="#" className="inline-flex items-center gap-1 text-muted-foreground/40 hover:text-primary text-sm mt-3 transition-colors">
+              <a href="#" className="inline-flex items-center gap-1 text-muted-foreground/40 hover:text-foreground text-sm mt-3 transition-colors">
                 <Linkedin size={14} /> LinkedIn
               </a>
             </div>
@@ -106,10 +103,9 @@ const AboutPage = () => (
       </div>
     </section>
 
-    {/* Values */}
-    <section className="py-24 md:py-32 bg-background">
+    <section className="py-24 md:py-32 border-y border-border">
       <div className="container max-w-3xl">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary font-medium mb-4">
+        <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
           Nuestros valores
         </p>
         <div className="space-y-0 divide-y divide-border">
@@ -120,7 +116,7 @@ const AboutPage = () => (
             { title: "Impacto local", desc: "Empezamos en Montevideo, con la visión de llegar a todo Uruguay." },
           ].map((v) => (
             <div key={v.title} className="py-6 first:pt-0 last:pb-0">
-              <h3 className="font-heading font-bold text-foreground text-lg mb-1">{v.title}</h3>
+              <h3 className="font-heading font-semibold text-foreground text-lg mb-1">{v.title}</h3>
               <p className="text-muted-foreground leading-relaxed">{v.desc}</p>
             </div>
           ))}
@@ -128,13 +124,12 @@ const AboutPage = () => (
       </div>
     </section>
 
-    {/* Impact */}
-    <section className="py-24 md:py-32 bg-secondary">
+    <section className="py-24 md:py-32">
       <div className="container">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary font-medium mb-4">
+        <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
           Nuestro impacto
         </p>
-        <h2 className="text-3xl md:text-4xl font-bold text-secondary-foreground mb-12">
+        <h2 className="text-3xl md:text-4xl text-foreground mb-12">
           Números que importan
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
@@ -145,10 +140,10 @@ const AboutPage = () => (
             { value: 3, label: "Liceos visitados" },
           ].map((s) => (
             <div key={s.label}>
-              <div className="text-4xl md:text-5xl font-heading font-bold text-primary mb-2">
+              <div className="text-4xl md:text-5xl font-heading font-semibold text-foreground mb-2">
                 <AnimatedCounter end={s.value} suffix={s.suffix} />
               </div>
-              <div className="text-secondary-foreground/40 text-sm">{s.label}</div>
+              <div className="text-muted-foreground text-sm">{s.label}</div>
             </div>
           ))}
         </div>

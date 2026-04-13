@@ -2,11 +2,11 @@ import SectionFade from "@/components/SectionFade";
 import { BookOpen, FileText, Play, Clock, ExternalLink } from "lucide-react";
 
 const resources = [
-  { title: "Guía: Cómo leer un Income Statement", type: "PDF", category: "Lectura de Estados Financieros", time: "10 min", icon: FileText },
+  { title: "Guía: Cómo leer un Income Statement", type: "PDF", category: "Estados Financieros", time: "10 min", icon: FileText },
   { title: "¿Qué es el P/E ratio?", type: "Artículo", category: "Conceptos Básicos", time: "5 min", icon: BookOpen },
   { title: "Caso de estudio: Análisis de Apple", type: "Video", category: "Casos de Estudio", time: "15 min", icon: Play },
   { title: "Plantilla de análisis fundamental", type: "PDF", category: "Análisis Fundamental", time: "—", icon: FileText },
-  { title: "El Balance Sheet explicado simple", type: "Artículo", category: "Lectura de Estados Financieros", time: "8 min", icon: BookOpen },
+  { title: "El Balance Sheet explicado simple", type: "Artículo", category: "Estados Financieros", time: "8 min", icon: BookOpen },
   { title: "Introducción al DCF", type: "Video", category: "Análisis Fundamental", time: "20 min", icon: Play },
 ];
 
@@ -27,37 +27,36 @@ const books = [
 
 const ResourcesPage = () => (
   <>
-    <section className="pt-32 md:pt-40 pb-20 bg-secondary">
+    <section className="pt-32 md:pt-40 pb-20">
       <div className="container">
         <SectionFade>
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary font-medium mb-6">
+          <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-6">
             Recursos
           </p>
-          <h1 className="text-3xl md:text-5xl font-bold text-secondary-foreground max-w-3xl mb-6">
+          <h1 className="text-3xl md:text-5xl text-foreground max-w-3xl mb-6">
             Aprendé a tu ritmo
           </h1>
-          <p className="text-secondary-foreground/50 text-lg max-w-xl">
+          <p className="text-muted-foreground text-lg max-w-xl">
             Guías, artículos, videos y herramientas para profundizar en análisis fundamental.
           </p>
         </SectionFade>
       </div>
     </section>
 
-    {/* Resource Library */}
-    <section className="py-24 md:py-32 bg-background">
+    <section className="py-24 md:py-32 border-y border-border">
       <div className="container">
-        <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-10">Biblioteca de recursos</h2>
+        <h2 className="text-2xl md:text-3xl text-foreground mb-10 font-heading">Biblioteca de recursos</h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border rounded-lg overflow-hidden">
           {resources.map((r) => (
-            <div key={r.title} className="bg-card p-6 hover:bg-background transition-colors group flex flex-col">
+            <div key={r.title} className="bg-background p-6 hover:bg-secondary transition-colors group flex flex-col">
               <div className="flex items-center gap-2 mb-4">
-                <span className="font-mono text-xs uppercase text-primary bg-primary/10 px-2 py-0.5 rounded">{r.type}</span>
-                <span className="font-mono text-xs text-muted-foreground">{r.category}</span>
+                <span className="text-xs uppercase text-foreground font-heading font-medium border border-border px-2 py-0.5 rounded">{r.type}</span>
+                <span className="text-xs text-muted-foreground font-heading">{r.category}</span>
               </div>
-              <h3 className="font-heading font-bold text-foreground mb-2 flex-1">{r.title}</h3>
+              <h3 className="font-heading font-semibold text-foreground mb-2 flex-1">{r.title}</h3>
               <div className="flex items-center justify-between mt-4">
                 <span className="flex items-center gap-1 text-muted-foreground text-xs"><Clock size={12} /> {r.time}</span>
-                <span className="text-primary text-sm font-medium group-hover:underline cursor-pointer flex items-center gap-1">
+                <span className="text-foreground text-sm font-heading font-medium group-hover:underline cursor-pointer flex items-center gap-1">
                   Ver recurso <ExternalLink size={12} />
                 </span>
               </div>
@@ -67,19 +66,18 @@ const ResourcesPage = () => (
       </div>
     </section>
 
-    {/* Glossary */}
-    <section className="py-24 md:py-32 bg-card border-y border-border">
+    <section className="py-24 md:py-32">
       <div className="container max-w-3xl">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary font-medium mb-4">
+        <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
           Glosario
         </p>
-        <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-10">
+        <h2 className="text-2xl md:text-3xl text-foreground mb-10 font-heading">
           Términos financieros en simple
         </h2>
         <div className="divide-y divide-border">
           {glossary.map((g) => (
             <div key={g.term} className="py-6 first:pt-0 last:pb-0">
-              <h3 className="font-heading font-bold text-foreground text-lg mb-1">{g.term}</h3>
+              <h3 className="font-heading font-semibold text-foreground text-lg mb-1">{g.term}</h3>
               <p className="text-muted-foreground leading-relaxed">{g.def}</p>
             </div>
           ))}
@@ -87,23 +85,22 @@ const ResourcesPage = () => (
       </div>
     </section>
 
-    {/* Recommended Reading */}
-    <section className="py-24 md:py-32 bg-background">
+    <section className="py-24 md:py-32 border-t border-border">
       <div className="container max-w-3xl">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary font-medium mb-4">
+        <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
           Lectura recomendada
         </p>
-        <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-10">
+        <h2 className="text-2xl md:text-3xl text-foreground mb-10 font-heading">
           Libros que cambian tu perspectiva
         </h2>
         <div className="divide-y divide-border">
           {books.map((b) => (
             <div key={b.title} className="py-6 first:pt-0 last:pb-0 flex gap-6 items-start">
-              <div className="w-16 h-20 bg-secondary/10 rounded flex-shrink-0 flex items-center justify-center">
+              <div className="w-16 h-20 bg-secondary rounded flex-shrink-0 flex items-center justify-center">
                 <BookOpen size={20} className="text-muted-foreground/30" />
               </div>
               <div>
-                <h3 className="font-heading font-bold text-foreground">{b.title}</h3>
+                <h3 className="font-heading font-semibold text-foreground">{b.title}</h3>
                 <p className="text-muted-foreground text-sm mb-1">{b.author}</p>
                 <p className="text-muted-foreground text-sm leading-relaxed">{b.pitch}</p>
               </div>
