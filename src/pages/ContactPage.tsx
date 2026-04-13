@@ -94,8 +94,8 @@ const ContactPage = () => {
                 <a href="https://linkedin.com/company/invertiuy" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
                   <Linkedin size={18} /> InvertíUY
                 </a>
-                <a href="https://wa.me/598000000" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
-                  <MessageCircle size={18} /> WhatsApp
+                <a href="https://chat.whatsapp.com/LIyfas9fhGUJzpv62LJTWg?mode=gi_t" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
+                  <MessageCircle size={18} /> Grupo de WhatsApp
                 </a>
               </div>
             </div>
