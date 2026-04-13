@@ -16,12 +16,21 @@ import ResourcesPage from "./pages/ResourcesPage";
 import PartnersPage from "./pages/PartnersPage";
 import BrokersPage from "./pages/BrokersPage";
 import DashboardPage from "./pages/DashboardPage";
+import AuthPage from "./pages/AuthPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const AppRoutes = () => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <span className="text-muted-foreground text-sm font-heading">Cargando...</span>
+      </div>
+    );
+  }
 
   if (isLoggedIn) {
     return (
@@ -36,6 +45,7 @@ const AppRoutes = () => {
           <Route path="/recursos" element={<><Navbar /><main><ResourcesPage /></main><Footer /></>} />
           <Route path="/partners" element={<><Navbar /><main><PartnersPage /></main><Footer /></>} />
           <Route path="/brokers" element={<><Navbar /><main><BrokersPage /></main><Footer /></>} />
+          <Route path="/auth" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
         <WhatsAppButton />
@@ -45,22 +55,19 @@ const AppRoutes = () => {
 
   return (
     <>
-      <Navbar />
-      <main>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/nosotros" element={<AboutPage />} />
-          <Route path="/programa" element={<ProgramPage />} />
-          <Route path="/registro" element={<RegisterPage />} />
-          <Route path="/contacto" element={<ContactPage />} />
-          <Route path="/recursos" element={<ResourcesPage />} />
-          <Route path="/partners" element={<PartnersPage />} />
-          <Route path="/brokers" element={<BrokersPage />} />
-          <Route path="/dashboard" element={<Navigate to="/" replace />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </main>
-      <Footer />
+      <Routes>
+        <Route path="/" element={<><Navbar /><main><Index /></main><Footer /></>} />
+        <Route path="/auth" element={<AuthPage />} />
+        <Route path="/nosotros" element={<><Navbar /><main><AboutPage /></main><Footer /></>} />
+        <Route path="/programa" element={<><Navbar /><main><ProgramPage /></main><Footer /></>} />
+        <Route path="/registro" element={<><Navbar /><main><RegisterPage /></main><Footer /></>} />
+        <Route path="/contacto" element={<><Navbar /><main><ContactPage /></main><Footer /></>} />
+        <Route path="/recursos" element={<><Navbar /><main><ResourcesPage /></main><Footer /></>} />
+        <Route path="/partners" element={<><Navbar /><main><PartnersPage /></main><Footer /></>} />
+        <Route path="/brokers" element={<><Navbar /><main><BrokersPage /></main><Footer /></>} />
+        <Route path="/dashboard" element={<Navigate to="/auth" replace />} />
+        <Route path="*" element={<><Navbar /><main><NotFound /></main><Footer /></>} />
+      </Routes>
       <WhatsAppButton />
     </>
   );
