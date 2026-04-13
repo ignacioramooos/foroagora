@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 const navLinks = [
   { label: "Nosotros", path: "/nosotros" },
-  { label: "El Programa", path: "/programa" },
+  { label: "Programa", path: "/programa" },
   { label: "Recursos", path: "/recursos" },
   { label: "Partners", path: "/partners" },
   { label: "Contacto", path: "/contacto" },
@@ -27,12 +27,12 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-200 ${
-          scrolled ? "bg-secondary shadow-md" : "bg-secondary/80 backdrop-blur-sm"
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 bg-background ${
+          scrolled ? "border-b border-border" : ""
         }`}
       >
         <div className="container flex items-center justify-between h-16">
-          <Link to="/" className="text-lg font-heading font-bold tracking-tight text-secondary-foreground">
+          <Link to="/" className="text-lg font-heading font-semibold tracking-tight text-foreground">
             InvertíUY
           </Link>
 
@@ -41,8 +41,8 @@ const Navbar = () => {
               <Link
                 key={l.path}
                 to={l.path}
-                className={`text-sm font-medium transition-colors ${
-                  location.pathname === l.path ? "text-primary" : "text-secondary-foreground/60 hover:text-secondary-foreground"
+                className={`text-sm font-heading font-medium transition-colors ${
+                  location.pathname === l.path ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {l.label}
@@ -52,13 +52,13 @@ const Navbar = () => {
 
           <div className="hidden md:block">
             <Button asChild variant="cta" size="sm">
-              <Link to="/registro">Anotate gratis</Link>
+              <Link to="/registro">Inscribite</Link>
             </Button>
           </div>
 
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden text-secondary-foreground p-2 -mr-2"
+            className="md:hidden text-foreground p-2 -mr-2"
             aria-label="Menu"
           >
             {mobileOpen ? <X size={24} /> : <Menu size={24} />}
@@ -66,16 +66,15 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Mobile overlay */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 bg-secondary flex flex-col pt-20 pb-8 px-6 md:hidden">
+        <div className="fixed inset-0 z-40 bg-background flex flex-col pt-20 pb-8 px-6 md:hidden">
           <div className="flex flex-col gap-6 flex-1">
             {navLinks.map((l) => (
               <Link
                 key={l.path}
                 to={l.path}
                 className={`text-2xl font-heading font-semibold transition-colors ${
-                  location.pathname === l.path ? "text-primary" : "text-secondary-foreground"
+                  location.pathname === l.path ? "text-foreground" : "text-muted-foreground"
                 }`}
               >
                 {l.label}
@@ -83,7 +82,7 @@ const Navbar = () => {
             ))}
           </div>
           <Button asChild variant="cta" size="cta" className="w-full">
-            <Link to="/registro">Anotate gratis</Link>
+            <Link to="/registro">Inscribite</Link>
           </Button>
         </div>
       )}

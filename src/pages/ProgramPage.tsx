@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import SectionFade from "@/components/SectionFade";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ArrowRight, AlertCircle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 const modules = [
   { id: "m1", title: "Módulo 1: ¿Qué es una acción y por qué importa?", desc: "Entendé qué representa una acción, cómo funcionan los mercados de valores y por qué invertir importa para tu futuro.", duration: "2 horas · Presencial" },
@@ -15,49 +15,44 @@ const modules = [
 
 const ProgramPage = () => (
   <>
-    {/* Header */}
-    <section className="pt-32 md:pt-40 pb-20 bg-secondary">
+    <section className="pt-32 md:pt-40 pb-20">
       <div className="container">
         <SectionFade>
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary font-medium mb-6">
+          <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-6">
             El programa
           </p>
-          <h1 className="text-3xl md:text-5xl font-bold text-secondary-foreground max-w-3xl mb-8 leading-tight">
+          <h1 className="text-3xl md:text-5xl text-foreground max-w-3xl mb-8 leading-tight">
             Un programa diseñado para que entiendas el mercado de verdad
           </h1>
         </SectionFade>
         <SectionFade delay={0.1}>
-          <div className="bg-secondary-foreground/5 border border-secondary-foreground/10 rounded-lg p-6 md:p-8 max-w-3xl">
-            <div className="flex gap-3 items-start">
-              <AlertCircle size={20} className="text-destructive mt-0.5 shrink-0" />
-              <p className="text-secondary-foreground/60 leading-relaxed">
-                <strong className="text-secondary-foreground">No enseñamos trading ni especulación.</strong>{" "}
-                Enseñamos análisis fundamental: la misma metodología que usan los mejores inversores del mundo.
-              </p>
-            </div>
+          <div className="border border-border rounded-lg p-6 md:p-8 max-w-3xl">
+            <p className="text-muted-foreground leading-relaxed">
+              <strong className="text-foreground">No enseñamos trading ni especulación.</strong>{" "}
+              Enseñamos análisis fundamental: la misma metodología que usan los mejores inversores del mundo.
+            </p>
           </div>
         </SectionFade>
       </div>
     </section>
 
-    {/* Curriculum */}
-    <section className="py-24 md:py-32 bg-background">
+    <section className="py-24 md:py-32 border-y border-border">
       <div className="container max-w-3xl">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary font-medium mb-4">
+        <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
           Programa de estudio
         </p>
-        <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-10">
+        <h2 className="text-3xl md:text-4xl text-foreground mb-10">
           6 módulos. Todo lo esencial.
         </h2>
         <Accordion type="single" collapsible className="space-y-2">
           {modules.map((m) => (
-            <AccordionItem key={m.id} value={m.id} className="bg-card border border-border rounded-lg px-6 overflow-hidden">
-              <AccordionTrigger className="text-left font-heading font-bold text-foreground hover:no-underline py-5">
+            <AccordionItem key={m.id} value={m.id} className="border border-border rounded-lg px-6 overflow-hidden">
+              <AccordionTrigger className="text-left font-heading font-semibold text-foreground hover:no-underline py-5">
                 {m.title}
               </AccordionTrigger>
               <AccordionContent className="pb-5">
                 <p className="text-muted-foreground leading-relaxed mb-2">{m.desc}</p>
-                <span className="font-mono text-xs text-primary">{m.duration}</span>
+                <span className="text-xs text-muted-foreground font-heading">{m.duration}</span>
               </AccordionContent>
             </AccordionItem>
           ))}
@@ -65,47 +60,45 @@ const ProgramPage = () => (
       </div>
     </section>
 
-    {/* Format */}
-    <section className="py-24 md:py-32 bg-card border-y border-border">
+    <section className="py-24 md:py-32">
       <div className="container max-w-3xl">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary font-medium mb-4">
+        <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
           Formato
         </p>
-        <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-10">
-          Modalidad presencial + comunidad online
+        <h2 className="text-3xl md:text-4xl text-foreground mb-10">
+          Presencial + comunidad online
         </h2>
         <div className="grid md:grid-cols-2 gap-px bg-border rounded-lg overflow-hidden">
-          <div className="bg-card p-8">
-            <h3 className="font-heading font-bold text-foreground text-lg mb-4">Clases presenciales</h3>
+          <div className="bg-background p-8">
+            <h3 className="font-heading font-semibold text-foreground text-lg mb-4">Clases presenciales</h3>
             <ul className="space-y-3 text-muted-foreground text-sm">
-              <li>📍 Montevideo, Centro</li>
-              <li>📅 Sábados, 10:00 – 12:00</li>
-              <li>⏱️ 6 sesiones (1 por módulo)</li>
-              <li>💰 100% gratuito</li>
+              <li>Montevideo, Centro</li>
+              <li>Sábados, 10:00 – 12:00</li>
+              <li>6 sesiones (1 por módulo)</li>
+              <li>Sin costo</li>
             </ul>
           </div>
-          <div className="bg-card p-8">
-            <h3 className="font-heading font-bold text-foreground text-lg mb-4">Recursos online</h3>
+          <div className="bg-background p-8">
+            <h3 className="font-heading font-semibold text-foreground text-lg mb-4">Recursos online</h3>
             <ul className="space-y-3 text-muted-foreground text-sm">
-              <li>📹 Contenido grabado de cada clase</li>
-              <li>📄 Material de lectura complementario</li>
-              <li>💬 Comunidad de estudiantes</li>
-              <li>📊 Plantillas de análisis</li>
+              <li>Contenido grabado de cada clase</li>
+              <li>Material de lectura complementario</li>
+              <li>Comunidad de estudiantes</li>
+              <li>Plantillas de análisis</li>
             </ul>
           </div>
         </div>
       </div>
     </section>
 
-    {/* Who is this for */}
-    <section className="py-24 md:py-32 bg-background">
+    <section className="py-24 md:py-32 border-y border-border">
       <div className="container max-w-3xl">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary font-medium mb-4">
+        <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
           ¿Es para vos?
         </p>
         <div className="space-y-8">
-          <div className="border-l-2 border-primary pl-8">
-            <h3 className="font-heading font-bold text-foreground text-lg mb-3">Ideal si sos...</h3>
+          <div className="border-l border-foreground pl-8">
+            <h3 className="font-heading font-semibold text-foreground text-lg mb-3">Ideal si sos...</h3>
             <ul className="space-y-1 text-muted-foreground">
               <li>Estudiante de liceo (15–18 años)</li>
               <li>Curioso/a sobre inversiones</li>
@@ -113,8 +106,8 @@ const ProgramPage = () => (
               <li>De Montevideo o alrededores</li>
             </ul>
           </div>
-          <div className="border-l-2 border-border pl-8">
-            <h3 className="font-heading font-bold text-foreground text-lg mb-3">También si sos...</h3>
+          <div className="border-l border-border pl-8">
+            <h3 className="font-heading font-semibold text-foreground text-lg mb-3">También si sos...</h3>
             <ul className="space-y-1 text-muted-foreground">
               <li>Estudiante universitario/a</li>
               <li>Joven profesional (18–25)</li>
@@ -122,8 +115,8 @@ const ProgramPage = () => (
               <li>De otro departamento (recursos online)</li>
             </ul>
           </div>
-          <div className="border-l-2 border-destructive/30 pl-8">
-            <h3 className="font-heading font-bold text-foreground text-lg mb-3">No es para vos si...</h3>
+          <div className="border-l border-border pl-8">
+            <h3 className="font-heading font-semibold text-foreground text-lg mb-3">No es para vos si...</h3>
             <ul className="space-y-1 text-muted-foreground">
               <li>Buscás tips de trading</li>
               <li>Querés "hacerte rico rápido"</li>
@@ -135,22 +128,19 @@ const ProgramPage = () => (
       </div>
     </section>
 
-    {/* CTA */}
-    <section className="py-24 md:py-32 bg-secondary">
+    <section className="py-24 md:py-32">
       <div className="container">
-        <SectionFade>
-          <div className="max-w-2xl">
-            <h2 className="text-3xl md:text-5xl font-bold text-secondary-foreground mb-6 leading-tight">
-              ¿Listo para aprender a invertir?
-            </h2>
-            <p className="text-secondary-foreground/40 mb-10 text-lg">
-              Tu lugar te está esperando. Es gratis, es presencial, es ahora.
-            </p>
-            <Button asChild variant="cta" size="cta">
-              <Link to="/registro">Anotate gratis <ArrowRight size={18} /></Link>
-            </Button>
-          </div>
-        </SectionFade>
+        <div className="max-w-2xl">
+          <h2 className="text-3xl md:text-5xl text-foreground mb-6 leading-tight">
+            ¿Listo para aprender a invertir?
+          </h2>
+          <p className="text-muted-foreground mb-10 text-lg">
+            Tu lugar te está esperando.
+          </p>
+          <Button asChild variant="cta" size="cta">
+            <Link to="/registro">Inscribite <ArrowRight size={16} /></Link>
+          </Button>
+        </div>
       </div>
     </section>
   </>

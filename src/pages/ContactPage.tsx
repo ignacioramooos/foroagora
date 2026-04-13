@@ -5,11 +5,11 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Mail, Instagram, Linkedin, MessageCircle, CheckCircle2 } from "lucide-react";
 
 const faqs = [
-  { q: "¿Es realmente gratis?", a: "Sí, 100% gratuito. No hay costos ocultos, ni suscripciones, ni pagos de ningún tipo. Somos una iniciativa sin fines de lucro financiada por voluntarios." },
-  { q: "¿Necesito saber de economía?", a: "No. El programa está diseñado para personas sin ningún conocimiento previo. Empezamos desde cero y avanzamos paso a paso." },
-  { q: "¿Puedo participar si soy de otro departamento?", a: "Las clases presenciales son en Montevideo, pero ofrecemos acceso a recursos online y comunidad virtual para participantes de cualquier parte de Uruguay." },
-  { q: "¿Qué edad tengo que tener?", a: "El programa está diseñado para estudiantes de 15 a 25 años, pero aceptamos participantes de cualquier edad que tengan ganas de aprender." },
-  { q: "¿Van a enseñarme a hacer trading?", a: "No. Enseñamos análisis fundamental: cómo entender y evaluar empresas. No damos señales de compra/venta ni enseñamos especulación." },
+  { q: "¿Es realmente gratis?", a: "Sí. No hay costos ocultos ni suscripciones. Somos una iniciativa sin fines de lucro." },
+  { q: "¿Necesito saber de economía?", a: "No. El programa está diseñado para personas sin ningún conocimiento previo. Empezamos desde cero." },
+  { q: "¿Puedo participar si soy de otro departamento?", a: "Las clases presenciales son en Montevideo, pero ofrecemos acceso a recursos online para participantes de cualquier parte de Uruguay." },
+  { q: "¿Qué edad tengo que tener?", a: "El programa está diseñado para estudiantes de 15 a 25 años, pero aceptamos participantes de cualquier edad." },
+  { q: "¿Van a enseñarme a hacer trading?", a: "No. Enseñamos análisis fundamental: cómo entender y evaluar empresas. No damos señales de compra/venta." },
 ];
 
 const ContactPage = () => {
@@ -21,49 +21,48 @@ const ContactPage = () => {
     if (form.name && form.email && form.message) setSent(true);
   };
 
-  const inputClass = "w-full h-12 px-4 rounded-lg border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow";
+  const inputClass = "w-full h-12 px-4 rounded-md border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring/50 transition-shadow font-heading";
 
   return (
     <>
-      <section className="pt-32 md:pt-40 pb-20 bg-secondary">
+      <section className="pt-32 md:pt-40 pb-20">
         <div className="container">
           <SectionFade>
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary font-medium mb-6">
+            <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-6">
               Contacto
             </p>
-            <h1 className="text-3xl md:text-5xl font-bold text-secondary-foreground max-w-2xl mb-6">
+            <h1 className="text-3xl md:text-5xl text-foreground max-w-2xl mb-6">
               Hablemos
             </h1>
-            <p className="text-secondary-foreground/50 text-lg max-w-xl">
+            <p className="text-muted-foreground text-lg max-w-xl">
               ¿Tenés preguntas, ideas o querés colaborar? Escribinos.
             </p>
           </SectionFade>
         </div>
       </section>
 
-      <section className="py-24 md:py-32 bg-background">
+      <section className="py-24 md:py-32 border-y border-border">
         <div className="container max-w-4xl">
           <div className="grid md:grid-cols-5 gap-16">
-            {/* Form */}
             <div className="md:col-span-3">
               {sent ? (
                 <div className="text-center py-12">
-                  <CheckCircle2 size={40} className="text-primary mx-auto mb-4" />
-                  <h3 className="font-heading font-bold text-foreground text-xl mb-2">¡Mensaje enviado!</h3>
+                  <CheckCircle2 size={40} className="text-foreground mx-auto mb-4" />
+                  <h3 className="font-heading font-semibold text-foreground text-xl mb-2">Mensaje enviado</h3>
                   <p className="text-muted-foreground">Te respondemos lo antes posible.</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-1.5">Nombre</label>
+                    <label className="block text-sm font-heading font-medium text-foreground mb-1.5">Nombre</label>
                     <input className={inputClass} value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} required />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-1.5">Email</label>
+                    <label className="block text-sm font-heading font-medium text-foreground mb-1.5">Email</label>
                     <input type="email" className={inputClass} value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} required />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-1.5">Mensaje</label>
+                    <label className="block text-sm font-heading font-medium text-foreground mb-1.5">Mensaje</label>
                     <textarea className={`${inputClass} h-32 py-3 resize-none`} value={form.message} onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))} required />
                   </div>
                   <Button type="submit" variant="cta" size="cta" className="w-full">Enviar mensaje</Button>
@@ -71,20 +70,19 @@ const ContactPage = () => {
               )}
             </div>
 
-            {/* Contact info */}
             <div className="md:col-span-2">
-              <h3 className="font-heading font-bold text-foreground text-lg mb-6">También podés encontrarnos en:</h3>
+              <h3 className="font-heading font-semibold text-foreground text-lg mb-6">También podés encontrarnos en:</h3>
               <div className="space-y-4">
-                <a href="mailto:hola@invertiuy.org" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
+                <a href="mailto:hola@invertiuy.org" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
                   <Mail size={18} /> hola@invertiuy.org
                 </a>
-                <a href="https://instagram.com/invertiuy" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
+                <a href="https://instagram.com/invertiuy" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
                   <Instagram size={18} /> @invertiuy
                 </a>
-                <a href="https://linkedin.com/company/invertiuy" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
+                <a href="https://linkedin.com/company/invertiuy" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
                   <Linkedin size={18} /> InvertíUY
                 </a>
-                <a href="https://wa.me/598000000" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors">
+                <a href="https://wa.me/598000000" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
                   <MessageCircle size={18} /> WhatsApp
                 </a>
               </div>
@@ -93,17 +91,16 @@ const ContactPage = () => {
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="py-24 md:py-32 bg-card border-t border-border">
+      <section className="py-24 md:py-32">
         <div className="container max-w-3xl">
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary font-medium mb-4">
+          <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
             Preguntas frecuentes
           </p>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-10">FAQ</h2>
+          <h2 className="text-3xl md:text-4xl text-foreground mb-10 font-heading">FAQ</h2>
           <Accordion type="single" collapsible className="space-y-2">
             {faqs.map((f, i) => (
-              <AccordionItem key={i} value={`faq-${i}`} className="bg-background border border-border rounded-lg px-6 overflow-hidden">
-                <AccordionTrigger className="text-left font-heading font-bold text-foreground hover:no-underline py-5">
+              <AccordionItem key={i} value={`faq-${i}`} className="border border-border rounded-lg px-6 overflow-hidden">
+                <AccordionTrigger className="text-left font-heading font-semibold text-foreground hover:no-underline py-5">
                   {f.q}
                 </AccordionTrigger>
                 <AccordionContent className="pb-5 text-muted-foreground leading-relaxed">
