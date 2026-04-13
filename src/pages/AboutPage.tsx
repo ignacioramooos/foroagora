@@ -3,14 +3,12 @@ import { Button } from "@/components/ui/button";
 import SectionFade from "@/components/SectionFade";
 import AnimatedCounter from "@/components/AnimatedCounter";
 import { Linkedin } from "lucide-react";
+import teamIgnacio from "@/assets/team-ignacio.jpeg";
+import teamNicolas from "@/assets/team-nicolas.jpeg";
 
 const team = [
-  { name: "Santiago Pérez", role: "Fundador & Director", bio: "Estudiante de Economía, UdelaR. Apasionado por democratizar las finanzas." },
-  { name: "Lucía Fernández", role: "Coordinadora Académica", bio: "Estudiante de Contabilidad. Traduce estados financieros a lenguaje humano." },
-  { name: "Mateo Rodríguez", role: "Instructor Principal", bio: "Estudiante de Ingeniería. Fan del análisis fundamental y los modelos DCF." },
-  { name: "Isabella García", role: "Comunicación & Redes", bio: "Estudiante de Comunicación. Convierte conceptos financieros en contenido accesible." },
-  { name: "Tomás Silva", role: "Instructor", bio: "Estudiante de Administración. Especialista en lectura de balances." },
-  { name: "Valentina López", role: "Operaciones", bio: "Estudiante de Derecho. Gestiona alianzas institucionales y logística." },
+  { name: "Juan Ignacio Ramos", age: 18, role: "Co-fundador", bio: "Apasionado por las finanzas y la educación. Lidera la visión y estrategia de InvertíUY.", photo: teamIgnacio },
+  { name: "Nicolás Sales", age: 17, role: "Co-fundador & Instructor", bio: "El que sabe. Especialista en análisis fundamental y mercados financieros.", photo: teamNicolas },
 ];
 
 const AboutPage = () => (
