@@ -7,8 +7,8 @@ import teamIgnacio from "@/assets/team-ignacio.jpeg";
 import teamNicolas from "@/assets/team-nicolas.jpeg";
 
 const team = [
-  { name: "Juan Ignacio Ramos", age: 18, role: "Co-fundador", bio: "Apasionado por las finanzas y la educación. Lidera la visión y estrategia de InvertíUY.", photo: teamIgnacio },
   { name: "Nicolás Sales", age: 17, role: "Co-fundador & Instructor", bio: "El que sabe. Especialista en análisis fundamental y mercados financieros.", photo: teamNicolas },
+  { name: "Juan Ignacio Ramos", age: 18, role: "Co-fundador", bio: "Apasionado por las finanzas y la educación. Lidera la visión y estrategia de InvertíUY.", photo: teamIgnacio },
 ];
 
 const AboutPage = () => (
