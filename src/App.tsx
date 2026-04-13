@@ -17,12 +17,17 @@ import PartnersPage from "./pages/PartnersPage";
 import BrokersPage from "./pages/BrokersPage";
 import DashboardPage from "./pages/DashboardPage";
 import AuthPage from "./pages/AuthPage";
+import OnboardingFlow from "./pages/OnboardingFlow";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const PublicPage = ({ children }: { children: React.ReactNode }) => (
+  <><Navbar /><main>{children}</main><Footer /></>
+);
+
 const AppRoutes = () => {
-  const { isLoggedIn, loading } = useAuth();
+  const { isLoggedIn, user, loading } = useAuth();
 
   if (loading) {
     return (
@@ -32,20 +37,34 @@ const AppRoutes = () => {
     );
   }
 
+  // Logged in but hasn't completed onboarding
+  if (isLoggedIn && user && !user.onboardingCompleted) {
+    return (
+      <>
+        <Routes>
+          <Route path="/onboarding" element={<OnboardingFlow />} />
+          <Route path="*" element={<Navigate to="/onboarding" replace />} />
+        </Routes>
+        <WhatsAppButton />
+      </>
+    );
+  }
+
   if (isLoggedIn) {
     return (
       <>
         <Routes>
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/" element={<><Navbar /><main><Index /></main><Footer /></>} />
-          <Route path="/nosotros" element={<><Navbar /><main><AboutPage /></main><Footer /></>} />
-          <Route path="/programa" element={<><Navbar /><main><ProgramPage /></main><Footer /></>} />
-          <Route path="/registro" element={<><Navbar /><main><RegisterPage /></main><Footer /></>} />
-          <Route path="/contacto" element={<><Navbar /><main><ContactPage /></main><Footer /></>} />
-          <Route path="/recursos" element={<><Navbar /><main><ResourcesPage /></main><Footer /></>} />
-          <Route path="/partners" element={<><Navbar /><main><PartnersPage /></main><Footer /></>} />
-          <Route path="/brokers" element={<><Navbar /><main><BrokersPage /></main><Footer /></>} />
+          <Route path="/" element={<PublicPage><Index /></PublicPage>} />
+          <Route path="/nosotros" element={<PublicPage><AboutPage /></PublicPage>} />
+          <Route path="/programa" element={<PublicPage><ProgramPage /></PublicPage>} />
+          <Route path="/registro" element={<PublicPage><RegisterPage /></PublicPage>} />
+          <Route path="/contacto" element={<PublicPage><ContactPage /></PublicPage>} />
+          <Route path="/recursos" element={<PublicPage><ResourcesPage /></PublicPage>} />
+          <Route path="/partners" element={<PublicPage><PartnersPage /></PublicPage>} />
+          <Route path="/brokers" element={<PublicPage><BrokersPage /></PublicPage>} />
           <Route path="/auth" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/onboarding" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
         <WhatsAppButton />
@@ -56,17 +75,17 @@ const AppRoutes = () => {
   return (
     <>
       <Routes>
-        <Route path="/" element={<><Navbar /><main><Index /></main><Footer /></>} />
+        <Route path="/" element={<PublicPage><Index /></PublicPage>} />
         <Route path="/auth" element={<AuthPage />} />
-        <Route path="/nosotros" element={<><Navbar /><main><AboutPage /></main><Footer /></>} />
-        <Route path="/programa" element={<><Navbar /><main><ProgramPage /></main><Footer /></>} />
-        <Route path="/registro" element={<><Navbar /><main><RegisterPage /></main><Footer /></>} />
-        <Route path="/contacto" element={<><Navbar /><main><ContactPage /></main><Footer /></>} />
-        <Route path="/recursos" element={<><Navbar /><main><ResourcesPage /></main><Footer /></>} />
-        <Route path="/partners" element={<><Navbar /><main><PartnersPage /></main><Footer /></>} />
-        <Route path="/brokers" element={<><Navbar /><main><BrokersPage /></main><Footer /></>} />
+        <Route path="/nosotros" element={<PublicPage><AboutPage /></PublicPage>} />
+        <Route path="/programa" element={<PublicPage><ProgramPage /></PublicPage>} />
+        <Route path="/registro" element={<PublicPage><RegisterPage /></PublicPage>} />
+        <Route path="/contacto" element={<PublicPage><ContactPage /></PublicPage>} />
+        <Route path="/recursos" element={<PublicPage><ResourcesPage /></PublicPage>} />
+        <Route path="/partners" element={<PublicPage><PartnersPage /></PublicPage>} />
+        <Route path="/brokers" element={<PublicPage><BrokersPage /></PublicPage>} />
         <Route path="/dashboard" element={<Navigate to="/" replace />} />
-        <Route path="*" element={<><Navbar /><main><NotFound /></main><Footer /></>} />
+        <Route path="*" element={<PublicPage><NotFound /></PublicPage>} />
       </Routes>
       <WhatsAppButton />
     </>
