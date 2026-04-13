@@ -61,9 +61,7 @@ const AboutPage = () => (
             </div>
           </div>
           <div className="md:col-span-2">
-            <div className="bg-secondary rounded-lg aspect-[3/4] flex items-center justify-center">
-              <span className="text-muted-foreground/30 text-xs font-heading">[Foto del equipo]</span>
-            </div>
+            <img src={teamPhoto} alt="El equipo de InvertíUY" className="rounded-lg w-full h-full object-cover" />
           </div>
         </div>
       </div>
