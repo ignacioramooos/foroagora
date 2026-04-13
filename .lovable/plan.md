@@ -1,43 +1,46 @@
 
 
-## Plan: Unify Registration + Onboarding into One Seamless Flow
+## Plan: Content Library + Admin Panel
 
-### Problem
-Currently, registration and onboarding are two separate pages/flows. After signup, the app forces users to `/onboarding` and blocks all other routes. The user wants:
-1. Landing page is always the landing page — no redirects
-2. Registration = signup + profile questions in one unified flow on `/auth`
-3. Flow: email/password → profile steps → "check your email" confirmation
-4. The separate `/onboarding` route and forced redirect logic are removed
+### What We're Building
 
-### Changes
+1. **Content Library** (student-facing dashboard tab "Clases") — browse recorded classes (YouTube unlisted embeds), articles, and materials organized by modules
+2. **Admin Panel** (separate `/admin` route) — full CRUD for managing classes, articles, and materials, restricted to verified admin users
 
-**1. Merge OnboardingFlow into AuthPage (`src/pages/AuthPage.tsx`)**
-- After the user submits signup (email + password + name), instead of immediately showing "check your email", transition to the 3 onboarding steps (identity, education, commitment) inline on the same page
-- Use a state machine: `login` → `signup` → `onboarding-step-1` → `onboarding-step-2` → `onboarding-step-3` → `email-confirmation`
-- The profile data (full_name, age_range, department, institution, how_found_us, interests, accepted_terms) is saved to the `profiles` table after step 3 completes
-- Then show the "Revisá tu email" screen
-- Import the departments, age ranges, interests, and howFound options from the current OnboardingFlow
+### Database Changes (Migration)
 
-**2. Update routing in `App.tsx`**
-- Remove the `isLoggedIn && !user.onboardingCompleted` block that forces redirect to `/onboarding`
-- Remove the `/onboarding` route entirely
-- When logged in but onboarding not completed, still allow normal navigation (the profile questions were already answered during signup, so `onboarding_completed` will be true)
-- The catch-all `*` for logged-in users should go to `/` (landing) not `/dashboard`
+**New tables:**
 
-**3. Handle Google OAuth onboarding**
-- For Google sign-in users who haven't completed onboarding: when they land on the app after OAuth redirect and `onboardingCompleted` is false, show a modal or redirect to `/auth?complete-profile=true` to collect the missing profile data
-- This is the only case where we still need a post-login onboarding prompt
+- `user_roles` — role-based access (admin/user) using `app_role` enum and a `has_role()` security definer function
+- `content_items` — unified content table with columns: `id`, `title`, `description`, `type` (enum: `video`, `article`, `material`), `youtube_url` (for unlisted video embeds), `content_body` (rich text for articles), `file_url` (for downloadable materials), `module_name`, `thumbnail_url`, `duration_minutes`, `sort_order`, `is_published`, `created_by` (user_id), `created_at`, `updated_at`
 
-**4. Delete `src/pages/OnboardingFlow.tsx`**
-- No longer needed as a separate file
+**RLS policies:**
+- Everyone authenticated can SELECT published content
+- Only admins (via `has_role()`) can INSERT/UPDATE/DELETE
 
-**5. Update `AuthContext.tsx`**
-- Keep `onboardingCompleted` tracking for Google OAuth edge case
-- Remove any logic that depends on the `/onboarding` route
+**Seed data:** Insert your user as admin in `user_roles`
+
+### Frontend Components
+
+**Student side:**
+- `ContentLibrary.tsx` — new dashboard tab showing content cards grouped by type (Videos, Artículos, Materiales), with YouTube iframe embeds for videos
+- Add "Clases" tab to `DashboardLayout.tsx` nav items
+
+**Admin side:**
+- `AdminPage.tsx` — route `/admin` protected by role check
+- `AdminLayout.tsx` — sidebar with sections: Clases, Artículos, Materiales
+- `AdminContentManager.tsx` — table listing all content with add/edit/delete
+- `ContentFormDialog.tsx` — modal form for creating/editing content (title, description, type selector, YouTube URL input, article body textarea, file URL, module, publish toggle)
+
+### Routing
+
+- Add `/admin` route in `App.tsx`, only accessible to authenticated users with admin role
+- Add admin link in dashboard sidebar (visible only to admins)
 
 ### Technical Details
-- The signup function creates the auth user and triggers the `handle_new_user` DB function which creates a basic profile
-- The onboarding steps update that profile with additional fields before showing email confirmation
-- The `onboarding_completed` flag is set to `true` after step 3 saves successfully
-- For login mode, behavior stays the same (no onboarding steps shown)
+
+- Admin role check uses `has_role(auth.uid(), 'admin')` security definer function to avoid RLS recursion
+- YouTube embeds use `iframe` with `youtube-nocookie.com` for privacy
+- Content type enum controls which fields are shown in the form (video → YouTube URL, article → body text, material → file URL)
+- No file upload needed initially — videos are YouTube URLs, materials are external links
 
