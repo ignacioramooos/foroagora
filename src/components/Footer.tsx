@@ -10,6 +10,9 @@ const Footer = () => (
           <p className="text-sm leading-relaxed max-w-xs">
             Educación financiera para jóvenes en Uruguay. Análisis fundamental, no trading.
           </p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mt-2">
+            No damos consejos financieros
+          </p>
         </div>
         <div>
           <h4 className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
