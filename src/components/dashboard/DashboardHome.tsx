@@ -1,15 +1,59 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { mockModules, mockCommunityPosts } from "@/lib/mockData";
-import { Flame, BookOpen, FileText, Target, MapPin, Clock, CalendarDays, ArrowRight } from "lucide-react";
+import { Flame, BookOpen, FileText, Target, MapPin, Clock, CalendarDays, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+interface RegisteredEvent {
+  id: string;
+  title: string;
+  event_date: string;
+  location: string;
+}
+
 const DashboardHome = () => {
-  const { user } = useAuth();
+  const { user, session } = useAuth();
+  const [myEvents, setMyEvents] = useState<RegisteredEvent[]>([]);
+
+  useEffect(() => {
+    if (!session?.user) return;
+    const fetchMyEvents = async () => {
+      const { data: regs } = await supabase
+        .from("event_registrations")
+        .select("event_id")
+        .eq("user_id", session.user.id);
+
+      if (!regs || regs.length === 0) return;
+
+      const ids = regs.map((r: { event_id: string }) => r.event_id);
+      const { data: evts } = await supabase
+        .from("events")
+        .select("id, title, event_date, location")
+        .in("id", ids)
+        .gte("event_date", new Date().toISOString())
+        .order("event_date", { ascending: true })
+        .limit(3);
+
+      setMyEvents((evts as RegisteredEvent[]) || []);
+    };
+    fetchMyEvents();
+  }, [session]);
+
   if (!user) return null;
 
   const progressPercent = Math.round((user.completedClasses / user.totalClasses) * 100);
   const currentModule = mockModules.find((m) => m.status === "in_progress");
+
+  const formatDate = (iso: string) => {
+    const d = new Date(iso);
+    return d.toLocaleDateString("es-UY", { weekday: "long", day: "numeric", month: "long" });
+  };
+  const formatTime = (iso: string) => {
+    const d = new Date(iso);
+    return d.toLocaleTimeString("es-UY", { hour: "2-digit", minute: "2-digit" });
+  };
 
   return (
     <div className="p-6 md:p-10 max-w-5xl">
@@ -60,23 +104,31 @@ const DashboardHome = () => {
         </div>
       </div>
 
-      {/* Next Event */}
-      <div className="border border-border rounded-lg p-6 mb-10">
-        <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-3">
-          Próxima clase presencial
-        </p>
-        <h3 className="text-xl font-heading font-semibold text-foreground mb-4">
-          Análisis Fundamental — Clase 3
-        </h3>
-        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-5">
-          <span className="flex items-center gap-1.5"><CalendarDays size={14} /> Jueves 19 de Junio</span>
-          <span className="flex items-center gap-1.5"><Clock size={14} /> 19:00 hs</span>
-          <span className="flex items-center gap-1.5"><MapPin size={14} /> Sede INJU</span>
+      {/* My upcoming events */}
+      {myEvents.length > 0 && (
+        <div className="mb-10">
+          <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
+            Mis próximos eventos
+          </p>
+          <div className="space-y-3">
+            {myEvents.map((event) => (
+              <div key={event.id} className="border border-border rounded-lg p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h3 className="font-heading font-semibold text-foreground">{event.title}</h3>
+                  <div className="flex flex-wrap gap-3 text-sm text-muted-foreground mt-2">
+                    <span className="flex items-center gap-1.5"><CalendarDays size={14} /> {formatDate(event.event_date)}</span>
+                    <span className="flex items-center gap-1.5"><Clock size={14} /> {formatTime(event.event_date)}</span>
+                    <span className="flex items-center gap-1.5"><MapPin size={14} /> {event.location}</span>
+                  </div>
+                </div>
+                <span className="flex items-center gap-1.5 text-sm text-muted-foreground font-heading">
+                  <CheckCircle2 size={14} /> Anotado
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
-        <button className="h-10 px-5 rounded-md bg-foreground text-background text-sm font-heading font-medium hover:bg-foreground/80 transition-colors">
-          Confirmar asistencia
-        </button>
-      </div>
+      )}
 
       {/* Community Feed */}
       <div>
