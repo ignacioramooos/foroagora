@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 import { Link } from "react-router-dom";
-import { Home, BookOpen, Wrench, Users, FileText, Settings, LogOut, Menu, X, ExternalLink, CalendarDays } from "lucide-react";
+import { Home, BookOpen, Wrench, Users, FileText, Settings, LogOut, Menu, X, ExternalLink, CalendarDays, PlayCircle, Shield } from "lucide-react";
 
-type DashboardTab = "home" | "progress" | "tools" | "community" | "theses" | "events" | "settings";
+type DashboardTab = "home" | "progress" | "tools" | "community" | "theses" | "events" | "content" | "settings";
 
 interface DashboardLayoutProps {
   activeTab: DashboardTab;
@@ -13,6 +14,7 @@ interface DashboardLayoutProps {
 
 const navItems: { id: DashboardTab; label: string; icon: typeof Home }[] = [
   { id: "home", label: "Inicio", icon: Home },
+  { id: "content", label: "Clases", icon: PlayCircle },
   { id: "progress", label: "Mi Progreso", icon: BookOpen },
   { id: "tools", label: "Herramientas", icon: Wrench },
   { id: "community", label: "Comunidad", icon: Users },
@@ -30,6 +32,7 @@ const mobileNav: { id: DashboardTab; label: string; icon: typeof Home }[] = [
 
 const DashboardLayout = ({ activeTab, onTabChange, children }: DashboardLayoutProps) => {
   const { logout } = useAuth();
+  const { isAdmin } = useUserRole();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -56,6 +59,15 @@ const DashboardLayout = ({ activeTab, onTabChange, children }: DashboardLayoutPr
           ))}
         </nav>
         <div className="p-3 border-t border-border space-y-1">
+          {isAdmin && (
+            <Link
+              to="/admin"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-heading text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
+            >
+              <Shield size={18} />
+              Admin
+            </Link>
+          )}
           <Link
             to="/"
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-heading text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"

@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      content_items: {
+        Row: {
+          content_body: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          duration_minutes: number | null
+          file_url: string | null
+          id: string
+          is_published: boolean
+          module_name: string | null
+          sort_order: number
+          thumbnail_url: string | null
+          title: string
+          type: Database["public"]["Enums"]["content_type"]
+          updated_at: string
+          youtube_url: string | null
+        }
+        Insert: {
+          content_body?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          duration_minutes?: number | null
+          file_url?: string | null
+          id?: string
+          is_published?: boolean
+          module_name?: string | null
+          sort_order?: number
+          thumbnail_url?: string | null
+          title: string
+          type?: Database["public"]["Enums"]["content_type"]
+          updated_at?: string
+          youtube_url?: string | null
+        }
+        Update: {
+          content_body?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          duration_minutes?: number | null
+          file_url?: string | null
+          id?: string
+          is_published?: boolean
+          module_name?: string | null
+          sort_order?: number
+          thumbnail_url?: string | null
+          title?: string
+          type?: Database["public"]["Enums"]["content_type"]
+          updated_at?: string
+          youtube_url?: string | null
+        }
+        Relationships: []
+      }
       event_registrations: {
         Row: {
           event_id: string
@@ -145,15 +199,43 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
+      content_type: "video" | "article" | "material"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -280,6 +362,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+      content_type: ["video", "article", "material"],
+    },
   },
 } as const

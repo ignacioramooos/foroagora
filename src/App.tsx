@@ -16,6 +16,7 @@ import ResourcesPage from "./pages/ResourcesPage";
 import PartnersPage from "./pages/PartnersPage";
 import BrokersPage from "./pages/BrokersPage";
 import DashboardPage from "./pages/DashboardPage";
+import AdminPage from "./pages/AdminPage";
 import AuthPage from "./pages/AuthPage";
 import NotFound from "./pages/NotFound";
 
@@ -41,6 +42,7 @@ const AppRoutes = () => {
       <>
         <Routes>
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="/" element={<PublicPage><Index /></PublicPage>} />
           <Route path="/nosotros" element={<PublicPage><AboutPage /></PublicPage>} />
           <Route path="/programa" element={<PublicPage><ProgramPage /></PublicPage>} />
