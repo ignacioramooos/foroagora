@@ -76,20 +76,17 @@ const AboutPage = () => (
         <h2 className="text-3xl md:text-4xl text-foreground mb-12">
           Jóvenes que enseñan a jóvenes
         </h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border">
+        <div className="grid sm:grid-cols-2 gap-8 max-w-2xl">
           {team.map((m) => (
-            <div key={m.name} className="bg-background p-8">
-              <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mb-4">
-                <span className="font-heading font-semibold text-foreground text-sm">
-                  {m.name.split(" ").map(n => n[0]).join("")}
-                </span>
+            <div key={m.name} className="bg-background border border-border rounded-lg overflow-hidden">
+              <div className="aspect-[3/4] overflow-hidden">
+                <img src={m.photo} alt={m.name} className="w-full h-full object-cover object-top" />
               </div>
-              <h3 className="font-heading font-semibold text-foreground text-lg">{m.name}</h3>
-              <span className="text-muted-foreground text-sm">{m.role}</span>
-              <p className="text-muted-foreground text-sm mt-3 leading-relaxed">{m.bio}</p>
-              <a href="#" className="inline-flex items-center gap-1 text-muted-foreground/40 hover:text-foreground text-sm mt-3 transition-colors">
-                <Linkedin size={14} /> LinkedIn
-              </a>
+              <div className="p-6">
+                <h3 className="font-heading font-semibold text-foreground text-lg">{m.name}</h3>
+                <span className="text-muted-foreground text-sm">{m.role} · {m.age} años</span>
+                <p className="text-muted-foreground text-sm mt-3 leading-relaxed">{m.bio}</p>
+              </div>
             </div>
           ))}
         </div>
