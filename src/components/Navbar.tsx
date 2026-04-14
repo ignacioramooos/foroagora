@@ -11,7 +11,7 @@ const navLinks = [
   { label: "Recursos", path: "/recursos" },
   { label: "Glosario", path: "/glosario" },
   { label: "Brokers", path: "/brokers" },
-  { label: "Partners", path: "/partners" },
+  { label: "Alianzas", path: "/alianzas" },
   { label: "Contacto", path: "/contacto" },
 ];
 
