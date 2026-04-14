@@ -66,10 +66,9 @@ const GlossaryContent = () => {
           onClick={() => setActiveCategory(null)}
           className={`px-3 py-1.5 rounded-md text-sm font-heading font-medium transition-colors ${
             !activeCategory
-              ? "text-white"
+              ? "bg-accent text-accent-foreground"
               : "border border-border text-muted-foreground hover:text-foreground"
           }`}
-          style={!activeCategory ? { backgroundColor: "#22D07A" } : undefined}
         >
           Todos
         </button>
@@ -79,10 +78,9 @@ const GlossaryContent = () => {
             onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
             className={`px-3 py-1.5 rounded-md text-sm font-heading font-medium transition-colors ${
               activeCategory === cat
-                ? "text-white"
+                ? "bg-accent text-accent-foreground"
                 : "border border-border text-muted-foreground hover:text-foreground"
             }`}
-            style={activeCategory === cat ? { backgroundColor: "#22D07A" } : undefined}
           >
             {categoryLabels[cat]}
           </button>
