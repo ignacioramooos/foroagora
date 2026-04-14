@@ -3,7 +3,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const VALID_RANGES = ["1mo", "3mo", "6mo", "1y"];
+const VALID_RANGES = ["1d", "5d", "1mo", "3mo", "6mo", "1y"];
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -23,7 +23,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    const apiUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=${range}`;
+    const interval = range === "1d" ? "5m" : range === "5d" ? "15m" : "1d";
+    const apiUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=${interval}&range=${range}`;
     const res = await fetch(apiUrl, {
       headers: { "User-Agent": "Mozilla/5.0" },
     });

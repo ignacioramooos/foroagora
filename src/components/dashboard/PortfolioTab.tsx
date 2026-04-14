@@ -52,7 +52,7 @@ const StockChartDialog = ({ ticker, companyName, open, onClose }: { ticker: stri
           <DialogTitle className="font-heading">{companyName} <span className="font-mono text-muted-foreground">({ticker})</span></DialogTitle>
         </DialogHeader>
         <div className="flex gap-2 mb-4">
-          {[["1mo","1M"],["3mo","3M"],["6mo","6M"],["1y","1A"]].map(([v,l]) => (
+          {[["1d","1D"],["5d","1S"],["1mo","1M"],["3mo","3M"],["6mo","6M"],["1y","1A"]].map(([v,l]) => (
             <Button key={v} size="sm" variant={range === v ? "cta" : "outline"} onClick={() => load(v)}>{l}</Button>
           ))}
         </div>
