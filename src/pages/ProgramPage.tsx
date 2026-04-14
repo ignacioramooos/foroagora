@@ -134,12 +134,17 @@ const ProgramPage = () => (
           <h2 className="text-3xl md:text-5xl text-foreground mb-6 leading-tight">
             ¿Listo para aprender a invertir?
           </h2>
-          <p className="text-muted-foreground mb-10 text-lg">
-            Tu lugar te está esperando.
+          <p className="text-muted-foreground mb-6 text-lg">
+            Antes de la primera clase, completá nuestra formación online gratuita →
           </p>
-          <Button asChild variant="cta" size="cta">
-            <Link to="/registro">Inscribite <ArrowRight size={16} /></Link>
-          </Button>
+          <div className="flex flex-wrap gap-3">
+            <Button asChild variant="cta" size="cta">
+              <Link to="/formacion">Empezar formación online <ArrowRight size={16} /></Link>
+            </Button>
+            <Button asChild variant="cta-outline" size="cta">
+              <Link to="/registro">Inscribite a las clases</Link>
+            </Button>
+          </div>
         </div>
       </div>
     </section>
