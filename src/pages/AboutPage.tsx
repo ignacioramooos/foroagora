@@ -29,7 +29,7 @@ const ImpactSection = () => {
   if (studentCount === null || studentCount === 0) return null;
 
   return (
-    <section className="py-24 md:py-32">
+    <section className="py-16 md:py-24">
       <div className="container">
         <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
           Nuestro impacto
@@ -52,7 +52,7 @@ const ImpactSection = () => {
 
 const AboutPage = () => (
   <>
-    <section className="pt-32 md:pt-40 pb-20">
+    <section className="pt-32 md:pt-40 pb-16">
       <div className="container">
         <SectionFade>
           <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-6">
@@ -70,9 +70,9 @@ const AboutPage = () => (
       </div>
     </section>
 
-    <section className="py-24 md:py-32 border-y border-border">
+    <section className="py-16 md:py-24 border-y border-border">
       <div className="container">
-        <div className="grid md:grid-cols-5 gap-16 items-start">
+        <div className="grid md:grid-cols-5 gap-10 md:gap-12 items-start">
           <div className="md:col-span-3">
             <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
               Nuestra historia
@@ -106,7 +106,7 @@ const AboutPage = () => (
       </div>
     </section>
 
-    <section className="py-24 md:py-32">
+    <section className="py-16 md:py-24">
       <div className="container">
         <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
           El equipo
@@ -134,19 +134,19 @@ const AboutPage = () => (
       </div>
     </section>
 
-    <section className="py-24 md:py-32 border-y border-border">
-      <div className="container max-w-3xl">
+    <section className="py-16 md:py-24 border-y border-border">
+      <div className="container max-w-4xl">
         <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
           Nuestros valores
         </p>
-        <div className="space-y-0 divide-y divide-border">
+        <div className="grid md:grid-cols-2 gap-x-12 divide-y md:divide-y-0 divide-border">
           {[
             { title: "Acceso universal", desc: "La educación financiera es un derecho, no un privilegio." },
             { title: "Rigor intelectual", desc: "Enseñamos con la misma seriedad que una universidad, pero sin barreras." },
             { title: "Comunidad", desc: "Aprender juntos es más poderoso que aprender solo." },
             { title: "Impacto local", desc: "Empezamos en Montevideo, con la visión de llegar a todo Uruguay." },
           ].map((v) => (
-            <div key={v.title} className="py-6 first:pt-0 last:pb-0">
+            <div key={v.title} className="py-5 first:pt-0">
               <h3 className="font-heading font-semibold text-foreground text-lg mb-1">{v.title}</h3>
               <p className="text-muted-foreground leading-relaxed">{v.desc}</p>
             </div>

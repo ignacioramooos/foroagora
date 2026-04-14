@@ -8,7 +8,6 @@ const CapacityBar = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      // Get active cohort
       const { data: cohorts } = await supabase
         .from("cohorts")
         .select("max_capacity")
@@ -24,7 +23,6 @@ const CapacityBar = () => {
 
       setMaxCapacity(cohorts[0].max_capacity);
 
-      // TODO: registrations aren't linked to cohorts yet, using total profile count as proxy
       const { count } = await supabase
         .from("profiles")
         .select("*", { count: "exact", head: true });
@@ -42,18 +40,20 @@ const CapacityBar = () => {
   const availablePercent = (available / maxCapacity) * 100;
   const isFull = available <= 0;
 
-  let barColor = "#22D07A";
+  let barColorClass = "bg-accent";
   let urgencyText: string | null = null;
+  let urgencyColorClass = "";
 
   if (isFull) {
-    barColor = "#EF4444";
-    urgencyText = null; // handled separately
+    barColorClass = "bg-destructive";
   } else if (availablePercent < 10) {
-    barColor = "#EF4444";
+    barColorClass = "bg-destructive";
     urgencyText = "¡Últimos cupos!";
+    urgencyColorClass = "text-destructive";
   } else if (availablePercent <= 30) {
-    barColor = "#F59E0B";
+    barColorClass = "bg-warning";
     urgencyText = "¡Quedan pocos lugares!";
+    urgencyColorClass = "text-warning";
   }
 
   return (
@@ -65,15 +65,15 @@ const CapacityBar = () => {
             : `${taken} de ${maxCapacity} cupos ocupados`}
         </span>
         {urgencyText && (
-          <span className="font-heading font-medium text-xs" style={{ color: barColor }}>
+          <span className={`font-heading font-medium text-xs ${urgencyColorClass}`}>
             {urgencyText}
           </span>
         )}
       </div>
       <div className="h-2 bg-secondary rounded-full overflow-hidden">
         <div
-          className="h-full rounded-full transition-all duration-500"
-          style={{ width: `${percent}%`, backgroundColor: barColor }}
+          className={`h-full rounded-full transition-all duration-500 ${barColorClass}`}
+          style={{ width: `${percent}%` }}
         />
       </div>
     </div>

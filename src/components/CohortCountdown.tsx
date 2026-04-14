@@ -60,7 +60,7 @@ const CohortCountdown = () => {
 
   if (expired) {
     return (
-      <p className="text-sm font-heading font-medium" style={{ color: "#22D07A" }}>
+      <p className="text-sm font-heading font-medium text-accent">
         ¡Inscripciones abiertas para el próximo cohorte!
       </p>
     );
@@ -80,17 +80,13 @@ const CohortCountdown = () => {
       {units.map((u) => (
         <div
           key={u.label}
-          className="flex flex-col items-center justify-center rounded"
-          style={{
-            width: 40,
-            height: 48,
-            backgroundColor: "#0D1B2A",
-          }}
+          className="flex flex-col items-center justify-center rounded bg-foreground"
+          style={{ width: 40, height: 48 }}
         >
-          <span className="text-white text-xl font-semibold leading-none tabular-nums">
+          <span className="text-background text-xl font-semibold leading-none tabular-nums">
             {String(u.value).padStart(2, "0")}
           </span>
-          <span className="text-[10px] text-white/50 mt-0.5">{u.label}</span>
+          <span className="text-[10px] text-background/50 mt-0.5">{u.label}</span>
         </div>
       ))}
     </div>

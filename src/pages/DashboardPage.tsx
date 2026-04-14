@@ -8,8 +8,6 @@ import ThesisBuilder from "@/components/dashboard/ThesisBuilder";
 import EventsSection from "@/components/dashboard/EventsSection";
 import DashboardSettings from "@/components/dashboard/DashboardSettings";
 import ContentLibrary from "@/components/dashboard/ContentLibrary";
-import PortfolioTab from "@/components/dashboard/PortfolioTab";
-import CaseStudySubmission from "@/components/dashboard/CaseStudySubmission";
 
 const DashboardPage = () => {
   const [activeTab, setActiveTab] = useState<DashboardTab>("home");
@@ -17,13 +15,11 @@ const DashboardPage = () => {
   const renderTab = () => {
     switch (activeTab) {
       case "home": return <DashboardHome />;
-      case "portfolio": return <PortfolioTab />;
       case "content": return <ContentLibrary />;
       case "progress": return <LearningRoadmap />;
       case "tools": return <Toolkit />;
       case "community": return <CommunityFeed />;
       case "theses": return <ThesisBuilder />;
-      case "case-study": return <CaseStudySubmission />;
       case "events": return <EventsSection />;
       case "settings": return <DashboardSettings />;
       default: return <DashboardHome />;

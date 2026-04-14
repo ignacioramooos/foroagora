@@ -27,7 +27,6 @@ const LiveStudentCounter = () => {
     return () => { supabase.removeChannel(channel); };
   }, []);
 
-  // Animate count-up
   useEffect(() => {
     if (count === null || animatedRef.current) return;
     animatedRef.current = true;
@@ -43,7 +42,6 @@ const LiveStudentCounter = () => {
     animate();
   }, [count]);
 
-  // Update display when count changes after initial animation
   useEffect(() => {
     if (count !== null && animatedRef.current) {
       setDisplayCount(count);
@@ -55,8 +53,8 @@ const LiveStudentCounter = () => {
   return (
     <div className="flex items-center gap-3">
       <span className="relative flex h-2 w-2">
-        <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: "#22D07A" }} />
-        <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: "#22D07A" }} />
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
       </span>
       <span className="text-sm text-muted-foreground">
         {count === 0 ? (

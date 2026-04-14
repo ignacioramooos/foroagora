@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { mockModules, mockCommunityPosts } from "@/lib/mockData";
-import DashboardFormacion from "@/components/dashboard/DashboardFormacion";
 import { Flame, BookOpen, FileText, Target, MapPin, Clock, CalendarDays, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -103,14 +102,6 @@ const DashboardHome = () => {
             {currentModule ? `Módulo: ${currentModule.title}` : "Completar programa"}
           </span>
         </div>
-      </div>
-
-      {/* Formación Online */}
-      <div className="mb-10">
-        <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
-          Formación online
-        </p>
-        <DashboardFormacion />
       </div>
 
       {/* My upcoming events */}

@@ -16,11 +16,6 @@ import ResourcesPage from "./pages/ResourcesPage";
 import PartnersPage from "./pages/PartnersPage";
 import BrokersPage from "./pages/BrokersPage";
 import GlossaryPage from "./pages/GlossaryPage";
-import FormacionPage from "./pages/FormacionPage";
-import RankingPage from "./pages/RankingPage";
-import ImpactPage from "./pages/ImpactPage";
-import CaseStudiesPage from "./pages/CaseStudiesPage";
-import CaseStudyDetailPage from "./pages/CaseStudyDetailPage";
 import DashboardPage from "./pages/DashboardPage";
 import AdminPage from "./pages/AdminPage";
 import AuthPage from "./pages/AuthPage";
@@ -52,14 +47,8 @@ const AppRoutes = () => {
       <Route path="/contacto" element={<PublicPage><ContactPage /></PublicPage>} />
       <Route path="/recursos" element={<PublicPage><ResourcesPage /></PublicPage>} />
       <Route path="/glosario" element={<PublicPage><GlossaryPage /></PublicPage>} />
-      <Route path="/partners" element={<Navigate to="/alianzas" replace />} />
-      <Route path="/alianzas" element={<PublicPage><PartnersPage /></PublicPage>} />
+      <Route path="/partners" element={<PublicPage><PartnersPage /></PublicPage>} />
       <Route path="/brokers" element={<PublicPage><BrokersPage /></PublicPage>} />
-      <Route path="/analisis" element={<PublicPage><CaseStudiesPage /></PublicPage>} />
-      <Route path="/analisis/:id" element={<PublicPage><CaseStudyDetailPage /></PublicPage>} />
-      <Route path="/formacion" element={<FormacionPage />} />
-      <Route path="/ranking" element={<RankingPage />} />
-      <Route path="/impacto" element={<ImpactPage />} />
       <Route path="/auth" element={<AuthPage />} />
     </>
   );

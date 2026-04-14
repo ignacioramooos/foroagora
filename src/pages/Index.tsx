@@ -2,17 +2,16 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import SectionFade from "@/components/SectionFade";
-import HomeCaseStudies from "@/components/HomeCaseStudies";
 import LiveStudentCounter from "@/components/LiveStudentCounter";
 import CohortCountdown from "@/components/CohortCountdown";
 import CapacityBar from "@/components/CapacityBar";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowRight, MapPin, Calendar, Users, Clock } from "lucide-react";
+import { ArrowRight, MapPin, Calendar, Users } from "lucide-react";
 
 const Hero = () => (
-  <section className="min-h-[88vh] flex items-center">
-    <div className="container py-32 md:py-40">
+  <section className="pt-32 md:pt-44 pb-20 md:pb-28">
+    <div className="container">
       <SectionFade>
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-semibold text-foreground leading-[0.95] max-w-4xl mb-8">
           Aprendé a analizar empresas e invertir con criterio propio
@@ -38,9 +37,9 @@ const Hero = () => (
 );
 
 const ProblemSection = () => (
-  <section className="py-24 md:py-32">
+  <section className="py-14 md:py-20">
     <div className="container">
-      <div className="grid md:grid-cols-5 gap-16 items-start">
+      <div className="grid md:grid-cols-5 gap-10 md:gap-12 items-start">
         <div className="md:col-span-2">
           <div className="border border-border rounded-lg p-10">
             <span className="text-6xl md:text-7xl font-heading font-semibold text-foreground leading-none block mb-3">
@@ -75,12 +74,12 @@ const ProblemSection = () => (
 );
 
 const ValueProp = () => (
-  <section className="py-24 md:py-32 border-y border-border">
+  <section className="py-16 md:py-24 border-y border-border">
     <div className="container">
       <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
         Qué enseñamos
       </p>
-      <div className="grid md:grid-cols-2 gap-16 items-start">
+      <div className="grid md:grid-cols-2 gap-10 md:gap-12 items-start">
         <div>
           <h2 className="text-3xl md:text-4xl text-foreground mb-6">
             Habilidades financieras reales, no atajos
@@ -129,22 +128,22 @@ const ValueProp = () => (
 );
 
 const HowItWorks = () => (
-  <section className="py-24 md:py-32">
-    <div className="container max-w-3xl">
+  <section className="py-14 md:py-20">
+    <div className="container max-w-4xl">
       <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
         Cómo funciona
       </p>
-      <h2 className="text-3xl md:text-4xl text-foreground mb-12">
+      <h2 className="text-3xl md:text-4xl text-foreground mb-10">
         Cuatro pasos
       </h2>
-      <div className="space-y-0">
+      <div className="grid md:grid-cols-2 gap-x-12 gap-y-0">
         {[
           { step: "01", title: "Inscribite", desc: "Completá el formulario de inscripción en 2 minutos." },
           { step: "02", title: "Asistí", desc: "Vení a clases presenciales en Montevideo." },
           { step: "03", title: "Aprendé", desc: "Accedé a recursos online y nuestra comunidad." },
           { step: "04", title: "Decidí", desc: "Tomá decisiones financieras con criterio propio." },
         ].map((s) => (
-          <div key={s.step} className="flex gap-6 md:gap-8 py-6 border-b border-border last:border-0">
+          <div key={s.step} className="flex gap-6 py-5 border-b border-border last:border-0">
             <span className="text-sm text-muted-foreground/40 font-heading font-medium w-8 shrink-0 pt-0.5">
               {s.step}
             </span>
@@ -182,9 +181,9 @@ const UpcomingClasses = () => {
   const dateStr = startDate.toLocaleDateString("es-UY", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 
   return (
-    <section className="py-24 md:py-32 border-y border-border">
+    <section className="py-16 md:py-24 border-y border-border">
       <div className="container">
-        <div className="grid md:grid-cols-2 gap-16 items-center">
+        <div className="grid md:grid-cols-2 gap-10 md:gap-12 items-center">
           <div>
             <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
               Próximas clases
@@ -226,9 +225,9 @@ const UpcomingClasses = () => {
 };
 
 const FinalCTA = () => (
-  <section className="py-24 md:py-32 border-t border-border">
+  <section className="py-16 md:py-24 border-t border-border">
     <div className="container">
-      <div className="max-w-3xl">
+      <div className="max-w-4xl">
         <h2 className="text-3xl md:text-5xl text-foreground leading-tight mb-6">
           El mejor momento para aprender a invertir era ayer.
           El segundo mejor es hoy.
@@ -244,12 +243,12 @@ const FinalCTA = () => (
 );
 
 const NewsletterSection = () => (
-  <section className="py-24 md:py-32" style={{ backgroundColor: "#0D1B2A" }}>
+  <section className="py-16 md:py-24 bg-foreground">
     <div className="container max-w-2xl text-center">
-      <h2 className="text-3xl md:text-4xl font-semibold text-white mb-3">
+      <h2 className="text-3xl md:text-4xl font-semibold text-primary-foreground mb-3">
         Aprendé algo nuevo cada semana
       </h2>
-      <p className="text-white/60 mb-10 text-lg">
+      <p className="text-primary-foreground/60 mb-10 text-lg">
         Un concepto financiero explicado de forma simple, directo a tu email.
       </p>
       <div className="max-w-md mx-auto text-left">
@@ -266,7 +265,6 @@ const Index = () => (
     <ValueProp />
     <HowItWorks />
     <UpcomingClasses />
-    <HomeCaseStudies />
     <NewsletterSection />
     <FinalCTA />
   </>
