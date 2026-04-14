@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { Link } from "react-router-dom";
-import { Home, BookOpen, Wrench, Users, FileText, Settings, LogOut, Menu, X, ExternalLink, CalendarDays, PlayCircle, Shield } from "lucide-react";
+import { Home, BookOpen, Wrench, Users, FileText, Settings, LogOut, Menu, X, ExternalLink, CalendarDays, PlayCircle, Shield, Briefcase } from "lucide-react";
 
-type DashboardTab = "home" | "progress" | "tools" | "community" | "theses" | "events" | "content" | "settings";
+type DashboardTab = "home" | "progress" | "tools" | "community" | "theses" | "events" | "content" | "portfolio" | "settings";
 
 interface DashboardLayoutProps {
   activeTab: DashboardTab;
@@ -14,6 +14,7 @@ interface DashboardLayoutProps {
 
 const navItems: { id: DashboardTab; label: string; icon: typeof Home }[] = [
   { id: "home", label: "Inicio", icon: Home },
+  { id: "portfolio", label: "Mi Portafolio", icon: Briefcase },
   { id: "content", label: "Clases", icon: PlayCircle },
   { id: "progress", label: "Mi Progreso", icon: BookOpen },
   { id: "tools", label: "Herramientas", icon: Wrench },

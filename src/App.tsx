@@ -17,6 +17,7 @@ import PartnersPage from "./pages/PartnersPage";
 import BrokersPage from "./pages/BrokersPage";
 import GlossaryPage from "./pages/GlossaryPage";
 import FormacionPage from "./pages/FormacionPage";
+import RankingPage from "./pages/RankingPage";
 import DashboardPage from "./pages/DashboardPage";
 import AdminPage from "./pages/AdminPage";
 import AuthPage from "./pages/AuthPage";
@@ -50,8 +51,9 @@ const AppRoutes = () => {
       <Route path="/glosario" element={<PublicPage><GlossaryPage /></PublicPage>} />
       <Route path="/partners" element={<PublicPage><PartnersPage /></PublicPage>} />
       <Route path="/brokers" element={<PublicPage><BrokersPage /></PublicPage>} />
-      <Route path="/formacion" element={<FormacionPage />} />
-      <Route path="/auth" element={<AuthPage />} />
+        <Route path="/formacion" element={<FormacionPage />} />
+        <Route path="/ranking" element={<RankingPage />} />
+        <Route path="/auth" element={<AuthPage />} />
     </>
   );
 
