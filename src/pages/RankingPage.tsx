@@ -21,17 +21,23 @@ const RankingPage = () => {
 
   const loadRanking = async () => {
     setLoading(true);
-    // Join portfolios with profiles for display names
-    const { data } = await supabase
+    // Fetch portfolios and profiles separately, then join by user_id
+    const { data: portfolios } = await supabase
       .from("portfolios")
-      .select("user_id, last_portfolio_value, profiles!inner(display_name, full_name)")
+      .select("user_id, last_portfolio_value")
       .order("last_portfolio_value", { ascending: false });
 
-    if (data) {
-      const mapped: RankEntry[] = data.map((row: any) => {
-        const profile = row.profiles;
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("user_id, display_name, full_name");
+
+    if (portfolios) {
+      const profileMap = new Map<string, { display_name?: string; full_name?: string }>();
+      (profiles || []).forEach((p: any) => profileMap.set(p.user_id, p));
+
+      const mapped: RankEntry[] = portfolios.map((row: any) => {
+        const profile = profileMap.get(row.user_id);
         const name = profile?.full_name || profile?.display_name || "Anónimo";
-        // Anonymize: first name + last initial
         const parts = name.trim().split(" ");
         const anonymized = parts.length > 1
           ? `${parts[0]} ${parts[parts.length - 1][0]}.`
