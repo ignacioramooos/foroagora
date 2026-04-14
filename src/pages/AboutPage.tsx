@@ -1,8 +1,9 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import SectionFade from "@/components/SectionFade";
 import AnimatedCounter from "@/components/AnimatedCounter";
-import { Linkedin } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import teamIgnacio from "@/assets/team-ignacio.jpeg";
 import teamNicolas from "@/assets/team-nicolas.jpeg";
 import teamPhoto from "@/assets/team-photo.jpeg";
@@ -11,6 +12,43 @@ const team = [
   { name: "Nicolás Sales", age: 17, role: "Co-fundador & Instructor", bio: "El que sabe. Especialista en análisis fundamental y mercados financieros.", photo: teamNicolas },
   { name: "Juan Ignacio Ramos", age: 18, role: "Co-fundador", bio: "Apasionado por las finanzas y la educación. Lidera la visión y estrategia de InvertíUY.", photo: teamIgnacio },
 ];
+
+const ImpactSection = () => {
+  const [studentCount, setStudentCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetch = async () => {
+      const { count } = await supabase
+        .from("profiles")
+        .select("*", { count: "exact", head: true });
+      setStudentCount(count ?? 0);
+    };
+    fetch();
+  }, []);
+
+  if (studentCount === null || studentCount === 0) return null;
+
+  return (
+    <section className="py-24 md:py-32">
+      <div className="container">
+        <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
+          Nuestro impacto
+        </p>
+        <h2 className="text-3xl md:text-4xl text-foreground mb-12">
+          Números que importan
+        </h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
+          <div>
+            <div className="text-4xl md:text-5xl font-heading font-semibold text-foreground mb-2">
+              <AnimatedCounter end={studentCount} />
+            </div>
+            <div className="text-muted-foreground text-sm">Estudiantes inscriptos</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
 
 const AboutPage = () => (
   <>
@@ -117,31 +155,7 @@ const AboutPage = () => (
       </div>
     </section>
 
-    <section className="py-24 md:py-32">
-      <div className="container">
-        <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
-          Nuestro impacto
-        </p>
-        <h2 className="text-3xl md:text-4xl text-foreground mb-12">
-          Números que importan
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
-          {[
-            { value: 150, suffix: "+", label: "Estudiantes alcanzados" },
-            { value: 24, label: "Clases dictadas" },
-            { value: 5, label: "Instituciones aliadas" },
-            { value: 3, label: "Liceos visitados" },
-          ].map((s) => (
-            <div key={s.label}>
-              <div className="text-4xl md:text-5xl font-heading font-semibold text-foreground mb-2">
-                <AnimatedCounter end={s.value} suffix={s.suffix} />
-              </div>
-              <div className="text-muted-foreground text-sm">{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
+    <ImpactSection />
   </>
 );
 

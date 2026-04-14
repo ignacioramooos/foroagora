@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      cohorts: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          location: string
+          max_capacity: number
+          name: string
+          start_date: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          location?: string
+          max_capacity?: number
+          name: string
+          start_date: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          location?: string
+          max_capacity?: number
+          name?: string
+          start_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       content_items: {
         Row: {
           content_body: string | null
