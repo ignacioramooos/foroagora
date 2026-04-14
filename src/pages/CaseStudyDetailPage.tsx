@@ -115,7 +115,6 @@ const CaseStudyDetailPage = () => {
           </p>
         </div>
 
-        {/* Key metrics */}
         {study.key_metrics.length > 0 && (
           <div className="flex flex-wrap gap-4 mb-8">
             {study.key_metrics.map((m, i) => (
@@ -127,12 +126,10 @@ const CaseStudyDetailPage = () => {
           </div>
         )}
 
-        {/* Content */}
         <div className="prose prose-neutral dark:prose-invert max-w-none mb-8">
           <ReactMarkdown>{study.content}</ReactMarkdown>
         </div>
 
-        {/* Verdict */}
         {study.verdict && (
           <div className="border-l-4 border-[#22D07A] bg-[#22D07A]/5 rounded-r-lg p-6 mb-8">
             <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-2">Veredicto del estudiante</p>

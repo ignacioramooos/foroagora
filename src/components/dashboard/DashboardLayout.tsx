@@ -4,7 +4,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { Link } from "react-router-dom";
 import { Home, BookOpen, Wrench, Users, FileText, Settings, LogOut, Menu, X, ExternalLink, CalendarDays, PlayCircle, Shield, Briefcase, PenTool } from "lucide-react";
 
-type DashboardTab = "home" | "progress" | "tools" | "community" | "theses" | "events" | "content" | "portfolio" | "case-study" | "settings";
+type DashboardTab = "home" | "portfolio" | "progress" | "tools" | "community" | "theses" | "case-study" | "events" | "content" | "settings";
 
 interface DashboardLayoutProps {
   activeTab: DashboardTab;

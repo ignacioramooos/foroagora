@@ -51,7 +51,7 @@ const CaseStudiesPage = () => {
           <div className="border border-amber-500/30 bg-amber-500/5 rounded-lg p-4 flex items-start gap-3 max-w-3xl">
             <AlertTriangle size={20} className="text-amber-500 shrink-0 mt-0.5" />
             <p className="text-sm text-muted-foreground">
-              ⚠️ Estos análisis son ejercicios educativos realizados por estudiantes. No constituyen asesoramiento financiero ni recomendaciones de compra o venta.
+              Estos análisis son ejercicios educativos realizados por estudiantes. No constituyen asesoramiento financiero ni recomendaciones de compra o venta.
             </p>
           </div>
         </div>

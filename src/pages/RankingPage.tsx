@@ -1,192 +1,123 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { Trophy, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import SectionFade from "@/components/SectionFade";
+import { Trophy } from "lucide-react";
 
 interface RankEntry {
+  display_name: string | null;
+  full_name: string | null;
+  last_portfolio_value: number | null;
+  cash_balance: number;
   user_id: string;
-  display_name: string;
-  last_portfolio_value: number;
-  return_pct: number;
 }
 
 const RankingPage = () => {
-  const { session } = useAuth();
-  const [entries, setEntries] = useState<RankEntry[]>([]);
+  const { user } = useAuth();
+  const [entries, setEntries] = useState<{ name: string; value: number; returnPct: number; userId: string }[]>([]);
   const [loading, setLoading] = useState(true);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  const loadRanking = async () => {
-    setLoading(true);
-    // Fetch portfolios and profiles separately, then join by user_id
-    const { data: portfolios } = await supabase
-      .from("portfolios")
-      .select("user_id, last_portfolio_value")
-      .order("last_portfolio_value", { ascending: false });
+  useEffect(() => {
+    const fetchRanking = async () => {
+      const { data: portfolios } = await supabase
+        .from("portfolios")
+        .select("user_id, cash_balance, last_portfolio_value");
 
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("user_id, display_name, full_name");
+      if (!portfolios || portfolios.length === 0) {
+        setLoading(false);
+        return;
+      }
 
-    if (portfolios) {
-      const profileMap = new Map<string, { display_name?: string; full_name?: string }>();
-      (profiles || []).forEach((p: any) => profileMap.set(p.user_id, p));
+      const userIds = portfolios.map((p) => p.user_id);
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, display_name, full_name")
+        .in("user_id", userIds);
 
-      const mapped: RankEntry[] = portfolios.map((row: any) => {
-        const profile = profileMap.get(row.user_id);
-        const name = profile?.full_name || profile?.display_name || "Anónimo";
-        const parts = name.trim().split(" ");
-        const anonymized = parts.length > 1
-          ? `${parts[0]} ${parts[parts.length - 1][0]}.`
-          : parts[0];
+      const profileMap = new Map((profiles || []).map((p) => [p.user_id, p]));
 
-        return {
-          user_id: row.user_id,
-          display_name: anonymized,
-          last_portfolio_value: Number(row.last_portfolio_value) || 10000,
-          return_pct: ((Number(row.last_portfolio_value) || 10000) / 10000 - 1) * 100,
-        };
-      });
-      setEntries(mapped);
-    }
-    setLastUpdated(new Date());
-    setLoading(false);
-  };
+      const ranked = portfolios
+        .map((p) => {
+          const profile = profileMap.get(p.user_id);
+          const fullName = profile?.full_name || profile?.display_name || "Anónimo";
+          const parts = fullName.trim().split(" ");
+          const name = parts[0] + (parts.length > 1 ? ` ${parts[parts.length - 1][0]}.` : "");
+          const totalValue = p.last_portfolio_value ?? p.cash_balance;
+          return {
+            name,
+            value: totalValue,
+            returnPct: ((totalValue / 10000 - 1) * 100),
+            userId: p.user_id,
+          };
+        })
+        .sort((a, b) => b.value - a.value);
 
-  useEffect(() => { loadRanking(); }, []);
+      setEntries(ranked);
+      setLoading(false);
+    };
+    fetchRanking();
+  }, []);
 
-  const top3 = entries.slice(0, 3);
-  const rest = entries.slice(3);
-  const podiumColors = ["#FFD700", "#C0C0C0", "#CD7F32"];
-
-  const formatCurrency = (n: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
+  const podiumColors = ["text-yellow-400", "text-gray-400", "text-amber-600"];
 
   return (
     <>
-      <Navbar />
-      <div className="min-h-screen bg-background pt-24 pb-16">
-        <div className="container max-w-3xl">
-          <div className="text-center mb-10">
-            <Trophy size={36} className="mx-auto mb-3" style={{ color: "#22D07A" }} />
-            <h1 className="text-3xl md:text-4xl font-semibold text-foreground mb-2">Ranking</h1>
-            <p className="text-muted-foreground text-sm">
-              Portfolios simulados de los estudiantes de InvertíUY
+      <section className="pt-32 md:pt-40 pb-12">
+        <div className="container">
+          <SectionFade>
+            <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
+              Ranking
             </p>
-          </div>
+            <h1 className="text-3xl md:text-5xl text-foreground mb-4">Tabla de posiciones</h1>
+            <p className="text-muted-foreground text-lg max-w-xl">
+              Ranking de portafolios simulados de los estudiantes del programa.
+            </p>
+          </SectionFade>
+        </div>
+      </section>
 
+      <section className="py-16 md:py-24">
+        <div className="container max-w-3xl">
           {loading ? (
             <div className="space-y-3">
-              {[1, 2, 3, 4, 5].map((i) => (
+              {[1, 2, 3].map((i) => (
                 <div key={i} className="h-14 bg-secondary rounded-lg animate-pulse" />
               ))}
             </div>
           ) : entries.length === 0 ? (
-            <div className="text-center py-16 text-muted-foreground">
-              <p className="text-sm">El ranking está vacío. ¡Sé el primero en operar!</p>
+            <div className="text-center py-16">
+              <Trophy size={40} className="mx-auto text-muted-foreground/30 mb-6" />
+              <h2 className="text-2xl text-foreground mb-4">El ranking está vacío</h2>
+              <p className="text-muted-foreground">¡Sé el primero en operar!</p>
             </div>
           ) : (
-            <>
-              {/* Podium */}
-              {top3.length > 0 && (
-                <div className="flex items-end justify-center gap-4 mb-10">
-                  {[1, 0, 2].map((idx) => {
-                    const entry = top3[idx];
-                    if (!entry) return <div key={idx} className="w-24" />;
-                    const isFirst = idx === 0;
-                    const rank = idx + 1;
-                    const isCurrentUser = session?.user?.id === entry.user_id;
-                    return (
-                      <div key={idx} className="text-center">
-                        <div
-                          className={`rounded-xl border border-border p-4 ${isFirst ? "pb-8" : "pb-5"} ${isCurrentUser ? "ring-2" : ""}`}
-                          style={{
-                            minWidth: isFirst ? 130 : 110,
-                            ...(isCurrentUser ? { borderColor: "#22D07A", ringColor: "#22D07A" } : {}),
-                          }}
-                        >
-                          <span
-                            className="text-2xl font-heading font-bold block mb-1"
-                            style={{ color: podiumColors[idx] }}
-                          >
-                            {rank}°
-                          </span>
-                          <p className="text-sm font-heading font-medium text-foreground truncate">
-                            {entry.display_name}
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1">{formatCurrency(entry.last_portfolio_value)}</p>
-                          <p
-                            className="text-xs font-heading font-medium mt-0.5"
-                            style={{ color: entry.return_pct >= 0 ? "#22D07A" : "#EF4444" }}
-                          >
-                            {entry.return_pct >= 0 ? "+" : ""}{entry.return_pct.toFixed(2)}%
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Rest of ranking */}
-              {rest.length > 0 && (
-                <div className="border border-border rounded-lg overflow-hidden">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-border">
-                        {["#", "Nombre", "Valor", "Retorno"].map((h) => (
-                          <th key={h} className="text-left px-4 py-3 text-xs font-heading font-medium text-muted-foreground uppercase tracking-wider">
-                            {h}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {rest.map((e, i) => {
-                        const isCurrentUser = session?.user?.id === e.user_id;
-                        return (
-                          <tr
-                            key={e.user_id}
-                            className={`border-b border-border last:border-0 ${isCurrentUser ? "bg-secondary/50" : ""}`}
-                          >
-                            <td className="px-4 py-3 font-heading text-muted-foreground">{i + 4}</td>
-                            <td className="px-4 py-3 font-heading font-medium text-foreground">
-                              {e.display_name}
-                              {isCurrentUser && <span className="ml-2 text-xs" style={{ color: "#22D07A" }}>(vos)</span>}
-                            </td>
-                            <td className="px-4 py-3 font-heading text-foreground">{formatCurrency(e.last_portfolio_value)}</td>
-                            <td className="px-4 py-3">
-                              <span className="font-heading font-medium" style={{ color: e.return_pct >= 0 ? "#22D07A" : "#EF4444" }}>
-                                {e.return_pct >= 0 ? "+" : ""}{e.return_pct.toFixed(2)}%
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </>
+            <div className="space-y-2">
+              {entries.map((e, i) => {
+                const isCurrentUser = user?.id === e.userId;
+                return (
+                  <div
+                    key={e.userId}
+                    className={`flex items-center gap-4 px-4 py-3 rounded-lg border transition-colors ${
+                      isCurrentUser ? "border-[#22D07A]/40 bg-[#22D07A]/5" : "border-border"
+                    }`}
+                  >
+                    <span className={`text-lg font-heading font-bold w-8 text-center ${i < 3 ? podiumColors[i] : "text-muted-foreground"}`}>
+                      {i + 1}
+                    </span>
+                    <span className="flex-1 font-heading font-medium text-foreground text-sm">{e.name}</span>
+                    <span className="text-sm text-muted-foreground font-heading">
+                      ${e.value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                    <span className={`text-sm font-heading font-medium ${e.returnPct >= 0 ? "text-[#22D07A]" : "text-red-500"}`}>
+                      {e.returnPct >= 0 ? "+" : ""}{e.returnPct.toFixed(2)}%
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           )}
-
-          {/* Refresh */}
-          <div className="flex items-center justify-center mt-6 gap-3">
-            <Button onClick={loadRanking} variant="cta-outline" size="sm" className="gap-2">
-              <RefreshCw size={14} /> Actualizar
-            </Button>
-            {lastUpdated && (
-              <span className="text-xs text-muted-foreground font-heading">
-                Última actualización: {lastUpdated.toLocaleTimeString("es-UY")}
-              </span>
-            )}
-          </div>
         </div>
-      </div>
-      <Footer />
+      </section>
     </>
   );
 };

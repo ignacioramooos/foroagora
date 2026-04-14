@@ -1,26 +1,26 @@
 import { supabase } from "@/integrations/supabase/client";
 
-export const SUPPORTED_STOCKS = [
-  { ticker: "AAPL", name: "Apple Inc." },
-  { ticker: "MSFT", name: "Microsoft Corp." },
-  { ticker: "GOOGL", name: "Alphabet Inc." },
-  { ticker: "AMZN", name: "Amazon.com Inc." },
-  { ticker: "META", name: "Meta Platforms Inc." },
-  { ticker: "TSLA", name: "Tesla Inc." },
-  { ticker: "NVDA", name: "NVIDIA Corp." },
+export const SUPPORTED_TICKERS = [
+  { ticker: "AAPL", name: "Apple" },
+  { ticker: "MSFT", name: "Microsoft" },
+  { ticker: "GOOGL", name: "Alphabet" },
+  { ticker: "AMZN", name: "Amazon" },
+  { ticker: "META", name: "Meta Platforms" },
+  { ticker: "TSLA", name: "Tesla" },
+  { ticker: "NVDA", name: "NVIDIA" },
   { ticker: "BRK-B", name: "Berkshire Hathaway" },
   { ticker: "JPM", name: "JPMorgan Chase" },
   { ticker: "JNJ", name: "Johnson & Johnson" },
-  { ticker: "MELI", name: "MercadoLibre Inc." },
-  { ticker: "GLOB", name: "Globant S.A." },
-  { ticker: "DESP", name: "Despegar.com" },
+  { ticker: "MELI", name: "MercadoLibre" },
+  { ticker: "GLOB", name: "Globant" },
+  { ticker: "DESP", name: "Despegar" },
   { ticker: "NU", name: "Nu Holdings" },
-  { ticker: "SPY", name: "SPDR S&P 500 ETF" },
-  { ticker: "QQQ", name: "Invesco QQQ Trust" },
-  { ticker: "VTI", name: "Vanguard Total Stock" },
+  { ticker: "SPY", name: "S&P 500 ETF" },
+  { ticker: "QQQ", name: "Nasdaq 100 ETF" },
+  { ticker: "VTI", name: "Total Stock Market ETF" },
 ];
 
-export interface StockQuote {
+interface Quote {
   ticker: string;
   price: number;
   change: number;
@@ -29,57 +29,34 @@ export interface StockQuote {
   currency: string;
 }
 
-export interface StockHistoryPoint {
-  date: string;
-  close: number;
-}
+const quoteCache = new Map<string, { data: Quote; timestamp: number }>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-export async function fetchStockPrice(ticker: string): Promise<StockQuote | null> {
+export async function fetchQuote(ticker: string): Promise<Quote | null> {
+  const cached = quoteCache.get(ticker);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) return cached.data;
+
   try {
-    const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-    const session = await supabase.auth.getSession();
-    const token = session.data.session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-    const resp = await fetch(
-      `https://${projectId}.supabase.co/functions/v1/stock-price?ticker=${encodeURIComponent(ticker)}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        },
-      }
-    );
-    if (!resp.ok) return null;
-    return await resp.json();
+    const { data, error } = await supabase.functions.invoke("stock-price", {
+      body: { ticker },
+    });
+    if (error || !data) return null;
+    const quote = data as Quote;
+    quoteCache.set(ticker, { data: quote, timestamp: Date.now() });
+    return quote;
   } catch {
     return null;
   }
 }
 
-export async function fetchStockHistory(ticker: string, range = "3mo"): Promise<StockHistoryPoint[]> {
+export async function fetchHistory(ticker: string, range = "3mo") {
   try {
-    const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-    const resp = await fetch(
-      `https://${projectId}.supabase.co/functions/v1/stock-history?ticker=${ticker}&range=${range}`,
-      {
-        headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        },
-      }
-    );
-    if (!resp.ok) return [];
-    return await resp.json();
+    const { data, error } = await supabase.functions.invoke("stock-history", {
+      body: { ticker, range },
+    });
+    if (error || !data) return [];
+    return data as { date: string; close: number }[];
   } catch {
     return [];
   }
-}
-
-export async function fetchMultipleStockPrices(tickers: string[]): Promise<Map<string, StockQuote>> {
-  const results = new Map<string, StockQuote>();
-  const promises = tickers.map(async (ticker) => {
-    const quote = await fetchStockPrice(ticker);
-    if (quote) results.set(ticker, quote);
-  });
-  await Promise.all(promises);
-  return results;
 }

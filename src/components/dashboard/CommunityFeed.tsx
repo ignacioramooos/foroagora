@@ -1,20 +1,40 @@
-import { Users } from "lucide-react";
+import { mockCommunityPosts } from "@/lib/mockData";
 
 const CommunityFeed = () => (
   <div className="p-6 md:p-10 max-w-3xl">
-    <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
-      Comunidad
-    </p>
-    <h2 className="text-2xl font-semibold text-foreground mb-6">Novedades y análisis</h2>
+    <h1 className="text-2xl md:text-3xl text-foreground mb-2">Comunidad</h1>
+    <p className="text-muted-foreground mb-8">Análisis de alumnos y anuncios del equipo.</p>
 
-    <div className="border border-border rounded-lg p-12 text-center">
-      <Users size={36} className="mx-auto text-muted-foreground/30 mb-4" />
-      <p className="text-muted-foreground text-sm mb-2">
-        Esta sección se habilitará pronto.
-      </p>
-      <p className="text-muted-foreground/60 text-xs">
-        Acá vas a poder compartir análisis, preguntas y novedades con otros estudiantes.
-      </p>
+    <div className="space-y-6">
+      {/* Announcements */}
+      <div>
+        <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-3">
+          Anuncios
+        </p>
+        <div className="border border-border rounded-lg divide-y divide-border">
+          {mockCommunityPosts.filter((p) => p.type === "announcement").map((post) => (
+            <div key={post.id} className="p-4">
+              <p className="text-sm font-heading font-medium text-foreground">{post.title}</p>
+              <p className="text-xs text-muted-foreground mt-1">{post.author} · {post.date}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Student Analyses */}
+      <div>
+        <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-3">
+          Análisis de alumnos
+        </p>
+        <div className="border border-border rounded-lg divide-y divide-border">
+          {mockCommunityPosts.filter((p) => p.type === "analysis").map((post) => (
+            <div key={post.id} className="p-4">
+              <p className="text-sm font-heading font-medium text-foreground">{post.title}</p>
+              <p className="text-xs text-muted-foreground mt-1">{post.author} · {post.date}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   </div>
 );

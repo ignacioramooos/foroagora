@@ -18,40 +18,23 @@ const CaseStudySubmission = () => {
   const [submitting, setSubmitting] = useState(false);
   const [preview, setPreview] = useState(false);
   const [form, setForm] = useState({
-    company_name: "",
-    company_ticker: "",
-    company_sector: "",
-    summary: "",
-    content: "",
-    verdict: "",
+    company_name: "", company_ticker: "", company_sector: "",
+    summary: "", content: "", verdict: "",
   });
   const [metrics, setMetrics] = useState<Metric[]>([]);
 
-  const addMetric = () => {
-    if (metrics.length >= 8) return;
-    setMetrics([...metrics, { label: "", value: "" }]);
-  };
-
+  const addMetric = () => { if (metrics.length < 8) setMetrics([...metrics, { label: "", value: "" }]); };
   const updateMetric = (i: number, field: "label" | "value", val: string) => {
-    const copy = [...metrics];
-    copy[i][field] = val;
-    setMetrics(copy);
+    const copy = [...metrics]; copy[i][field] = val; setMetrics(copy);
   };
-
-  const removeMetric = (i: number) => {
-    setMetrics(metrics.filter((_, idx) => idx !== i));
-  };
+  const removeMetric = (i: number) => setMetrics(metrics.filter((_, idx) => idx !== i));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !form.company_name || !form.summary || !form.content) return;
 
-    // Derive author info from profile
     const { data: profile } = await supabase
-      .from("profiles")
-      .select("full_name, institution")
-      .eq("user_id", user.id)
-      .single();
+      .from("profiles").select("full_name, institution").eq("user_id", user.id).single();
 
     const fullName = profile?.full_name || user.name || "Anónimo";
     const parts = fullName.trim().split(" ");
@@ -81,29 +64,26 @@ const CaseStudySubmission = () => {
     }
   };
 
-  const inputClass =
-    "w-full h-10 px-3 rounded-md border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring/50 transition-shadow font-heading";
+  const inputClass = "w-full h-10 px-3 rounded-md border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring/50 transition-shadow font-heading";
 
   if (submitted) {
     return (
-      <div className="border border-[#22D07A]/30 bg-[#22D07A]/5 rounded-lg p-8 text-center">
-        <CheckCircle2 size={40} className="text-[#22D07A] mx-auto mb-4" />
-        <h3 className="font-heading font-semibold text-foreground text-xl mb-2">¡Gracias!</h3>
-        <p className="text-muted-foreground">
-          Tu análisis fue enviado para revisión. Te avisamos cuando lo publiquemos.
-        </p>
+      <div className="p-6">
+        <div className="border border-[#22D07A]/30 bg-[#22D07A]/5 rounded-lg p-8 text-center">
+          <CheckCircle2 size={40} className="text-[#22D07A] mx-auto mb-4" />
+          <h3 className="font-heading font-semibold text-foreground text-xl mb-2">¡Gracias!</h3>
+          <p className="text-muted-foreground">Tu análisis fue enviado para revisión. Te avisamos cuando lo publiquemos.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="p-6">
       <h2 className="text-xl font-heading font-semibold text-foreground mb-1">Subir mi análisis</h2>
-      <p className="text-sm text-muted-foreground mb-6">
-        Enviá tu análisis de una empresa para revisión. Si es aprobado, se publicará en /analisis.
-      </p>
+      <p className="text-sm text-muted-foreground mb-6">Enviá tu análisis de una empresa para revisión. Si es aprobado, se publicará en /analisis.</p>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl">
         <div className="grid grid-cols-3 gap-3">
           <div>
             <label className="block text-xs font-heading font-medium text-foreground mb-1">Empresa *</label>
@@ -121,13 +101,7 @@ const CaseStudySubmission = () => {
 
         <div>
           <label className="block text-xs font-heading font-medium text-foreground mb-1">Resumen * (máx. 300 caracteres)</label>
-          <textarea
-            className={`${inputClass} h-20 py-2 resize-none`}
-            maxLength={300}
-            value={form.summary}
-            onChange={(e) => setForm((p) => ({ ...p, summary: e.target.value }))}
-            required
-          />
+          <textarea className={`${inputClass} h-20 py-2 resize-none`} maxLength={300} value={form.summary} onChange={(e) => setForm((p) => ({ ...p, summary: e.target.value }))} required />
           <p className="text-xs text-muted-foreground mt-1">{form.summary.length}/300</p>
         </div>
 
@@ -135,8 +109,7 @@ const CaseStudySubmission = () => {
           <div className="flex items-center justify-between mb-1">
             <label className="text-xs font-heading font-medium text-foreground">Análisis completo * (Markdown)</label>
             <button type="button" onClick={() => setPreview(!preview)} className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1">
-              {preview ? <EyeOff size={12} /> : <Eye size={12} />}
-              {preview ? "Editar" : "Vista previa"}
+              {preview ? <EyeOff size={12} /> : <Eye size={12} />} {preview ? "Editar" : "Vista previa"}
             </button>
           </div>
           {preview ? (
@@ -144,26 +117,17 @@ const CaseStudySubmission = () => {
               <ReactMarkdown>{form.content || "*Escribí tu análisis arriba.*"}</ReactMarkdown>
             </div>
           ) : (
-            <textarea
-              className={`${inputClass} h-48 py-2 resize-y`}
-              value={form.content}
-              onChange={(e) => setForm((p) => ({ ...p, content: e.target.value }))}
-              required
-              placeholder="Escribí tu análisis aquí. Podés usar Markdown."
-            />
+            <textarea className={`${inputClass} h-48 py-2 resize-y`} value={form.content} onChange={(e) => setForm((p) => ({ ...p, content: e.target.value }))} required placeholder="Escribí tu análisis aquí. Podés usar Markdown." />
           )}
         </div>
 
-        {/* Metrics */}
         <div>
           <label className="block text-xs font-heading font-medium text-foreground mb-2">Métricas clave</label>
           {metrics.map((m, i) => (
             <div key={i} className="flex gap-2 mb-2">
               <input className={`${inputClass} flex-1`} placeholder="Etiqueta (e.g. P/E)" value={m.label} onChange={(e) => updateMetric(i, "label", e.target.value)} />
               <input className={`${inputClass} flex-1`} placeholder="Valor (e.g. 25.3x)" value={m.value} onChange={(e) => updateMetric(i, "value", e.target.value)} />
-              <button type="button" onClick={() => removeMetric(i)} className="text-muted-foreground hover:text-foreground">
-                <X size={16} />
-              </button>
+              <button type="button" onClick={() => removeMetric(i)} className="text-muted-foreground hover:text-foreground"><X size={16} /></button>
             </div>
           ))}
           {metrics.length < 8 && (

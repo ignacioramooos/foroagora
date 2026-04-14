@@ -1,22 +1,18 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { fetchMultipleStockPrices, StockQuote, SUPPORTED_STOCKS, fetchStockHistory, StockHistoryPoint } from "@/lib/stockData";
-import { DollarSign, TrendingUp, TrendingDown, Wallet, PieChart, ChevronDown, ChevronUp, Search, ArrowRight, X } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Briefcase, TrendingUp, TrendingDown, Search, DollarSign, BarChart3 } from "lucide-react";
+import { SUPPORTED_TICKERS, fetchQuote } from "@/lib/stockData";
 
 interface Portfolio {
   id: string;
   cash_balance: number;
-  last_portfolio_value: number;
 }
 
 interface Holding {
   id: string;
-  portfolio_id: string;
   ticker: string;
   company_name: string;
   shares: number;
@@ -34,443 +30,261 @@ interface Transaction {
   executed_at: string;
 }
 
-const formatCurrency = (n: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
-
 const PortfolioTab = () => {
-  const { session } = useAuth();
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [holdings, setHoldings] = useState<Holding[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [prices, setPrices] = useState<Map<string, StockQuote>>(new Map());
+  const [prices, setPrices] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
-  const [pricesLoading, setPricesLoading] = useState(false);
-  const [txOpen, setTxOpen] = useState(false);
-  const [txPage, setTxPage] = useState(0);
-
-  // Trade state
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
-  const [selectedQuote, setSelectedQuote] = useState<StockQuote | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedTicker, setSelectedTicker] = useState("");
   const [tradeShares, setTradeShares] = useState("");
-  const [tradeMode, setTradeMode] = useState<"BUY" | "SELL">("BUY");
+  const [tradeType, setTradeType] = useState<"BUY" | "SELL">("BUY");
   const [trading, setTrading] = useState(false);
-  const [tradeError, setTradeError] = useState("");
+  const [showTxns, setShowTxns] = useState(false);
 
-  // Chart modal
-  const [chartTicker, setChartTicker] = useState<string | null>(null);
-  const [chartData, setChartData] = useState<StockHistoryPoint[]>([]);
-  const [chartLoading, setChartLoading] = useState(false);
-
-  const userId = session?.user?.id;
-
-  const loadData = useCallback(async () => {
-    if (!userId) return;
-    setLoading(true);
-
-    // Check if portfolio exists, create if not
-    let { data: p } = await supabase
-      .from("portfolios")
-      .select("id, cash_balance, last_portfolio_value")
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (!p) {
-      const { data: newP } = await supabase
-        .from("portfolios")
-        .insert({ user_id: userId })
-        .select("id, cash_balance, last_portfolio_value")
-        .single();
-      p = newP;
-    }
-
-    if (!p) { setLoading(false); return; }
-    setPortfolio(p as Portfolio);
-
-    const [{ data: h }, { data: t }] = await Promise.all([
-      supabase.from("portfolio_holdings").select("*").eq("portfolio_id", p.id).gt("shares", 0),
-      supabase.from("portfolio_transactions").select("*").eq("portfolio_id", p.id).order("executed_at", { ascending: false }),
-    ]);
-
-    const holdingsData = (h || []) as Holding[];
-    setHoldings(holdingsData);
-    setTransactions((t || []) as Transaction[]);
-    setLoading(false);
-
-    // Fetch prices
-    if (holdingsData.length > 0) {
-      setPricesLoading(true);
-      const tickers = holdingsData.map((h) => h.ticker);
-      const priceMap = await fetchMultipleStockPrices(tickers);
-      setPrices(priceMap);
-      setPricesLoading(false);
-
-      // Update last_portfolio_value
-      let holdingsValue = 0;
-      holdingsData.forEach((h) => {
-        const q = priceMap.get(h.ticker);
-        if (q) holdingsValue += q.price * h.shares;
-      });
-      const totalValue = p.cash_balance + holdingsValue;
-      await supabase.from("portfolios").update({ last_portfolio_value: totalValue }).eq("id", p.id);
-    }
-  }, [userId]);
-
-  useEffect(() => { loadData(); }, [loadData]);
-
-  // Calculate metrics
-  const holdingsValue = holdings.reduce((sum, h) => {
-    const q = prices.get(h.ticker);
-    return sum + (q ? q.price * h.shares : h.avg_cost_per_share * h.shares);
-  }, 0);
-  const totalValue = (portfolio?.cash_balance || 0) + holdingsValue;
-  const totalReturn = ((totalValue / 10000) - 1) * 100;
-
-  // Search
-  const searchResults = searchQuery.length > 0
-    ? SUPPORTED_STOCKS.filter(
-        (s) =>
-          s.ticker.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          s.name.toLowerCase().includes(searchQuery.toLowerCase())
-      ).slice(0, 6)
+  const filteredTickers = searchTerm
+    ? SUPPORTED_TICKERS.filter((t) => t.ticker.toLowerCase().includes(searchTerm.toLowerCase()) || t.name.toLowerCase().includes(searchTerm.toLowerCase()))
     : [];
 
-  const handleSelectTicker = async (ticker: string) => {
-    setSelectedTicker(ticker);
-    setSearchQuery("");
-    setTradeError("");
-    setTradeShares("");
-    const existingHolding = holdings.find((h) => h.ticker === ticker);
-    setTradeMode(existingHolding ? "BUY" : "BUY");
+  useEffect(() => {
+    if (!user) return;
+    const load = async () => {
+      // Get or create portfolio
+      let { data: p } = await supabase.from("portfolios").select("id, cash_balance").eq("user_id", user.id).single();
+      if (!p) {
+        const { data: created } = await supabase.from("portfolios").insert({ user_id: user.id }).select("id, cash_balance").single();
+        p = created;
+      }
+      if (!p) { setLoading(false); return; }
+      setPortfolio(p);
 
-    // Fetch fresh price
-    const priceMap = await fetchMultipleStockPrices([ticker]);
-    const q = priceMap.get(ticker);
-    setSelectedQuote(q || null);
+      const [holdingsRes, txnRes] = await Promise.all([
+        supabase.from("portfolio_holdings").select("*").eq("portfolio_id", p.id),
+        supabase.from("portfolio_transactions").select("*").eq("portfolio_id", p.id).order("executed_at", { ascending: false }).limit(20),
+      ]);
+      setHoldings(holdingsRes.data || []);
+      setTransactions(txnRes.data || []);
+
+      // Fetch prices for holdings
+      if (holdingsRes.data && holdingsRes.data.length > 0) {
+        const priceMap: Record<string, number> = {};
+        await Promise.all(
+          holdingsRes.data.map(async (h) => {
+            const quote = await fetchQuote(h.ticker);
+            if (quote) priceMap[h.ticker] = quote.price;
+          })
+        );
+        setPrices(priceMap);
+      }
+      setLoading(false);
+    };
+    load();
+  }, [user]);
+
+  const selectTicker = async (ticker: string) => {
+    setSelectedTicker(ticker);
+    setSearchTerm("");
+    const quote = await fetchQuote(ticker);
+    if (quote) setPrices((p) => ({ ...p, [ticker]: quote.price }));
   };
 
-  const tradeSharesNum = parseFloat(tradeShares) || 0;
-  const tradeTotal = tradeSharesNum * (selectedQuote?.price || 0);
-  const existingHolding = holdings.find((h) => h.ticker === selectedTicker);
+  const executeTrade = async () => {
+    if (!portfolio || !selectedTicker || !tradeShares) return;
+    const shares = parseFloat(tradeShares);
+    const price = prices[selectedTicker];
+    if (!price || shares <= 0) return;
 
-  const handleTrade = async () => {
-    if (!portfolio || !selectedTicker || !selectedQuote || tradeSharesNum <= 0) return;
-    setTradeError("");
+    const total = shares * price;
+    const tickerInfo = SUPPORTED_TICKERS.find((t) => t.ticker === selectedTicker);
+
+    if (tradeType === "BUY") {
+      if (total > portfolio.cash_balance) {
+        toast({ title: "Saldo insuficiente", variant: "destructive" });
+        return;
+      }
+    } else {
+      const holding = holdings.find((h) => h.ticker === selectedTicker);
+      if (!holding || shares > holding.shares) {
+        toast({ title: "No tenés suficientes acciones", variant: "destructive" });
+        return;
+      }
+    }
+
     setTrading(true);
 
-    try {
-      if (tradeMode === "BUY") {
-        if (tradeTotal > portfolio.cash_balance) {
-          setTradeError("Saldo insuficiente");
-          setTrading(false);
-          return;
-        }
+    // Insert transaction
+    await supabase.from("portfolio_transactions").insert({
+      portfolio_id: portfolio.id, ticker: selectedTicker,
+      company_name: tickerInfo?.name || selectedTicker,
+      transaction_type: tradeType, shares, price_per_share: price, total_amount: total,
+    });
 
-        // Deduct cash
-        await supabase.from("portfolios").update({
-          cash_balance: portfolio.cash_balance - tradeTotal,
-        }).eq("id", portfolio.id);
+    // Update cash
+    const newCash = tradeType === "BUY" ? portfolio.cash_balance - total : portfolio.cash_balance + total;
+    await supabase.from("portfolios").update({ cash_balance: newCash }).eq("id", portfolio.id);
 
-        // Upsert holding
-        if (existingHolding) {
-          const newShares = existingHolding.shares + tradeSharesNum;
-          const newAvg = (existingHolding.shares * existingHolding.avg_cost_per_share + tradeSharesNum * selectedQuote.price) / newShares;
-          await supabase.from("portfolio_holdings").update({
-            shares: newShares,
-            avg_cost_per_share: Math.round(newAvg * 100) / 100,
-          }).eq("id", existingHolding.id);
-        } else {
-          await supabase.from("portfolio_holdings").insert({
-            portfolio_id: portfolio.id,
-            ticker: selectedTicker,
-            company_name: selectedQuote.companyName,
-            shares: tradeSharesNum,
-            avg_cost_per_share: selectedQuote.price,
-          });
-        }
-
-        // Record transaction
-        await supabase.from("portfolio_transactions").insert({
-          portfolio_id: portfolio.id,
-          ticker: selectedTicker,
-          company_name: selectedQuote.companyName,
-          transaction_type: "BUY",
-          shares: tradeSharesNum,
-          price_per_share: selectedQuote.price,
-          total_amount: tradeTotal,
-        });
+    // Update holdings
+    const existing = holdings.find((h) => h.ticker === selectedTicker);
+    if (tradeType === "BUY") {
+      if (existing) {
+        const newShares = existing.shares + shares;
+        const newAvg = (existing.shares * existing.avg_cost_per_share + shares * price) / newShares;
+        await supabase.from("portfolio_holdings").update({ shares: newShares, avg_cost_per_share: newAvg }).eq("id", existing.id);
       } else {
-        // SELL
-        if (!existingHolding || tradeSharesNum > existingHolding.shares) {
-          setTradeError("No tenés suficientes acciones");
-          setTrading(false);
-          return;
-        }
-
-        const proceeds = tradeSharesNum * selectedQuote.price;
-
-        await supabase.from("portfolios").update({
-          cash_balance: portfolio.cash_balance + proceeds,
-        }).eq("id", portfolio.id);
-
-        const remainingShares = existingHolding.shares - tradeSharesNum;
-        if (remainingShares <= 0) {
-          await supabase.from("portfolio_holdings").delete().eq("id", existingHolding.id);
-        } else {
-          await supabase.from("portfolio_holdings").update({
-            shares: remainingShares,
-          }).eq("id", existingHolding.id);
-        }
-
-        await supabase.from("portfolio_transactions").insert({
-          portfolio_id: portfolio.id,
-          ticker: selectedTicker,
-          company_name: selectedQuote.companyName,
-          transaction_type: "SELL",
-          shares: tradeSharesNum,
-          price_per_share: selectedQuote.price,
-          total_amount: proceeds,
+        await supabase.from("portfolio_holdings").insert({
+          portfolio_id: portfolio.id, ticker: selectedTicker,
+          company_name: tickerInfo?.name || selectedTicker,
+          shares, avg_cost_per_share: price,
         });
       }
-
-      setSelectedTicker(null);
-      setSelectedQuote(null);
-      setTradeShares("");
-      await loadData();
-    } catch {
-      setTradeError("Error al ejecutar la operación");
+    } else {
+      if (existing) {
+        const newShares = existing.shares - shares;
+        if (newShares <= 0) {
+          await supabase.from("portfolio_holdings").delete().eq("id", existing.id);
+        } else {
+          await supabase.from("portfolio_holdings").update({ shares: newShares }).eq("id", existing.id);
+        }
+      }
     }
+
+    // Refresh
+    setPortfolio({ ...portfolio, cash_balance: newCash });
+    const { data: h } = await supabase.from("portfolio_holdings").select("*").eq("portfolio_id", portfolio.id);
+    setHoldings(h || []);
+    const { data: t } = await supabase.from("portfolio_transactions").select("*").eq("portfolio_id", portfolio.id).order("executed_at", { ascending: false }).limit(20);
+    setTransactions(t || []);
+    setTradeShares("");
     setTrading(false);
+    toast({ title: tradeType === "BUY" ? "Compra ejecutada" : "Venta ejecutada" });
   };
 
-  const openChart = async (ticker: string) => {
-    setChartTicker(ticker);
-    setChartLoading(true);
-    const data = await fetchStockHistory(ticker);
-    setChartData(data);
-    setChartLoading(false);
-  };
+  const holdingsValue = holdings.reduce((sum, h) => sum + h.shares * (prices[h.ticker] || h.avg_cost_per_share), 0);
+  const totalValue = (portfolio?.cash_balance || 0) + holdingsValue;
+  const totalReturn = ((totalValue / 10000 - 1) * 100);
 
   if (loading) {
-    return (
-      <div className="space-y-4">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="h-20 bg-secondary rounded-lg animate-pulse" />
-        ))}
-      </div>
-    );
+    return <div className="p-6"><div className="animate-pulse space-y-4"><div className="h-20 bg-secondary rounded-lg" /><div className="h-40 bg-secondary rounded-lg" /></div></div>;
   }
 
-  const paginatedTx = transactions.slice(txPage * 10, (txPage + 1) * 10);
-
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6">
+      <h2 className="text-xl font-heading font-semibold text-foreground">Mi Portafolio</h2>
+
       {/* Metrics */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {[
-          { label: "Saldo disponible", value: formatCurrency(portfolio?.cash_balance || 0), icon: Wallet },
-          { label: "Valor holdings", value: pricesLoading ? "..." : formatCurrency(holdingsValue), icon: PieChart },
-          { label: "Valor total", value: pricesLoading ? "..." : formatCurrency(totalValue), icon: DollarSign },
-          {
-            label: "Retorno total",
-            value: pricesLoading ? "..." : `${totalReturn >= 0 ? "+" : ""}${totalReturn.toFixed(2)}%`,
-            icon: totalReturn >= 0 ? TrendingUp : TrendingDown,
-            color: totalReturn >= 0 ? "#22D07A" : "#EF4444",
-          },
-        ].map((m) => (
-          <div key={m.label} className="border border-border rounded-lg p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <m.icon size={14} className="text-muted-foreground" style={m.color ? { color: m.color } : undefined} />
-              <span className="text-xs font-heading text-muted-foreground">{m.label}</span>
-            </div>
-            <p className="text-lg font-heading font-semibold text-foreground" style={m.color ? { color: m.color } : undefined}>
-              {m.value}
-            </p>
-          </div>
-        ))}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="border border-border rounded-lg p-4">
+          <p className="text-xs text-muted-foreground font-heading uppercase tracking-wide mb-1">Saldo disponible</p>
+          <p className="text-lg font-heading font-semibold text-foreground">${portfolio?.cash_balance.toLocaleString("en-US", { minimumFractionDigits: 2 }) || "0.00"}</p>
+        </div>
+        <div className="border border-border rounded-lg p-4">
+          <p className="text-xs text-muted-foreground font-heading uppercase tracking-wide mb-1">Valor holdings</p>
+          <p className="text-lg font-heading font-semibold text-foreground">${holdingsValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+        </div>
+        <div className="border border-border rounded-lg p-4">
+          <p className="text-xs text-muted-foreground font-heading uppercase tracking-wide mb-1">Valor total</p>
+          <p className="text-lg font-heading font-semibold text-foreground">${totalValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+        </div>
+        <div className="border border-border rounded-lg p-4">
+          <p className="text-xs text-muted-foreground font-heading uppercase tracking-wide mb-1">Retorno total</p>
+          <p className={`text-lg font-heading font-semibold ${totalReturn >= 0 ? "text-[#22D07A]" : "text-red-500"}`}>
+            {totalReturn >= 0 ? "+" : ""}{totalReturn.toFixed(2)}%
+          </p>
+        </div>
       </div>
 
-      {/* Trade panel */}
-      <div className="border border-border rounded-lg p-5">
-        <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">Operar</p>
-
-        {/* Search */}
+      {/* Trade */}
+      <div className="border border-border rounded-lg p-6">
+        <h3 className="font-heading font-semibold text-foreground mb-4">Operar</h3>
         <div className="relative mb-4">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Buscar ticker o empresa..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 font-heading"
+          <Search size={16} className="absolute left-3 top-3 text-muted-foreground" />
+          <input
+            className="w-full h-10 pl-9 pr-4 rounded-md border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring/50 font-heading"
+            placeholder="Buscar ticker (e.g. AAPL, MELI)..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
-          {searchResults.length > 0 && (
-            <div className="absolute z-10 top-full mt-1 w-full bg-background border border-border rounded-lg shadow-lg overflow-hidden">
-              {searchResults.map((s) => (
-                <button
-                  key={s.ticker}
-                  onClick={() => handleSelectTicker(s.ticker)}
-                  className="w-full flex items-center justify-between px-4 py-2.5 text-sm font-heading hover:bg-secondary transition-colors"
-                >
-                  <span className="font-medium text-foreground">{s.ticker}</span>
-                  <span className="text-muted-foreground text-xs">{s.name}</span>
+          {filteredTickers.length > 0 && searchTerm && (
+            <div className="absolute top-11 left-0 right-0 bg-background border border-border rounded-md shadow-lg z-10 max-h-48 overflow-y-auto">
+              {filteredTickers.map((t) => (
+                <button key={t.ticker} onClick={() => selectTicker(t.ticker)}
+                  className="w-full text-left px-4 py-2 text-sm hover:bg-secondary transition-colors font-heading">
+                  <span className="font-medium text-foreground">{t.ticker}</span>
+                  <span className="text-muted-foreground ml-2">{t.name}</span>
                 </button>
               ))}
             </div>
           )}
         </div>
 
-        {/* Selected stock trade form */}
-        {selectedTicker && selectedQuote && (
-          <div className="border border-border rounded-lg p-4">
-            <div className="flex items-center justify-between mb-4">
+        {selectedTicker && prices[selectedTicker] && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
               <div>
-                <p className="font-heading font-semibold text-foreground">{selectedQuote.companyName}</p>
-                <p className="text-xs text-muted-foreground">{selectedTicker} · Precio en tiempo real</p>
+                <span className="font-heading font-semibold text-foreground">{selectedTicker}</span>
+                <span className="text-muted-foreground text-sm ml-2">${prices[selectedTicker].toFixed(2)}</span>
               </div>
-              <div className="text-right">
-                <p className="font-heading font-semibold text-foreground">{formatCurrency(selectedQuote.price)}</p>
-                <p className="text-xs" style={{ color: selectedQuote.change >= 0 ? "#22D07A" : "#EF4444" }}>
-                  {selectedQuote.change >= 0 ? "+" : ""}{selectedQuote.change} ({selectedQuote.changePercent}%)
-                </p>
+              <div className="flex gap-2">
+                <button onClick={() => setTradeType("BUY")} className={`px-3 py-1 rounded text-sm font-heading font-medium ${tradeType === "BUY" ? "bg-[#22D07A] text-white" : "bg-secondary text-muted-foreground"}`}>Comprar</button>
+                <button onClick={() => setTradeType("SELL")} className={`px-3 py-1 rounded text-sm font-heading font-medium ${tradeType === "SELL" ? "bg-red-500 text-white" : "bg-secondary text-muted-foreground"}`}>Vender</button>
               </div>
             </div>
-
-            {/* Buy/Sell toggle */}
-            <div className="flex gap-2 mb-4">
-              <button
-                onClick={() => { setTradeMode("BUY"); setTradeError(""); }}
-                className={`flex-1 py-2 rounded-md text-sm font-heading font-medium transition-colors ${
-                  tradeMode === "BUY" ? "text-white" : "bg-secondary text-muted-foreground"
-                }`}
-                style={tradeMode === "BUY" ? { backgroundColor: "#22D07A" } : undefined}
-              >
-                Comprar
-              </button>
-              <button
-                onClick={() => { setTradeMode("SELL"); setTradeError(""); }}
-                className={`flex-1 py-2 rounded-md text-sm font-heading font-medium transition-colors ${
-                  tradeMode === "SELL" ? "bg-red-500 text-white" : "bg-secondary text-muted-foreground"
-                }`}
-              >
-                Vender
-              </button>
-            </div>
-
-            {tradeMode === "SELL" && existingHolding && (
-              <p className="text-xs text-muted-foreground mb-2">
-                Tenés {existingHolding.shares} acciones de {selectedTicker}
+            <input
+              type="number" step="0.01" min="0"
+              className="w-full h-10 px-3 rounded-md border border-border bg-background text-foreground text-sm font-heading"
+              placeholder="Cantidad de acciones"
+              value={tradeShares}
+              onChange={(e) => setTradeShares(e.target.value)}
+            />
+            {tradeShares && (
+              <p className="text-sm text-muted-foreground">
+                {tradeType === "BUY" ? "Total a invertir" : "Recibirás"}: ${(parseFloat(tradeShares) * prices[selectedTicker]).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             )}
-
-            <div className="flex gap-3 items-end">
-              <div className="flex-1">
-                <label className="text-xs font-heading text-muted-foreground mb-1 block">Cantidad de acciones</label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={tradeShares}
-                  onChange={(e) => { setTradeShares(e.target.value); setTradeError(""); }}
-                  placeholder="0.00"
-                  className="font-heading"
-                />
-              </div>
-              <div className="text-right pb-1">
-                <p className="text-xs text-muted-foreground">
-                  {tradeMode === "BUY" ? "Total a invertir" : "Recibirás"}
-                </p>
-                <p className="font-heading font-semibold text-foreground">{formatCurrency(tradeTotal)}</p>
-              </div>
-            </div>
-
-            {tradeError && (
-              <p className="text-xs text-red-500 mt-2">{tradeError}</p>
-            )}
-
-            <Button
-              onClick={handleTrade}
-              disabled={trading || tradeSharesNum <= 0}
-              className="w-full mt-4 gap-2"
-              variant="cta"
-              size="sm"
-            >
-              {trading ? "Ejecutando..." : tradeMode === "BUY" ? "Comprar" : "Vender"} <ArrowRight size={14} />
+            <Button onClick={executeTrade} variant="cta" className="w-full" disabled={trading || !tradeShares}>
+              {trading ? "Ejecutando..." : tradeType === "BUY" ? "Comprar" : "Vender"}
             </Button>
-
-            <button
-              onClick={() => { setSelectedTicker(null); setSelectedQuote(null); }}
-              className="w-full text-center text-xs text-muted-foreground mt-2 hover:text-foreground"
-            >
-              Cancelar
-            </button>
           </div>
         )}
       </div>
 
       {/* Holdings */}
-      <div>
-        <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
-          Mis posiciones
-        </p>
+      <div className="border border-border rounded-lg overflow-hidden">
+        <div className="px-6 py-4 border-b border-border">
+          <h3 className="font-heading font-semibold text-foreground">Holdings</h3>
+        </div>
         {holdings.length === 0 ? (
-          <div className="border border-border rounded-lg p-8 text-center">
-            <PieChart size={32} className="mx-auto text-muted-foreground/30 mb-3" />
-            <p className="text-sm text-muted-foreground">
-              Tu portafolio está vacío. ¡Comprá tu primera acción! ↑
-            </p>
+          <div className="p-8 text-center">
+            <Briefcase size={32} className="mx-auto text-muted-foreground/30 mb-3" />
+            <p className="text-muted-foreground">Tu portafolio está vacío. ¡Comprá tu primera acción!</p>
           </div>
         ) : (
-          <div className="border border-border rounded-lg overflow-x-auto">
+          <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border">
-                  {["Ticker", "Acciones", "Costo prom.", "Precio actual", "Valor", "P&L", ""].map((h) => (
-                    <th key={h} className="text-left px-4 py-3 text-xs font-heading font-medium text-muted-foreground uppercase tracking-wider">
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
+              <thead><tr className="border-b border-border text-xs text-muted-foreground font-heading uppercase">
+                <th className="text-left px-4 py-2">Ticker</th>
+                <th className="text-left px-4 py-2">Empresa</th>
+                <th className="text-right px-4 py-2">Acciones</th>
+                <th className="text-right px-4 py-2">Costo prom.</th>
+                <th className="text-right px-4 py-2">Precio actual</th>
+                <th className="text-right px-4 py-2">P&L</th>
+              </tr></thead>
               <tbody>
                 {holdings.map((h) => {
-                  const q = prices.get(h.ticker);
-                  const currentPrice = q?.price || h.avg_cost_per_share;
-                  const value = currentPrice * h.shares;
+                  const currentPrice = prices[h.ticker] || h.avg_cost_per_share;
                   const pnl = (currentPrice - h.avg_cost_per_share) * h.shares;
-                  const pnlPct = ((currentPrice / h.avg_cost_per_share) - 1) * 100;
-                  const isPositive = pnl >= 0;
-
                   return (
-                    <tr key={h.id} className="border-b border-border last:border-0 hover:bg-secondary/30 transition-colors">
-                      <td className="px-4 py-3">
-                        <p className="font-heading font-medium text-foreground">{h.ticker}</p>
-                        <p className="text-xs text-muted-foreground truncate max-w-[120px]">{h.company_name}</p>
-                      </td>
-                      <td className="px-4 py-3 font-heading text-foreground">{h.shares}</td>
-                      <td className="px-4 py-3 font-heading text-muted-foreground">{formatCurrency(h.avg_cost_per_share)}</td>
-                      <td className="px-4 py-3 font-heading text-foreground">
-                        {pricesLoading ? "..." : formatCurrency(currentPrice)}
-                      </td>
-                      <td className="px-4 py-3 font-heading text-foreground">{pricesLoading ? "..." : formatCurrency(value)}</td>
-                      <td className="px-4 py-3">
-                        <span className="font-heading font-medium" style={{ color: isPositive ? "#22D07A" : "#EF4444" }}>
-                          {isPositive ? "+" : ""}{formatCurrency(pnl)}
-                          <span className="text-xs ml-1">({pnlPct.toFixed(1)}%)</span>
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex gap-1">
-                          <button onClick={() => openChart(h.ticker)} className="text-xs text-muted-foreground hover:text-foreground font-heading">
-                            Gráfico
-                          </button>
-                          <span className="text-muted-foreground/30">·</span>
-                          <button
-                            onClick={() => { handleSelectTicker(h.ticker); setTradeMode("SELL"); }}
-                            className="text-xs text-red-400 hover:text-red-300 font-heading"
-                          >
-                            Vender
-                          </button>
-                        </div>
+                    <tr key={h.id} className="border-b border-border last:border-0">
+                      <td className="px-4 py-3 font-heading font-medium text-foreground">{h.ticker}</td>
+                      <td className="px-4 py-3 text-muted-foreground">{h.company_name}</td>
+                      <td className="px-4 py-3 text-right">{h.shares}</td>
+                      <td className="px-4 py-3 text-right">${h.avg_cost_per_share.toFixed(2)}</td>
+                      <td className="px-4 py-3 text-right">${currentPrice.toFixed(2)}</td>
+                      <td className={`px-4 py-3 text-right font-medium ${pnl >= 0 ? "text-[#22D07A]" : "text-red-500"}`}>
+                        {pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}
                       </td>
                     </tr>
                   );
@@ -483,117 +297,41 @@ const PortfolioTab = () => {
 
       {/* Transactions */}
       {transactions.length > 0 && (
-        <div>
-          <button
-            onClick={() => setTxOpen(!txOpen)}
-            className="flex items-center gap-2 text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-3 hover:text-foreground transition-colors"
-          >
-            Historial de operaciones
-            {txOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+        <div className="border border-border rounded-lg overflow-hidden">
+          <button onClick={() => setShowTxns(!showTxns)} className="w-full px-6 py-4 flex items-center justify-between text-left">
+            <h3 className="font-heading font-semibold text-foreground">Historial de transacciones</h3>
+            <span className="text-muted-foreground text-sm">{showTxns ? "Ocultar" : "Mostrar"}</span>
           </button>
-          {txOpen && (
-            <div className="border border-border rounded-lg overflow-x-auto">
+          {showTxns && (
+            <div className="overflow-x-auto border-t border-border">
               <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border">
-                    {["Fecha", "Tipo", "Ticker", "Acciones", "Precio", "Total"].map((h) => (
-                      <th key={h} className="text-left px-4 py-3 text-xs font-heading font-medium text-muted-foreground uppercase tracking-wider">
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
+                <thead><tr className="border-b border-border text-xs text-muted-foreground font-heading uppercase">
+                  <th className="text-left px-4 py-2">Fecha</th>
+                  <th className="text-left px-4 py-2">Tipo</th>
+                  <th className="text-left px-4 py-2">Ticker</th>
+                  <th className="text-right px-4 py-2">Acciones</th>
+                  <th className="text-right px-4 py-2">Precio</th>
+                  <th className="text-right px-4 py-2">Total</th>
+                </tr></thead>
                 <tbody>
-                  {paginatedTx.map((t) => (
+                  {transactions.map((t) => (
                     <tr key={t.id} className="border-b border-border last:border-0">
-                      <td className="px-4 py-3 text-muted-foreground font-heading">
-                        {new Date(t.executed_at).toLocaleDateString("es-UY")}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span
-                          className="text-xs font-heading font-medium px-2 py-0.5 rounded"
-                          style={{
-                            backgroundColor: t.transaction_type === "BUY" ? "rgba(34,208,122,0.1)" : "rgba(239,68,68,0.1)",
-                            color: t.transaction_type === "BUY" ? "#22D07A" : "#EF4444",
-                          }}
-                        >
-                          {t.transaction_type === "BUY" ? "Compra" : "Venta"}
-                        </span>
+                      <td className="px-4 py-3 text-muted-foreground">{new Date(t.executed_at).toLocaleDateString("es-UY")}</td>
+                      <td className={`px-4 py-3 font-medium ${t.transaction_type === "BUY" ? "text-[#22D07A]" : "text-red-500"}`}>
+                        {t.transaction_type === "BUY" ? "Compra" : "Venta"}
                       </td>
                       <td className="px-4 py-3 font-heading font-medium text-foreground">{t.ticker}</td>
-                      <td className="px-4 py-3 font-heading text-foreground">{t.shares}</td>
-                      <td className="px-4 py-3 font-heading text-muted-foreground">{formatCurrency(t.price_per_share)}</td>
-                      <td className="px-4 py-3 font-heading text-foreground">{formatCurrency(t.total_amount)}</td>
+                      <td className="px-4 py-3 text-right">{t.shares}</td>
+                      <td className="px-4 py-3 text-right">${t.price_per_share.toFixed(2)}</td>
+                      <td className="px-4 py-3 text-right">${t.total_amount.toFixed(2)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-              {transactions.length > 10 && (
-                <div className="flex items-center justify-between px-4 py-3 border-t border-border">
-                  <button
-                    disabled={txPage === 0}
-                    onClick={() => setTxPage(txPage - 1)}
-                    className="text-xs font-heading text-muted-foreground hover:text-foreground disabled:opacity-30"
-                  >
-                    ← Anterior
-                  </button>
-                  <span className="text-xs text-muted-foreground font-heading">
-                    Página {txPage + 1} de {Math.ceil(transactions.length / 10)}
-                  </span>
-                  <button
-                    disabled={(txPage + 1) * 10 >= transactions.length}
-                    onClick={() => setTxPage(txPage + 1)}
-                    className="text-xs font-heading text-muted-foreground hover:text-foreground disabled:opacity-30"
-                  >
-                    Siguiente →
-                  </button>
-                </div>
-              )}
             </div>
           )}
         </div>
       )}
-
-      {/* Chart modal */}
-      <Dialog open={!!chartTicker} onOpenChange={() => setChartTicker(null)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="font-heading">{chartTicker} — Últimos 3 meses</DialogTitle>
-          </DialogHeader>
-          {chartLoading ? (
-            <div className="h-64 flex items-center justify-center text-muted-foreground text-sm">Cargando...</div>
-          ) : (
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis
-                    dataKey="date"
-                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
-                    tickFormatter={(v) => v.slice(5)}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
-                    tickFormatter={(v) => `$${v}`}
-                    domain={["auto", "auto"]}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--background))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: 8,
-                      fontSize: 12,
-                    }}
-                    formatter={(v: number) => [formatCurrency(v), "Precio"]}
-                    labelFormatter={(l) => l}
-                  />
-                  <Line type="monotone" dataKey="close" stroke="#22D07A" strokeWidth={2} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
