@@ -57,6 +57,9 @@ const AppRoutes = () => {
         <Route path="/formacion" element={<FormacionPage />} />
         <Route path="/ranking" element={<RankingPage />} />
         <Route path="/impacto" element={<ImpactPage />} />
+        <Route path="/analisis" element={<PublicPage><CaseStudiesPage /></PublicPage>} />
+        <Route path="/analisis/:id" element={<PublicPage><CaseStudyDetailPage /></PublicPage>} />
+        <Route path="/alianzas" element={<PublicPage><PartnersPage /></PublicPage>} />
         <Route path="/auth" element={<AuthPage />} />
     </>
   );
