@@ -193,41 +193,13 @@ const InvestorQuiz = () => {
   );
 };
 
-/* ---- Glossary ---- */
-const Glossary = () => {
-  const [search, setSearch] = useState("");
-  const filtered = mockGlossary.filter((t) =>
-    t.term.toLowerCase().includes(search.toLowerCase()) ||
-    t.definition.toLowerCase().includes(search.toLowerCase())
-  );
-
-  return (
-    <div className="border border-border rounded-lg p-6">
-      <div className="flex items-center gap-2 mb-4">
-        <Search size={18} className="text-muted-foreground" />
-        <h3 className="font-heading font-semibold text-foreground text-lg">Glosario</h3>
-      </div>
-      <input
-        type="text"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        placeholder="Buscar término..."
-        className="w-full h-10 px-3 rounded-md border border-border bg-background text-foreground text-sm font-heading focus:outline-none focus:ring-2 focus:ring-ring/50 mb-4"
-      />
-      <div className="divide-y divide-border max-h-80 overflow-y-auto">
-        {filtered.map((t) => (
-          <div key={t.term} className="py-3">
-            <p className="text-sm font-heading font-medium text-foreground">{t.term}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">{t.definition}</p>
-          </div>
-        ))}
-        {filtered.length === 0 && (
-          <p className="py-4 text-sm text-muted-foreground text-center">No se encontraron resultados.</p>
-        )}
-      </div>
-    </div>
-  );
-};
+/* ---- Glossary (shared component) ---- */
+const DashboardGlossary = () => (
+  <div className="border border-border rounded-lg p-6">
+    <h3 className="font-heading font-semibold text-foreground text-lg mb-4">Glosario</h3>
+    <GlossaryContent />
+  </div>
+);
 
 /* ---- Main Toolkit View ---- */
 const Toolkit = () => (
