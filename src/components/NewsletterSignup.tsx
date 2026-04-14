@@ -4,11 +4,7 @@ import { CheckCircle2 } from "lucide-react";
 
 type Status = "idle" | "loading" | "success" | "duplicate" | "error";
 
-interface Props {
-  variant?: "default" | "dark";
-}
-
-const NewsletterSignup = ({ variant = "default" }: Props) => {
+const NewsletterSignup = () => {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
 
@@ -41,15 +37,11 @@ const NewsletterSignup = ({ variant = "default" }: Props) => {
     }
   };
 
-  const isDark = variant === "dark";
-  const textColor = isDark ? "text-primary-foreground" : "text-foreground";
-  const mutedColor = isDark ? "text-primary-foreground/60" : "text-muted-foreground";
-
   if (status === "success") {
     return (
       <div className="flex items-center gap-2">
         <CheckCircle2 size={18} className="text-accent" />
-        <span className={`text-sm font-heading ${textColor}`}>
+        <span className="text-sm font-heading text-foreground">
           ¡Te sumaste! Te escribimos pronto.
         </span>
       </div>
@@ -68,10 +60,10 @@ const NewsletterSignup = ({ variant = "default" }: Props) => {
 
   return (
     <div>
-      <p className={`font-heading font-semibold text-base mb-1 ${textColor}`}>
+      <p className="font-heading font-semibold text-base mb-1 text-foreground">
         Recibí un concepto financiero por semana.
       </p>
-      <p className={`text-sm mb-4 ${mutedColor}`}>
+      <p className="text-sm mb-4 text-muted-foreground">
         Sin spam. Solo valor. Gratis.
       </p>
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
@@ -81,11 +73,7 @@ const NewsletterSignup = ({ variant = "default" }: Props) => {
           onChange={(e) => { setEmail(e.target.value); if (status === "error") setStatus("idle"); }}
           placeholder="tu@email.com"
           required
-          className={`h-11 px-4 rounded-lg text-sm font-heading focus:outline-none focus:ring-2 focus:ring-ring/50 flex-1 min-w-0 ${
-            isDark
-              ? "bg-primary-foreground/10 border border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/40"
-              : "bg-background border border-border text-foreground placeholder:text-muted-foreground"
-          }`}
+          className="h-11 px-4 rounded-lg text-sm font-heading focus:outline-none focus:ring-2 focus:ring-ring/50 flex-1 min-w-0 bg-background border border-border text-foreground placeholder:text-muted-foreground"
         />
         <button
           type="submit"
