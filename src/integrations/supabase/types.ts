@@ -285,6 +285,120 @@ export type Database = {
         }
         Relationships: []
       }
+      portfolio_holdings: {
+        Row: {
+          avg_cost_per_share: number
+          company_name: string
+          id: string
+          portfolio_id: string
+          shares: number
+          ticker: string
+        }
+        Insert: {
+          avg_cost_per_share: number
+          company_name: string
+          id?: string
+          portfolio_id: string
+          shares?: number
+          ticker: string
+        }
+        Update: {
+          avg_cost_per_share?: number
+          company_name?: string
+          id?: string
+          portfolio_id?: string
+          shares?: number
+          ticker?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_holdings_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            isOneToOne: false
+            referencedRelation: "portfolios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      portfolio_transactions: {
+        Row: {
+          company_name: string
+          executed_at: string
+          id: string
+          portfolio_id: string
+          price_per_share: number
+          shares: number
+          ticker: string
+          total_amount: number
+          transaction_type: string
+        }
+        Insert: {
+          company_name: string
+          executed_at?: string
+          id?: string
+          portfolio_id: string
+          price_per_share: number
+          shares: number
+          ticker: string
+          total_amount: number
+          transaction_type: string
+        }
+        Update: {
+          company_name?: string
+          executed_at?: string
+          id?: string
+          portfolio_id?: string
+          price_per_share?: number
+          shares?: number
+          ticker?: string
+          total_amount?: number
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_transactions_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            isOneToOne: false
+            referencedRelation: "portfolios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      portfolios: {
+        Row: {
+          cash_balance: number
+          cohort_id: string | null
+          created_at: string
+          id: string
+          last_portfolio_value: number | null
+          user_id: string
+        }
+        Insert: {
+          cash_balance?: number
+          cohort_id?: string | null
+          created_at?: string
+          id?: string
+          last_portfolio_value?: number | null
+          user_id: string
+        }
+        Update: {
+          cash_balance?: number
+          cohort_id?: string | null
+          created_at?: string
+          id?: string
+          last_portfolio_value?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portfolios_cohort_id_fkey"
+            columns: ["cohort_id"]
+            isOneToOne: false
+            referencedRelation: "cohorts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           accepted_terms: boolean
