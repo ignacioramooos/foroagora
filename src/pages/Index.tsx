@@ -1,7 +1,11 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import SectionFade from "@/components/SectionFade";
-import AnimatedCounter from "@/components/AnimatedCounter";
+import LiveStudentCounter from "@/components/LiveStudentCounter";
+import CohortCountdown from "@/components/CohortCountdown";
+import CapacityBar from "@/components/CapacityBar";
+import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, MapPin, Calendar, Users, Clock } from "lucide-react";
 
 const Hero = () => (
@@ -13,36 +17,20 @@ const Hero = () => (
         </h1>
       </SectionFade>
       <SectionFade delay={0.1}>
-        <p className="text-lg text-muted-foreground max-w-lg mb-12 leading-relaxed">
+        <p className="text-lg text-muted-foreground max-w-lg mb-8 leading-relaxed">
           Clases presenciales de análisis fundamental para estudiantes en Uruguay. Sin costos. Sin trading. Sin experiencia previa.
         </p>
+      </SectionFade>
+      <SectionFade delay={0.12}>
+        <div className="mb-12">
+          <LiveStudentCounter />
+        </div>
       </SectionFade>
       <SectionFade delay={0.15}>
         <Button asChild variant="cta" size="cta">
           <Link to="/registro">Inscribite</Link>
         </Button>
       </SectionFade>
-    </div>
-  </section>
-);
-
-const SocialProof = () => (
-  <section className="border-y border-border">
-    <div className="container py-8">
-      <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4 text-center">
-        {[
-          { value: 150, suffix: "+", label: "estudiantes" },
-          { value: 24, label: "clases dictadas" },
-          { value: 96, suffix: "%", label: "lo recomiendan" },
-        ].map((s) => (
-          <div key={s.label} className="flex items-baseline gap-2">
-            <span className="text-2xl font-heading font-semibold text-foreground">
-              <AnimatedCounter end={s.value} suffix={s.suffix} />
-            </span>
-            <span className="text-sm text-muted-foreground">{s.label}</span>
-          </div>
-        ))}
-      </div>
     </div>
   </section>
 );
@@ -169,77 +157,71 @@ const HowItWorks = () => (
   </section>
 );
 
-const UpcomingClasses = () => (
-  <section className="py-24 md:py-32 border-y border-border">
-    <div className="container">
-      <div className="grid md:grid-cols-2 gap-16 items-center">
-        <div>
-          <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
-            Próximas clases
-          </p>
-          <h2 className="text-3xl md:text-4xl text-foreground mb-6">
-            Próxima cohorte
-          </h2>
-          <p className="text-muted-foreground text-lg leading-relaxed">
-            Las clases son presenciales, en grupos reducidos.
-          </p>
-        </div>
-        <div className="border border-border rounded-lg p-8">
-          <div className="space-y-4 mb-8">
-            <div className="flex items-center gap-3 text-muted-foreground">
-              <MapPin size={16} className="shrink-0" />
-              <span>Montevideo, Centro</span>
-            </div>
-            <div className="flex items-center gap-3 text-muted-foreground">
-              <Calendar size={16} className="shrink-0" />
-              <span>Sábados, Mayo 2025</span>
-            </div>
-            <div className="flex items-center gap-3 text-muted-foreground">
-              <Clock size={16} className="shrink-0" />
-              <span>10:00 – 12:00</span>
-            </div>
-            <div className="flex items-center gap-3 text-muted-foreground">
-              <Users size={16} className="shrink-0" />
-              <span>25 lugares disponibles</span>
-            </div>
-          </div>
-          <Button asChild variant="cta" size="cta" className="w-full">
-            <Link to="/registro">Ver inscripción</Link>
-          </Button>
-        </div>
-      </div>
-    </div>
-  </section>
-);
+const UpcomingClasses = () => {
+  const [cohort, setCohort] = useState<{ start_date: string; location: string; max_capacity: number } | null>(null);
 
-const Testimonials = () => (
-  <section className="py-24 md:py-32">
-    <div className="container max-w-3xl">
-      <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
-        Testimonios
-      </p>
-      <h2 className="text-3xl md:text-4xl text-foreground mb-16">
-        Lo que dicen nuestros estudiantes
-      </h2>
-      <div className="space-y-12">
-        {[
-          { name: "Valentina R.", age: "17 años, Liceo 7", quote: "Nunca pensé que iba a entender un balance general. Ahora puedo analizar empresas con mis propios criterios." },
-          { name: "Martín G.", age: "16 años, Liceo Francés", quote: "Me encantó que no nos hablen de hacernos ricos rápido. Aprendí a pensar a largo plazo." },
-          { name: "Camila S.", age: "18 años, UTU", quote: "Las clases son claras, los profes tienen nuestra edad y eso hace que todo sea más cercano." },
-        ].map((t) => (
-          <blockquote key={t.name} className="border-l border-border pl-8">
-            <p className="text-foreground text-xl md:text-2xl font-heading font-medium leading-snug mb-4">
-              "{t.quote}"
+  useEffect(() => {
+    const fetch = async () => {
+      const { data } = await supabase
+        .from("cohorts")
+        .select("start_date, location, max_capacity")
+        .eq("is_active", true)
+        .gte("start_date", new Date().toISOString())
+        .order("start_date", { ascending: true })
+        .limit(1);
+      if (data && data.length > 0) setCohort(data[0]);
+    };
+    fetch();
+  }, []);
+
+  if (!cohort) return null;
+
+  const startDate = new Date(cohort.start_date);
+  const dateStr = startDate.toLocaleDateString("es-UY", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+
+  return (
+    <section className="py-24 md:py-32 border-y border-border">
+      <div className="container">
+        <div className="grid md:grid-cols-2 gap-16 items-center">
+          <div>
+            <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
+              Próximas clases
             </p>
-            <footer className="text-sm text-muted-foreground">
-              <strong className="text-foreground font-medium">{t.name}</strong> — {t.age}
-            </footer>
-          </blockquote>
-        ))}
+            <h2 className="text-3xl md:text-4xl text-foreground mb-6">
+              Próxima cohorte
+            </h2>
+            <p className="text-muted-foreground text-lg leading-relaxed mb-6">
+              Las clases son presenciales, en grupos reducidos.
+            </p>
+            <CohortCountdown />
+          </div>
+          <div className="border border-border rounded-lg p-8">
+            <div className="space-y-4 mb-6">
+              <div className="flex items-center gap-3 text-muted-foreground">
+                <MapPin size={16} className="shrink-0" />
+                <span>{cohort.location}</span>
+              </div>
+              <div className="flex items-center gap-3 text-muted-foreground">
+                <Calendar size={16} className="shrink-0" />
+                <span className="capitalize">{dateStr}</span>
+              </div>
+              <div className="flex items-center gap-3 text-muted-foreground">
+                <Users size={16} className="shrink-0" />
+                <span>{cohort.max_capacity} lugares</span>
+              </div>
+            </div>
+            <div className="mb-6">
+              <CapacityBar />
+            </div>
+            <Button asChild variant="cta" size="cta" className="w-full">
+              <Link to="/registro">Inscribite</Link>
+            </Button>
+          </div>
+        </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 const FinalCTA = () => (
   <section className="py-24 md:py-32 border-t border-border">
@@ -262,12 +244,10 @@ const FinalCTA = () => (
 const Index = () => (
   <>
     <Hero />
-    <SocialProof />
     <ProblemSection />
     <ValueProp />
     <HowItWorks />
     <UpcomingClasses />
-    <Testimonials />
     <FinalCTA />
   </>
 );
