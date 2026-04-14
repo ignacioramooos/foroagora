@@ -92,13 +92,7 @@ const ChartTooltip = RechartsPrimitive.Tooltip;
 const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  any & {
-      hideLabel?: boolean;
-      hideIndicator?: boolean;
-      indicator?: "line" | "dot" | "dashed";
-      nameKey?: string;
-      labelKey?: string;
-    }
+  any
 >(
   (
     {
@@ -230,13 +224,8 @@ const ChartLegend = RechartsPrimitive.Legend;
 const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  React.ComponentProps<"div"> & {
-      payload?: any[];
-      verticalAlign?: "top" | "bottom";
-      hideIcon?: boolean;
-      nameKey?: string;
-    }
->(({ className, hideIcon = false, payload, verticalAlign = "bottom", nameKey }, ref) => {
+  any
+>(({ className, hideIcon = false, payload, verticalAlign = "bottom", nameKey }: any, ref: any) => {
   const { config } = useChart();
 
   if (!payload?.length) {
