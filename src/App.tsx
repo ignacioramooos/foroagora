@@ -52,7 +52,7 @@ const AppRoutes = () => {
       <Route path="/contacto" element={<PublicPage><ContactPage /></PublicPage>} />
       <Route path="/recursos" element={<PublicPage><ResourcesPage /></PublicPage>} />
       <Route path="/glosario" element={<PublicPage><GlossaryPage /></PublicPage>} />
-      <Route path="/partners" element={<PublicPage><PartnersPage /></PublicPage>} />
+      <Route path="/partners" element={<Navigate to="/alianzas" replace />} />
       <Route path="/brokers" element={<PublicPage><BrokersPage /></PublicPage>} />
         <Route path="/formacion" element={<FormacionPage />} />
         <Route path="/ranking" element={<RankingPage />} />
