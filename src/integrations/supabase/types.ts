@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      certificates: {
+        Row: {
+          certificate_code: string | null
+          id: string
+          issued_at: string | null
+          user_id: string
+        }
+        Insert: {
+          certificate_code?: string | null
+          id?: string
+          issued_at?: string | null
+          user_id: string
+        }
+        Update: {
+          certificate_code?: string | null
+          id?: string
+          issued_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       cohorts: {
         Row: {
           created_at: string
@@ -175,6 +196,68 @@ export type Database = {
           spots_total?: number
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      lesson_progress: {
+        Row: {
+          completed_at: string | null
+          id: string
+          lesson_id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          id?: string
+          lesson_id: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          id?: string
+          lesson_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_progress_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lessons: {
+        Row: {
+          content: string
+          created_at: string | null
+          estimated_minutes: number | null
+          id: string
+          is_published: boolean | null
+          lesson_number: number
+          module_number: number
+          title: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          estimated_minutes?: number | null
+          id?: string
+          is_published?: boolean | null
+          lesson_number: number
+          module_number: number
+          title: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          estimated_minutes?: number | null
+          id?: string
+          is_published?: boolean | null
+          lesson_number?: number
+          module_number?: number
+          title?: string
         }
         Relationships: []
       }
