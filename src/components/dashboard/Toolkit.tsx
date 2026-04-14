@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { DollarSign, HeartPulse, UserCheck, Search } from "lucide-react";
-import { mockGlossary } from "@/lib/mockData";
+import { DollarSign, HeartPulse, UserCheck } from "lucide-react";
+import GlossaryContent from "@/components/GlossaryContent";
 
 /* ---- Opportunity Cost Calculator ---- */
 const OpportunityCostCalc = () => {

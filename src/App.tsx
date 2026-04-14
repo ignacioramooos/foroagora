@@ -15,6 +15,7 @@ import ContactPage from "./pages/ContactPage";
 import ResourcesPage from "./pages/ResourcesPage";
 import PartnersPage from "./pages/PartnersPage";
 import BrokersPage from "./pages/BrokersPage";
+import GlossaryPage from "./pages/GlossaryPage";
 import DashboardPage from "./pages/DashboardPage";
 import AdminPage from "./pages/AdminPage";
 import AuthPage from "./pages/AuthPage";
@@ -37,21 +38,28 @@ const AppRoutes = () => {
     );
   }
 
+  const publicRoutes = (
+    <>
+      <Route path="/" element={<PublicPage><Index /></PublicPage>} />
+      <Route path="/nosotros" element={<PublicPage><AboutPage /></PublicPage>} />
+      <Route path="/programa" element={<PublicPage><ProgramPage /></PublicPage>} />
+      <Route path="/registro" element={<PublicPage><RegisterPage /></PublicPage>} />
+      <Route path="/contacto" element={<PublicPage><ContactPage /></PublicPage>} />
+      <Route path="/recursos" element={<PublicPage><ResourcesPage /></PublicPage>} />
+      <Route path="/glosario" element={<PublicPage><GlossaryPage /></PublicPage>} />
+      <Route path="/partners" element={<PublicPage><PartnersPage /></PublicPage>} />
+      <Route path="/brokers" element={<PublicPage><BrokersPage /></PublicPage>} />
+      <Route path="/auth" element={<AuthPage />} />
+    </>
+  );
+
   if (isLoggedIn) {
     return (
       <>
         <Routes>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/admin" element={<AdminPage />} />
-          <Route path="/" element={<PublicPage><Index /></PublicPage>} />
-          <Route path="/nosotros" element={<PublicPage><AboutPage /></PublicPage>} />
-          <Route path="/programa" element={<PublicPage><ProgramPage /></PublicPage>} />
-          <Route path="/registro" element={<PublicPage><RegisterPage /></PublicPage>} />
-          <Route path="/contacto" element={<PublicPage><ContactPage /></PublicPage>} />
-          <Route path="/recursos" element={<PublicPage><ResourcesPage /></PublicPage>} />
-          <Route path="/partners" element={<PublicPage><PartnersPage /></PublicPage>} />
-          <Route path="/brokers" element={<PublicPage><BrokersPage /></PublicPage>} />
-          <Route path="/auth" element={<AuthPage />} />
+          {publicRoutes}
           <Route path="*" element={<PublicPage><NotFound /></PublicPage>} />
         </Routes>
         <WhatsAppButton />
@@ -62,15 +70,7 @@ const AppRoutes = () => {
   return (
     <>
       <Routes>
-        <Route path="/" element={<PublicPage><Index /></PublicPage>} />
-        <Route path="/auth" element={<AuthPage />} />
-        <Route path="/nosotros" element={<PublicPage><AboutPage /></PublicPage>} />
-        <Route path="/programa" element={<PublicPage><ProgramPage /></PublicPage>} />
-        <Route path="/registro" element={<PublicPage><RegisterPage /></PublicPage>} />
-        <Route path="/contacto" element={<PublicPage><ContactPage /></PublicPage>} />
-        <Route path="/recursos" element={<PublicPage><ResourcesPage /></PublicPage>} />
-        <Route path="/partners" element={<PublicPage><PartnersPage /></PublicPage>} />
-        <Route path="/brokers" element={<PublicPage><BrokersPage /></PublicPage>} />
+        {publicRoutes}
         <Route path="/dashboard" element={<Navigate to="/auth" replace />} />
         <Route path="*" element={<PublicPage><NotFound /></PublicPage>} />
       </Routes>

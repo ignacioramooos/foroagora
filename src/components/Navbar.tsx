@@ -8,6 +8,7 @@ const navLinks = [
   { label: "Nosotros", path: "/nosotros" },
   { label: "Programa", path: "/programa" },
   { label: "Recursos", path: "/recursos" },
+  { label: "Glosario", path: "/glosario" },
   { label: "Brokers", path: "/brokers" },
   { label: "Partners", path: "/partners" },
   { label: "Contacto", path: "/contacto" },
