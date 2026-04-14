@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Instagram, Linkedin, Youtube, Mail } from "lucide-react";
+import NewsletterSignup from "@/components/NewsletterSignup";
 
 const Footer = () => (
   <footer className="border-t border-border">
@@ -47,6 +48,11 @@ const Footer = () => (
             hola@invertiuy.org
           </p>
         </div>
+      </div>
+    </div>
+    <div className="border-t border-border">
+      <div className="container py-8">
+        <NewsletterSignup />
       </div>
     </div>
     <div className="border-t border-border">
