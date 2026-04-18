@@ -1,21 +1,96 @@
+import { useState } from "react";
 import SectionFade from "@/components/SectionFade";
-import { BookOpen, FileText, Play, Clock, ExternalLink } from "lucide-react";
+import { BookOpen, FileText, Play, ChevronDown, Download, Lock } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-const resources = [
-  { title: "Guía: Cómo leer un Income Statement", type: "PDF", category: "Estados Financieros", time: "10 min", icon: FileText },
-  { title: "¿Qué es el P/E ratio?", type: "Artículo", category: "Conceptos Básicos", time: "5 min", icon: BookOpen },
-  { title: "Caso de estudio: Análisis de Apple", type: "Video", category: "Casos de Estudio", time: "15 min", icon: Play },
-  { title: "Plantilla de análisis fundamental", type: "PDF", category: "Análisis Fundamental", time: "—", icon: FileText },
-  { title: "El Balance Sheet explicado simple", type: "Artículo", category: "Estados Financieros", time: "8 min", icon: BookOpen },
-  { title: "Introducción al DCF", type: "Video", category: "Análisis Fundamental", time: "20 min", icon: Play },
-];
+type ClassResource = {
+  label: string;
+  type: "PDF" | "Plantilla" | "Lectura";
+};
 
-const glossary = [
-  { term: "Acción", def: "Una fracción de propiedad de una empresa. Si comprás una acción de Apple, sos dueño de una pequeña parte de Apple." },
-  { term: "Balance Sheet", def: "Estado financiero que muestra qué tiene (activos), qué debe (pasivos) y cuánto vale (patrimonio) una empresa en un momento dado." },
-  { term: "DCF (Flujo de Caja Descontado)", def: "Método de valoración que estima cuánto vale una empresa hoy basándose en el dinero que generará en el futuro." },
-  { term: "P/E Ratio", def: "Precio de la acción dividido por las ganancias por acción. Indica cuánto están dispuestos a pagar los inversores por cada peso de ganancia." },
-  { term: "ROE (Return on Equity)", def: "Mide qué tan eficiente es una empresa generando ganancias con el dinero de sus accionistas." },
+type ClassVideo = {
+  id: string;
+  module: string;
+  title: string;
+  desc: string;
+  duration: string;
+  videoUrl: string | null;
+  resources: ClassResource[];
+};
+
+const classes: ClassVideo[] = [
+  {
+    id: "m1",
+    module: "Módulo 1",
+    title: "Fundamentos del mercado",
+    desc: "Qué es una acción, empresas públicas vs. privadas, IPOs y herramientas que vamos a usar.",
+    duration: "Próximamente",
+    videoUrl: null,
+    resources: [
+      { label: "Guía: Cómo usar stockanalysis.com", type: "PDF" },
+      { label: "Glosario inicial de términos", type: "Lectura" },
+    ],
+  },
+  {
+    id: "m2",
+    module: "Módulo 2",
+    title: "Qué es el fundamental investing",
+    desc: "Diferencias con trading y quantitative investing. Los principios de Warren Buffett.",
+    duration: "Próximamente",
+    videoUrl: null,
+    resources: [
+      { label: "Carta a los accionistas de Berkshire (resumen)", type: "Lectura" },
+      { label: "Comparativa: trading vs. investing", type: "PDF" },
+    ],
+  },
+  {
+    id: "m3",
+    module: "Módulo 3",
+    title: "Income Statement",
+    desc: "Lectura línea por línea del estado de resultados. Amortización y depreciación con ejemplos.",
+    duration: "Próximamente",
+    videoUrl: null,
+    resources: [
+      { label: "Plantilla de análisis de Income Statement", type: "Plantilla" },
+      { label: "Guía: Cómo leer un Income Statement", type: "PDF" },
+    ],
+  },
+  {
+    id: "m4",
+    module: "Módulo 4",
+    title: "Cash Flow Statement",
+    desc: "Cash from operations, capex, free cash flow y net cash flow. Diferencias con el income statement.",
+    duration: "Próximamente",
+    videoUrl: null,
+    resources: [
+      { label: "Plantilla de Free Cash Flow", type: "Plantilla" },
+      { label: "Caso práctico: cash flow de una empresa real", type: "PDF" },
+    ],
+  },
+  {
+    id: "m5",
+    module: "Módulo 5",
+    title: "Balance Sheet y métricas de valuación",
+    desc: "Activos, pasivos, book value y métricas clave: P/E, P/FCF, P/B, PEG, CAGR.",
+    duration: "Próximamente",
+    videoUrl: null,
+    resources: [
+      { label: "Cheatsheet de métricas de valuación", type: "PDF" },
+      { label: "Plantilla de análisis fundamental", type: "Plantilla" },
+    ],
+  },
+  {
+    id: "m6",
+    module: "Módulo 6",
+    title: "Psicología de mercado y decisiones",
+    desc: "Sesgos comunes, gestión emocional y caso práctico integrador.",
+    duration: "Próximamente",
+    videoUrl: null,
+    resources: [
+      { label: "Lectura: Be greedy when others are fearful", type: "Lectura" },
+      { label: "Checklist de decisión de inversión", type: "PDF" },
+    ],
+  },
 ];
 
 const books = [
@@ -25,91 +100,170 @@ const books = [
   { title: "Beating the Street", author: "Peter Lynch", pitch: "Más del legendario Peter Lynch." },
 ];
 
-const ResourcesPage = () => (
-  <>
-    <section className="pt-32 md:pt-40 pb-20">
-      <div className="container">
-        <SectionFade>
-          <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-6">
-            Recursos
+const extractYouTubeId = (url: string) => {
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?\s]+)/);
+  return match?.[1] || null;
+};
+
+const ClassCard = ({ item, isOpen, onToggle }: { item: ClassVideo; isOpen: boolean; onToggle: () => void }) => {
+  const youtubeId = item.videoUrl ? extractYouTubeId(item.videoUrl) : null;
+
+  return (
+    <div className="border border-border rounded-lg overflow-hidden bg-background">
+      <button
+        onClick={onToggle}
+        className="w-full text-left p-6 hover:bg-secondary/40 transition-colors flex items-start gap-4"
+      >
+        <div className="flex-shrink-0 w-12 h-12 rounded-md bg-secondary flex items-center justify-center">
+          {item.videoUrl ? (
+            <Play size={18} className="text-foreground" />
+          ) : (
+            <Lock size={16} className="text-muted-foreground" />
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-1">
+            {item.module} · {item.duration}
           </p>
-          <h1 className="text-3xl md:text-5xl text-foreground max-w-3xl mb-6">
-            Aprendé a tu ritmo
-          </h1>
-          <p className="text-muted-foreground text-lg max-w-xl">
-            Guías, artículos, videos y herramientas para profundizar en análisis fundamental.
+          <h3 className="font-heading font-semibold text-foreground text-lg mb-1">{item.title}</h3>
+          <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
+        </div>
+        <ChevronDown
+          size={18}
+          className={cn(
+            "flex-shrink-0 text-muted-foreground transition-transform mt-2",
+            isOpen && "rotate-180"
+          )}
+        />
+      </button>
+
+      {isOpen && (
+        <div className="border-t border-border p-6 space-y-6 bg-secondary/20">
+          {/* Video */}
+          <div>
+            <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-3">
+              Clase grabada
+            </p>
+            {youtubeId ? (
+              <div className="aspect-video rounded-md overflow-hidden bg-muted">
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${youtubeId}`}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title={item.title}
+                />
+              </div>
+            ) : (
+              <div className="aspect-video rounded-md border border-dashed border-border flex flex-col items-center justify-center text-center p-6">
+                <Lock size={20} className="text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground">
+                  Video disponible cuando se dicte el módulo.
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Las clases se graban y se publican acá después de cada sesión.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Resources */}
+          <div>
+            <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-3">
+              Recursos adjuntos
+            </p>
+            <div className="divide-y divide-border border border-border rounded-md bg-background">
+              {item.resources.map((r) => (
+                <div
+                  key={r.label}
+                  className="flex items-center justify-between gap-4 p-4 hover:bg-secondary/40 transition-colors"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <FileText size={16} className="text-muted-foreground flex-shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-sm text-foreground truncate">{r.label}</p>
+                      <p className="text-xs text-muted-foreground font-heading">{r.type}</p>
+                    </div>
+                  </div>
+                  <span className="text-xs text-muted-foreground flex items-center gap-1 flex-shrink-0">
+                    <Download size={12} /> Próximamente
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ResourcesPage = () => {
+  const [openId, setOpenId] = useState<string | null>(null);
+
+  return (
+    <>
+      <section className="pt-32 md:pt-40 pb-20">
+        <div className="container">
+          <SectionFade>
+            <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-6">
+              Recursos
+            </p>
+            <h1 className="text-3xl md:text-5xl text-foreground max-w-3xl mb-6">
+              Aprendé a tu ritmo
+            </h1>
+            <p className="text-muted-foreground text-lg max-w-xl">
+              Videos de las clases y materiales adjuntos para profundizar en cada módulo.
+            </p>
+          </SectionFade>
+        </div>
+      </section>
+
+      <section className="py-24 md:py-32 border-y border-border">
+        <div className="container max-w-4xl">
+          <h2 className="text-2xl md:text-3xl text-foreground mb-3 font-heading">Biblioteca de clases</h2>
+          <p className="text-muted-foreground mb-10 max-w-2xl">
+            Tocá cualquier módulo para ver el video de la clase y los recursos adjuntos.
           </p>
-        </SectionFade>
-      </div>
-    </section>
-
-    <section className="py-24 md:py-32 border-y border-border">
-      <div className="container">
-        <h2 className="text-2xl md:text-3xl text-foreground mb-10 font-heading">Biblioteca de recursos</h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-border rounded-lg overflow-hidden">
-          {resources.map((r) => (
-            <div key={r.title} className="bg-background p-6 hover:bg-secondary transition-colors group flex flex-col">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-xs uppercase text-foreground font-heading font-medium border border-border px-2 py-0.5 rounded">{r.type}</span>
-                <span className="text-xs text-muted-foreground font-heading">{r.category}</span>
-              </div>
-              <h3 className="font-heading font-semibold text-foreground mb-2 flex-1">{r.title}</h3>
-              <div className="flex items-center justify-between mt-4">
-                <span className="flex items-center gap-1 text-muted-foreground text-xs"><Clock size={12} /> {r.time}</span>
-                <span className="text-foreground text-sm font-heading font-medium group-hover:underline cursor-pointer flex items-center gap-1">
-                  Ver recurso <ExternalLink size={12} />
-                </span>
-              </div>
-            </div>
-          ))}
+          <div className="space-y-3">
+            {classes.map((c) => (
+              <ClassCard
+                key={c.id}
+                item={c}
+                isOpen={openId === c.id}
+                onToggle={() => setOpenId(openId === c.id ? null : c.id)}
+              />
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section className="py-24 md:py-32">
-      <div className="container max-w-3xl">
-        <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
-          Glosario
-        </p>
-        <h2 className="text-2xl md:text-3xl text-foreground mb-10 font-heading">
-          Términos financieros en simple
-        </h2>
-        <div className="divide-y divide-border">
-          {glossary.map((g) => (
-            <div key={g.term} className="py-6 first:pt-0 last:pb-0">
-              <h3 className="font-heading font-semibold text-foreground text-lg mb-1">{g.term}</h3>
-              <p className="text-muted-foreground leading-relaxed">{g.def}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-
-    <section className="py-24 md:py-32 border-t border-border">
-      <div className="container max-w-3xl">
-        <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
-          Lectura recomendada
-        </p>
-        <h2 className="text-2xl md:text-3xl text-foreground mb-10 font-heading">
-          Libros que cambian tu perspectiva
-        </h2>
-        <div className="divide-y divide-border">
-          {books.map((b) => (
-            <div key={b.title} className="py-6 first:pt-0 last:pb-0 flex gap-6 items-start">
-              <div className="w-16 h-20 bg-secondary rounded flex-shrink-0 flex items-center justify-center">
-                <BookOpen size={20} className="text-muted-foreground/30" />
+      <section className="py-24 md:py-32 border-t border-border">
+        <div className="container max-w-3xl">
+          <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
+            Lectura recomendada
+          </p>
+          <h2 className="text-2xl md:text-3xl text-foreground mb-10 font-heading">
+            Libros que cambian tu perspectiva
+          </h2>
+          <div className="divide-y divide-border">
+            {books.map((b) => (
+              <div key={b.title} className="py-6 first:pt-0 last:pb-0 flex gap-6 items-start">
+                <div className="w-16 h-20 bg-secondary rounded flex-shrink-0 flex items-center justify-center">
+                  <BookOpen size={20} className="text-muted-foreground/30" />
+                </div>
+                <div>
+                  <h3 className="font-heading font-semibold text-foreground">{b.title}</h3>
+                  <p className="text-muted-foreground text-sm mb-1">{b.author}</p>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{b.pitch}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-heading font-semibold text-foreground">{b.title}</h3>
-                <p className="text-muted-foreground text-sm mb-1">{b.author}</p>
-                <p className="text-muted-foreground text-sm leading-relaxed">{b.pitch}</p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
-  </>
-);
+      </section>
+    </>
+  );
+};
 
 export default ResourcesPage;
