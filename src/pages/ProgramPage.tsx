@@ -5,12 +5,42 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { ArrowRight } from "lucide-react";
 
 const modules = [
-  { id: "m1", title: "Módulo 1: ¿Qué es una acción y por qué importa?", desc: "Entendé qué representa una acción, cómo funcionan los mercados de valores y por qué invertir importa para tu futuro.", duration: "2 horas · Presencial" },
-  { id: "m2", title: "Módulo 2: Cómo leer un Income Statement", desc: "Aprendé a interpretar el estado de resultados de una empresa: ingresos, costos, márgenes y beneficios.", duration: "2 horas · Presencial" },
-  { id: "m3", title: "Módulo 3: El Balance Sheet y la salud financiera", desc: "Descubrí cómo leer un balance general para evaluar si una empresa está sana o endeudada.", duration: "2 horas · Presencial" },
-  { id: "m4", title: "Módulo 4: Métricas clave — P/E, ROE, márgenes, deuda", desc: "Dominá los ratios financieros que usan los profesionales para comparar empresas entre sí.", duration: "2 horas · Presencial" },
-  { id: "m5", title: "Módulo 5: Cómo valuar una empresa (DCF simplificado)", desc: "Aprendé una versión simplificada del modelo de flujos descontados para estimar el valor de una empresa.", duration: "2 horas · Presencial" },
-  { id: "m6", title: "Módulo 6: Armando un portafolio con criterio", desc: "Integrá todo lo aprendido para construir una cartera diversificada basada en análisis fundamental.", duration: "2 horas · Presencial" },
+  {
+    id: "m1",
+    title: "Módulo 1: Fundamentos del mercado",
+    desc: "Qué es una acción y cómo se divide el capital de una empresa. Empresas públicas vs. privadas y qué es una IPO. Herramientas que vamos a usar (stockanalysis.com u otras equivalentes) y cómo se organiza el curso entre clases presenciales y recursos online.",
+    duration: "2 horas · Presencial",
+  },
+  {
+    id: "m2",
+    title: "Módulo 2: Qué es el fundamental investing",
+    desc: "El enfoque que vamos a enseñar: evaluar empresas por sus activos, pasivos, ingresos y crecimiento futuro. Diferencias con trading y quantitative investing. Los principios de inversión de Warren Buffett como marco conceptual.",
+    duration: "2 horas · Presencial",
+  },
+  {
+    id: "m3",
+    title: "Módulo 3: Income Statement",
+    desc: "Cómo se construye el estado de resultados línea por línea. Por qué el accounting prorratea gastos: amortización y depreciación con ejemplos cotidianos (auto). Por qué este estado se mueve con inercia y qué nos dice sobre la rentabilidad real.",
+    duration: "2 horas · Presencial",
+  },
+  {
+    id: "m4",
+    title: "Módulo 4: Cash Flow Statement",
+    desc: "El flujo de caja real, que la mayoría de empresas busca maximizar. Cash from operations, capex y free cash flow. Diferencia con el income statement (capex full vs. amortizado) y cómo llegar al net cash flow incluyendo SBC y financiamiento.",
+    duration: "2 horas · Presencial",
+  },
+  {
+    id: "m5",
+    title: "Módulo 5: Balance Sheet y métricas de valuación",
+    desc: "Activos y pasivos, especialmente importantes en bancos. Concepto de book value. Métricas para evaluar una acción: P/E, Forward P/E, P/FCF, P/B, PEG y CAGR — qué miden y cómo compararlas entre empresas.",
+    duration: "2 horas · Presencial",
+  },
+  {
+    id: "m6",
+    title: "Módulo 6: Psicología de mercado y decisiones",
+    desc: "Cómo aplicar todo lo aprendido para tomar decisiones con criterio propio. Sesgos comunes, gestión emocional y el principio de Buffett: 'be greedy when others are fearful'. Cierre con un caso práctico integrador.",
+    duration: "2 horas · Presencial",
+  },
 ];
 
 const ProgramPage = () => (
