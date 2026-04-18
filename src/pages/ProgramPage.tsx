@@ -20,7 +20,7 @@ const modules = [
   {
     id: "m3",
     title: "Módulo 3: Income Statement",
-    desc: "Cómo se construye el estado de resultados línea por línea. Por qué el accounting prorratea gastos: amortización y depreciación con ejemplos cotidianos (auto). Por qué este estado se mueve con inercia y qué nos dice sobre la rentabilidad real.",
+    desc: "Cómo se construye el estado de resultados línea por línea. Por qué el accounting prorratea gastos: amortización y depreciación con ejemplos cotidianos. Por qué este estado se mueve con inercia y qué nos dice sobre la rentabilidad real.",
     duration: "2 horas · Presencial",
   },
   {
