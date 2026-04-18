@@ -14,7 +14,7 @@ const Hero = () => (
     <div className="container">
       <SectionFade>
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-semibold text-foreground leading-[0.95] max-w-4xl mb-8">
-          Aprendé a analizar empresas e invertir con criterio propio, Gratis.
+          Aprendé a analizar empresas e invertir con criterio propio, <u>Gratis</u>.
         </h1>
       </SectionFade>
       <SectionFade delay={0.1}>
