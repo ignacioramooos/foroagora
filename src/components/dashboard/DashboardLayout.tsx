@@ -28,8 +28,9 @@ const navItems: { id: DashboardTab; label: string; icon: typeof Home }[] = [
 const mobileNav: { id: DashboardTab; label: string; icon: typeof Home }[] = [
   { id: "home", label: "Inicio", icon: Home },
   { id: "portfolio", label: "Portafolio", icon: TrendingUp },
+  { id: "content", label: "Clases", icon: PlayCircle },
   { id: "progress", label: "Cursos", icon: BookOpen },
-  { id: "tools", label: "Herramientas", icon: Wrench },
+  { id: "events", label: "Eventos", icon: CalendarDays },
 ];
 
 const DashboardLayout = ({ activeTab, onTabChange, children }: DashboardLayoutProps) => {

@@ -37,15 +37,16 @@ const AuthContext = createContext<AuthContextType>({
 
 const buildProfile = (
   supabaseUser: SupabaseUser,
-  profileData?: { display_name?: string | null; onboarding_completed?: boolean | null }
+  profileData?: { display_name?: string | null; onboarding_completed?: boolean | null },
+  stats?: { completedClasses: number; publishedTheses: number }
 ): UserProfile => ({
   id: supabaseUser.id,
   name: profileData?.display_name || supabaseUser.user_metadata?.display_name || supabaseUser.email?.split("@")[0] || "Usuario",
   email: supabaseUser.email || "",
-  streak: 5,
-  completedClasses: 4,
+  streak: 0,
+  completedClasses: stats?.completedClasses ?? 0,
   totalClasses: 12,
-  publishedTheses: 2,
+  publishedTheses: stats?.publishedTheses ?? 0,
   onboardingCompleted: profileData?.onboarding_completed ?? false,
 });
 
@@ -55,12 +56,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = useCallback(async (supabaseUser: SupabaseUser) => {
+    let completedClasses = 0;
+    let publishedTheses = 0;
+
+    try {
+      const { count } = await supabase
+        .from("lesson_progress")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", supabaseUser.id)
+        .not("completed_at", "is", null);
+      completedClasses = count ?? 0;
+    } catch {
+      completedClasses = 0;
+    }
+
+    try {
+      const { count } = await supabase
+        .from("certificates")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", supabaseUser.id);
+      publishedTheses = count ?? 0;
+    } catch {
+      publishedTheses = 0;
+    }
+
     const { data } = await supabase
       .from("profiles")
       .select("display_name, onboarding_completed")
       .eq("user_id", supabaseUser.id)
       .single();
-    setUser(buildProfile(supabaseUser, data));
+    setUser(buildProfile(supabaseUser, data, { completedClasses, publishedTheses }));
   }, []);
 
   const refreshProfile = useCallback(async () => {

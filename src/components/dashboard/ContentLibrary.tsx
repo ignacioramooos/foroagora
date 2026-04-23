@@ -84,7 +84,21 @@ const ContentLibrary = () => {
       </div>
 
       {loading ? (
-        <div className="text-muted-foreground text-sm py-12 text-center">Cargando contenido...</div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Card key={i}>
+              <div className="aspect-video bg-muted animate-pulse" />
+              <CardHeader className="pb-2">
+                <div className="h-4 w-20 bg-muted rounded animate-pulse mb-2" />
+                <div className="h-5 w-3/4 bg-muted rounded animate-pulse" />
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="h-4 w-full bg-muted rounded animate-pulse mb-2" />
+                <div className="h-4 w-2/3 bg-muted rounded animate-pulse" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 space-y-3">
           <BookOpen className="mx-auto text-muted-foreground" size={40} />

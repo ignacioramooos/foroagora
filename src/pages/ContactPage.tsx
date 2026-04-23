@@ -3,7 +3,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import SectionFade from "@/components/SectionFade";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Mail, Instagram, Linkedin, MessageCircle, CheckCircle2 } from "lucide-react";
+import { Mail, Instagram, Linkedin, MessageCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const faqs = [
   { q: "¿Es realmente gratis?", a: "Sí. No hay costos ocultos ni suscripciones. Somos una iniciativa sin fines de lucro." },
@@ -16,6 +17,7 @@ const faqs = [
 const ContactPage = () => {
   const { user } = useAuth();
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", message: "" });
 
   useEffect(() => {
@@ -28,9 +30,19 @@ const ContactPage = () => {
     }
   }, [user]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (form.name && form.email && form.message) setSent(true);
+    if (!form.name || !form.email || !form.message) return;
+
+    setLoading(true);
+    const { error } = await supabase.from("contact_messages").insert({
+      name: form.name,
+      email: form.email,
+      message: form.message,
+    });
+    setLoading(false);
+
+    if (!error) setSent(true);
   };
 
   const inputClass = "w-full h-12 px-4 rounded-md border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring/50 transition-shadow font-heading";
@@ -77,7 +89,9 @@ const ContactPage = () => {
                     <label className="block text-sm font-heading font-medium text-foreground mb-1.5">Mensaje</label>
                     <textarea className={`${inputClass} h-32 py-3 resize-none`} value={form.message} onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))} required />
                   </div>
-                  <Button type="submit" variant="cta" size="cta" className="w-full">Enviar mensaje</Button>
+                  <Button type="submit" variant="cta" size="cta" className="w-full" disabled={loading}>
+                    {loading ? <Loader2 size={16} className="animate-spin" /> : "Enviar mensaje"}
+                  </Button>
                 </form>
               )}
             </div>

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import SectionFade from "@/components/SectionFade";
 import { CheckCircle2, Building2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
 
 const collaborationOptions = [
   "Ofrecer espacio para clases",
@@ -33,7 +34,7 @@ const PartnersPage = () => {
     collaboration_types: [] as string[],
     message: "",
   });
-  const [partners, setPartners] = useState<any[]>([]);
+  const [partners, setPartners] = useState<Tables<"partners">[]>([]);
 
   useEffect(() => {
     const fetchPartners = async () => {

@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { mockModules, mockCommunityPosts } from "@/lib/mockData";
+import { mockModules } from "@/lib/mockData";
 import { Flame, BookOpen, FileText, Target, MapPin, Clock, CalendarDays, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface RegisteredEvent {
   id: string;
@@ -13,33 +14,76 @@ interface RegisteredEvent {
   location: string;
 }
 
+interface CommunityPost {
+  id: string;
+  author: string;
+  type: "analysis" | "announcement";
+  title: string;
+  created_at: string;
+}
+
 const DashboardHome = () => {
   const { user, session } = useAuth();
   const [myEvents, setMyEvents] = useState<RegisteredEvent[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+  const [communityPosts, setCommunityPosts] = useState<CommunityPost[]>([]);
+  const [loadingCommunity, setLoadingCommunity] = useState(true);
 
   useEffect(() => {
-    if (!session?.user) return;
+    if (!session?.user) {
+      setLoadingEvents(false);
+      return;
+    }
+
     const fetchMyEvents = async () => {
-      const { data: regs } = await supabase
-        .from("event_registrations")
-        .select("event_id")
-        .eq("user_id", session.user.id);
+      setLoadingEvents(true);
+      try {
+        const { data: regs } = await supabase
+          .from("event_registrations")
+          .select("event_id")
+          .eq("user_id", session.user.id);
 
-      if (!regs || regs.length === 0) return;
+        if (!regs || regs.length === 0) {
+          setMyEvents([]);
+          return;
+        }
 
-      const ids = regs.map((r: { event_id: string }) => r.event_id);
-      const { data: evts } = await supabase
-        .from("events")
-        .select("id, title, event_date, location")
-        .in("id", ids)
-        .gte("event_date", new Date().toISOString())
-        .order("event_date", { ascending: true })
-        .limit(3);
+        const ids = regs.map((r: { event_id: string }) => r.event_id);
+        const { data: evts } = await supabase
+          .from("events")
+          .select("id, title, event_date, location")
+          .in("id", ids)
+          .gte("event_date", new Date().toISOString())
+          .order("event_date", { ascending: true })
+          .limit(3);
 
-      setMyEvents((evts as RegisteredEvent[]) || []);
+        setMyEvents((evts as RegisteredEvent[]) || []);
+      } finally {
+        setLoadingEvents(false);
+      }
     };
     fetchMyEvents();
   }, [session]);
+
+  useEffect(() => {
+    const fetchCommunity = async () => {
+      setLoadingCommunity(true);
+      try {
+        const { data } = await supabase
+          .from("community_posts")
+          .select("id, author, type, title, created_at")
+          .eq("is_published", true)
+          .order("created_at", { ascending: false })
+          .limit(4);
+
+        if (data) setCommunityPosts(data as CommunityPost[]);
+      } finally {
+        setLoadingCommunity(false);
+      }
+    };
+
+    fetchCommunity();
+  }, []);
 
   if (!user) return null;
 
@@ -105,7 +149,14 @@ const DashboardHome = () => {
       </div>
 
       {/* My upcoming events */}
-      {myEvents.length > 0 && (
+      {loadingEvents && (
+        <div className="mb-10 space-y-3">
+          <Skeleton className="h-20 rounded-lg" />
+          <Skeleton className="h-20 rounded-lg" />
+        </div>
+      )}
+
+      {!loadingEvents && myEvents.length > 0 && (
         <div className="mb-10">
           <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
             Mis próximos eventos
@@ -136,11 +187,20 @@ const DashboardHome = () => {
           Comunidad
         </p>
         <div className="divide-y divide-border border border-border rounded-lg">
-          {mockCommunityPosts.map((post) => (
+          {loadingCommunity && (
+            <div className="p-4 space-y-3">
+              <Skeleton className="h-5 w-3/4" />
+              <Skeleton className="h-5 w-2/3" />
+              <Skeleton className="h-5 w-4/5" />
+            </div>
+          )}
+          {communityPosts.map((post) => (
             <div key={post.id} className="p-4 flex items-start justify-between">
               <div>
                 <p className="text-sm font-heading font-medium text-foreground">{post.title}</p>
-                <p className="text-xs text-muted-foreground mt-1">{post.author} · {post.date}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {post.author} · {new Date(post.created_at).toLocaleDateString("es-UY")}
+                </p>
               </div>
               <span className={`text-xs font-heading px-2 py-0.5 rounded ${
                 post.type === "announcement" ? "bg-secondary text-foreground" : "bg-background text-muted-foreground border border-border"
@@ -149,6 +209,11 @@ const DashboardHome = () => {
               </span>
             </div>
           ))}
+          {!loadingCommunity && communityPosts.length === 0 && (
+            <div className="p-4 text-sm text-muted-foreground text-center">
+              Próximamente — publicaciones del equipo y análisis de alumnos.
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { usePortfolio, HoldingWithPrice } from "@/hooks/usePortfolio";
+import { usePortfolio, Transaction } from "@/hooks/usePortfolio";
 import { SUPPORTED_STOCKS, fetchStockPrices, fetchStockHistory, StockQuote, HistoryPoint } from "@/lib/stockData";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,58 @@ import { toast } from "sonner";
 const fmt = (v: number) => v.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 });
 const pct = (v: number) => `${v >= 0 ? "+" : ""}${v.toFixed(2)}%`;
 const pnlFmt = (v: number) => `${v >= 0 ? "+" : ""}${fmt(v)}`;
+
+const buildPortfolioHistory = (
+  transactions: Transaction[],
+  finalValue: number,
+): { date: string; value: number }[] => {
+  if (!transactions.length) {
+    return [
+      { date: "Inicio", value: 10000 },
+      { date: "Hoy", value: Math.round(finalValue) },
+    ];
+  }
+
+  const sorted = [...transactions].sort(
+    (a, b) => new Date(a.executed_at).getTime() - new Date(b.executed_at).getTime(),
+  );
+
+  let cash = 10000;
+  const holdings = new Map<string, number>();
+  const lastPrice = new Map<string, number>();
+  const points: { date: string; value: number }[] = [{ date: "Inicio", value: 10000 }];
+
+  sorted.forEach((t) => {
+    const shares = Number(t.shares);
+    const price = Number(t.price_per_share);
+    const amount = Number(t.total_amount);
+
+    lastPrice.set(t.ticker, price);
+
+    if (t.transaction_type === "BUY") {
+      cash -= amount;
+      holdings.set(t.ticker, (holdings.get(t.ticker) ?? 0) + shares);
+    } else {
+      cash += amount;
+      holdings.set(t.ticker, Math.max((holdings.get(t.ticker) ?? 0) - shares, 0));
+    }
+
+    let holdingsValue = 0;
+    holdings.forEach((qty, ticker) => {
+      holdingsValue += qty * (lastPrice.get(ticker) ?? 0);
+    });
+
+    const dateLabel = new Date(t.executed_at).toLocaleDateString("es-UY", {
+      day: "numeric",
+      month: "short",
+    });
+
+    points.push({ date: dateLabel, value: Math.round(cash + holdingsValue) });
+  });
+
+  points.push({ date: "Hoy", value: Math.round(finalValue) });
+  return points;
+};
 
 // ─── Metric Card ───
 const MetricCard = ({ label, value, sub, color }: { label: string; value: string; sub?: string; color?: string }) => (
@@ -96,6 +148,11 @@ const PortfolioTab = () => {
   const [showHistory, setShowHistory] = useState(false);
   const [historyPage, setHistoryPage] = useState(0);
   const [mobileTradeOpen, setMobileTradeOpen] = useState(false);
+
+  const portfolioHistory = useMemo(
+    () => buildPortfolioHistory(transactions, totalPortfolioValue),
+    [transactions, totalPortfolioValue],
+  );
 
   const filteredStocks = useMemo(() => {
     if (!searchQuery.trim()) return [];
@@ -276,9 +333,9 @@ const PortfolioTab = () => {
               </div>
             ) : (
               <ChartContainer config={{ value: { label: "Valor", color: "hsl(var(--accent))" } }} className="h-full w-full">
-                <AreaChart data={[{ date: "Inicio", value: 10000 }, { date: "Hoy", value: totalPortfolioValue }]}>
-                  <XAxis dataKey="date" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `$${v.toLocaleString()}`} />
+                <AreaChart data={portfolioHistory}>
+                  <XAxis dataKey="date" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
+                  <YAxis domain={["auto", "auto"]} tick={{ fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `$${v.toLocaleString()}`} />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <defs>
                     <linearGradient id="portfolioGrad" x1="0" y1="0" x2="0" y2="1">

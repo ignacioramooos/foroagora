@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import SectionFade from "@/components/SectionFade";
-import { CheckCircle2, MapPin, Calendar, Gift, Users } from "lucide-react";
+import { CheckCircle2, MapPin, Calendar, Gift, Users, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const departments = [
   "Montevideo", "Canelones", "Maldonado", "Salto", "Colonia", "Paysandú",
@@ -15,6 +16,7 @@ const hearOptions = ["Instagram", "Un amigo/a", "Mi liceo", "LinkedIn", "Google"
 const RegisterPage = () => {
   const { user } = useAuth();
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [form, setForm] = useState({
     name: "", age: "", school: "", department: "", email: "", phone: "", hearAbout: "", why: "", consent: false,
@@ -47,9 +49,33 @@ const RegisterPage = () => {
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = (ev: React.FormEvent) => {
+  const handleSubmit = async (ev: React.FormEvent) => {
     ev.preventDefault();
-    if (validate()) setSubmitted(true);
+    if (!validate()) return;
+
+    setLoading(true);
+    setErrors((prev) => ({ ...prev, submit: "" }));
+
+    const { error } = await supabase.from("class_registrations").insert({
+      name: form.name,
+      age: Number(form.age),
+      school: form.school,
+      department: form.department,
+      email: form.email,
+      phone: form.phone || null,
+      hear_about: form.hearAbout || null,
+      why: form.why || null,
+      consent: form.consent,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      setErrors((prev) => ({ ...prev, submit: "Hubo un error. Intentá de nuevo." }));
+      return;
+    }
+
+    setSubmitted(true);
   };
 
   if (submitted) {
@@ -158,8 +184,9 @@ const RegisterPage = () => {
                 </label>
               </div>
               {errors.consent && <p className="text-destructive text-xs">{errors.consent}</p>}
-              <Button type="submit" variant="cta" size="cta" className="w-full">
-                Inscribirme
+              {errors.submit && <p className="text-destructive text-xs">{errors.submit}</p>}
+              <Button type="submit" variant="cta" size="cta" className="w-full" disabled={loading}>
+                {loading ? <Loader2 size={16} className="animate-spin" /> : "Inscribirme"}
               </Button>
             </form>
           </div>

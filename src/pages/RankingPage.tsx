@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Trophy, RefreshCw } from "lucide-react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 const fmt = (v: number) => v.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 });
 const pct = (v: number) => `${v >= 0 ? "+" : ""}${v.toFixed(2)}%`;
@@ -67,8 +65,7 @@ const RankingPage = () => {
   useEffect(() => { fetchLeaderboard(); }, []);
 
   const top3 = entries.slice(0, 3);
-  const rest = entries.slice(3);
-  const podiumOrder = top3.length === 3 ? [top3[1], top3[0], top3[2]] : top3;
+  const podiumOrder = [top3[1], top3[0], top3[2]];
 
   return (
     <div className="min-h-screen bg-background">
@@ -102,6 +99,7 @@ const RankingPage = () => {
         ) : (
           <>
             {/* Podium (desktop) */}
+            {entries.length >= 3 && (
             <div className="hidden md:grid grid-cols-3 gap-4 mb-8">
               {podiumOrder.map((entry, i) => {
                 const rank = i === 1 ? 1 : i === 0 ? 2 : 3;
@@ -122,6 +120,7 @@ const RankingPage = () => {
                 );
               })}
             </div>
+            )}
 
             {/* Full table */}
             <Card>

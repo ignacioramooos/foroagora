@@ -122,6 +122,99 @@ export type Database = {
         }
         Relationships: []
       }
+      class_registrations: {
+        Row: {
+          age: number
+          consent: boolean
+          created_at: string
+          department: string
+          email: string
+          hear_about: string | null
+          id: string
+          name: string
+          phone: string | null
+          school: string
+          why: string | null
+        }
+        Insert: {
+          age: number
+          consent: boolean
+          created_at?: string
+          department: string
+          email: string
+          hear_about?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          school: string
+          why?: string | null
+        }
+        Update: {
+          age?: number
+          consent?: boolean
+          created_at?: string
+          department?: string
+          email?: string
+          hear_about?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          school?: string
+          why?: string | null
+        }
+        Relationships: []
+      }
+      community_posts: {
+        Row: {
+          author: string
+          created_at: string
+          id: string
+          is_published: boolean
+          title: string
+          type: string
+        }
+        Insert: {
+          author: string
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          title: string
+          type: string
+        }
+        Update: {
+          author?: string
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          title?: string
+          type?: string
+        }
+        Relationships: []
+      }
+      contact_messages: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+        }
+        Relationships: []
+      }
       content_items: {
         Row: {
           content_body: string | null

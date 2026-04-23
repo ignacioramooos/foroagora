@@ -17,14 +17,22 @@ const navLinks = [
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const { isLoggedIn, user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 20);
+      const totalHeight = document.body.scrollHeight - window.innerHeight;
+      const progress = totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0;
+      setScrollProgress(Math.min(100, Math.max(0, progress)));
+    };
+
     window.addEventListener("scroll", onScroll);
+    onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -98,6 +106,10 @@ const Navbar = () => {
           </button>
         </div>
       </nav>
+
+      <div className="fixed top-16 left-0 right-0 z-50 h-[2px] bg-transparent pointer-events-none">
+        <div className="h-full bg-foreground transition-[width] duration-75" style={{ width: `${scrollProgress}%` }} />
+      </div>
 
       {mobileOpen && (
         <div className="fixed inset-0 z-40 bg-background flex flex-col pt-20 pb-8 px-6 md:hidden">

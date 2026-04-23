@@ -3,7 +3,16 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const cache = new Map<string, { data: any; ts: number }>();
+interface QuoteResult {
+  ticker: string;
+  price: number | null;
+  previousClose: number | null;
+  changePercent: number | null;
+  companyName: string;
+  error?: boolean;
+}
+
+const cache = new Map<string, { data: QuoteResult; ts: number }>();
 const TTL = 3 * 60 * 1000; // 3 minutes
 
 async function fetchQuote(ticker: string) {

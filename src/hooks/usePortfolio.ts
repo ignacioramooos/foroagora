@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { fetchStockPrices, StockQuote } from "@/lib/stockData";
+import type { Tables } from "@/integrations/supabase/types";
 
 export interface HoldingWithPrice {
   id: string;
@@ -32,8 +33,8 @@ export function usePortfolio() {
   const { session } = useAuth();
   const userId = session?.user?.id;
 
-  const [portfolio, setPortfolio] = useState<any>(null);
-  const [holdings, setHoldings] = useState<any[]>([]);
+  const [portfolio, setPortfolio] = useState<Tables<"portfolios"> | null>(null);
+  const [holdings, setHoldings] = useState<Tables<"portfolio_holdings">[]>([]);
   const [holdingsWithPrices, setHoldingsWithPrices] = useState<HoldingWithPrice[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -61,7 +62,7 @@ export function usePortfolio() {
     setTransactions((data || []) as Transaction[]);
   }, []);
 
-  const enrichHoldings = useCallback(async (rawHoldings: any[]) => {
+  const enrichHoldings = useCallback(async (rawHoldings: Tables<"portfolio_holdings">[]) => {
     if (!rawHoldings.length) { setHoldingsWithPrices([]); return; }
     const tickers = rawHoldings.map(h => h.ticker);
     const quotes = await fetchStockPrices(tickers);

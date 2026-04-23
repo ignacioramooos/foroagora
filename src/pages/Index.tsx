@@ -7,34 +7,55 @@ import CohortCountdown from "@/components/CohortCountdown";
 import CapacityBar from "@/components/CapacityBar";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowRight, MapPin, Calendar, Users } from "lucide-react";
+import { ArrowRight, MapPin, Calendar, Users, ChevronDown } from "lucide-react";
 
-const Hero = () => (
-  <section className="pt-32 md:pt-44 pb-20 md:pb-28">
-    <div className="container">
-      <SectionFade>
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-semibold text-foreground leading-[0.95] max-w-4xl mb-8">
-          Aprendé a analizar empresas e invertir con criterio propio, <u>Gratis</u>.
-        </h1>
-      </SectionFade>
-      <SectionFade delay={0.1}>
-        <p className="text-lg text-muted-foreground max-w-lg mb-8 leading-relaxed">
-          Clases presenciales de análisis fundamental para estudiantes en Uruguay. Sin costos. Sin trading. Sin experiencia previa.
-        </p>
-      </SectionFade>
-      <SectionFade delay={0.12}>
-        <div className="mb-12">
-          <LiveStudentCounter />
+const Hero = () => {
+  const [showScrollHint, setShowScrollHint] = useState(true);
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (window.scrollY > 30) {
+        setShowScrollHint(false);
+      }
+    };
+
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return (
+    <section className="relative pt-32 md:pt-44 pb-20 md:pb-28">
+      <div className="container">
+        <SectionFade>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-semibold text-foreground leading-[0.95] max-w-4xl mb-8">
+            Aprendé a analizar empresas e invertir con criterio propio, <u>Gratis</u>.
+          </h1>
+        </SectionFade>
+        <SectionFade delay={0.1}>
+          <p className="text-lg text-muted-foreground max-w-lg mb-8 leading-relaxed">
+            Clases presenciales de análisis fundamental para estudiantes en Uruguay. Sin costos. Sin trading. Sin experiencia previa.
+          </p>
+        </SectionFade>
+        <SectionFade delay={0.12}>
+          <div className="mb-12">
+            <LiveStudentCounter />
+          </div>
+        </SectionFade>
+        <SectionFade delay={0.15}>
+          <Button asChild variant="cta" size="cta">
+            <Link to="/registro">Inscribite</Link>
+          </Button>
+        </SectionFade>
+      </div>
+
+      {showScrollHint && (
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce opacity-40">
+          <ChevronDown size={20} className="text-foreground" />
         </div>
-      </SectionFade>
-      <SectionFade delay={0.15}>
-        <Button asChild variant="cta" size="cta">
-          <Link to="/registro">Inscribite</Link>
-        </Button>
-      </SectionFade>
-    </div>
-  </section>
-);
+      )}
+    </section>
+  );
+};
 
 const ProblemSection = () => (
   <section className="py-14 md:py-20">

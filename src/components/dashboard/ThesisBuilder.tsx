@@ -1,24 +1,88 @@
-import { useState } from "react";
-import { mockTheses, Thesis } from "@/lib/mockData";
+import { useEffect, useState } from "react";
+import { Thesis } from "@/lib/mockData";
 import { Plus, FileText } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const companies = ["Mercado Libre", "Globant", "Vista Energy", "Dlocal", "YPF", "Nu Holdings", "Coca-Cola", "Apple", "Google", "Otra"];
 
 const ThesisBuilder = () => {
-  const [theses, setTheses] = useState<Thesis[]>(mockTheses);
+  const { session, user } = useAuth();
+  const userId = session?.user?.id;
+  const [theses, setTheses] = useState<Thesis[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({ company: "", content: "" });
 
-  const handleSubmit = () => {
-    const newThesis: Thesis = {
-      id: String(Date.now()),
-      company: form.company,
-      date: new Date().toISOString().split("T")[0],
-      status: "borrador",
-      content: form.content,
+  useEffect(() => {
+    const fetchTheses = async () => {
+      if (!userId) {
+        setTheses([]);
+        setLoading(false);
+        return;
+      }
+
+      const { data } = await supabase
+        .from("case_studies")
+        .select("id, company_name, content, is_published, created_at")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+
+      if (data) {
+        setTheses(
+          data.map((d) => ({
+            id: d.id,
+            company: d.company_name,
+            date: String(d.created_at).split("T")[0],
+            status: d.is_published ? "publicado" : "borrador",
+            content: d.content || "",
+          })),
+        );
+      }
+
+      setLoading(false);
     };
-    setTheses([newThesis, ...theses]);
+
+    fetchTheses();
+  }, [userId]);
+
+  const handleSubmit = async () => {
+    if (!userId) return;
+
+    const nameParts = (user?.name || "Usuario").trim().split(" ").filter(Boolean);
+    const firstName = nameParts[0] || "Usuario";
+    const lastInitial = nameParts.length > 1 ? `${nameParts[nameParts.length - 1][0]}.` : "-";
+
+    const { data, error } = await supabase.from("case_studies").insert({
+      user_id: userId,
+      author_first_name: firstName,
+      author_last_initial: lastInitial,
+      author_school: null,
+      cohort_label: null,
+      company_name: form.company,
+      company_sector: null,
+      company_ticker: null,
+      content: form.content,
+      summary: form.content.slice(0, 180),
+      verdict: null,
+      key_metrics: null,
+      is_published: false,
+    }).select("id, company_name, content, created_at").single();
+
+    if (!error && data) {
+      setTheses((prev) => [
+        {
+          id: data.id,
+          company: data.company_name,
+          date: String(data.created_at).split("T")[0],
+          status: "borrador",
+          content: data.content || "",
+        },
+        ...prev,
+      ]);
+    }
+
     setShowForm(false);
     setStep(1);
     setForm({ company: "", content: "" });
@@ -119,7 +183,11 @@ const ThesisBuilder = () => {
 
       {/* Theses List */}
       <div className="border border-border rounded-lg divide-y divide-border">
-        {theses.length === 0 ? (
+        {loading ? (
+          <div className="p-8 text-center text-muted-foreground text-sm">
+            Cargando tesis...
+          </div>
+        ) : theses.length === 0 ? (
           <div className="p-8 text-center text-muted-foreground text-sm">
             No tenés tesis todavía. ¡Empezá con tu primer análisis!
           </div>

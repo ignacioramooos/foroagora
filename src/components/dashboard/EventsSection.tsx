@@ -6,6 +6,7 @@ import { CalendarDays, Clock, MapPin, Users, Loader2, CheckCircle2, X } from "lu
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Event {
   id: string;
@@ -104,8 +105,12 @@ const EventsSection = () => {
 
   if (loading) {
     return (
-      <div className="p-6 md:p-10 flex justify-center">
-        <Loader2 className="animate-spin text-muted-foreground" size={24} />
+      <div className="p-6 md:p-10 max-w-5xl space-y-4">
+        <Skeleton className="h-8 w-40" />
+        <Skeleton className="h-5 w-72" />
+        <Skeleton className="h-28 rounded-lg" />
+        <Skeleton className="h-28 rounded-lg" />
+        <Skeleton className="h-28 rounded-lg" />
       </div>
     );
   }
