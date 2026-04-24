@@ -99,14 +99,14 @@ const ContactPage = () => {
             <div className="md:col-span-2">
               <h3 className="font-heading font-semibold text-foreground text-lg mb-6">También podés encontrarnos en:</h3>
               <div className="space-y-4">
-                <a href="mailto:hola@invertiuy.org" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
-                  <Mail size={18} /> hola@invertiuy.org
+                <a href="mailto:hola@foroagora.org" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
+                  <Mail size={18} /> hola@foroagora.org
                 </a>
-                <a href="https://instagram.com/invertiuy" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
-                  <Instagram size={18} /> @invertiuy
+                <a href="https://instagram.com/foroagora" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
+                  <Instagram size={18} /> @foroagora
                 </a>
-                <a href="https://linkedin.com/company/invertiuy" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
-                  <Linkedin size={18} /> InvertíUY
+                <a href="https://linkedin.com/company/foroagora" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
+                  <Linkedin size={18} /> Foro Agora
                 </a>
                 <a href="https://chat.whatsapp.com/LIyfas9fhGUJzpv62LJTWg?mode=gi_t" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
                   <MessageCircle size={18} /> Grupo de WhatsApp

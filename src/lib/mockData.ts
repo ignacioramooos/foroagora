@@ -70,9 +70,9 @@ export const mockTheses: Thesis[] = [
 
 export const mockCommunityPosts: CommunityPost[] = [
   { id: "1", author: "Valentina R.", type: "analysis", title: "Análisis de Globant: ¿Comprar o esperar?", date: "2025-06-08" },
-  { id: "2", author: "Equipo InvertíUY", type: "announcement", title: "Nueva sede confirmada: INJU Centro", date: "2025-06-05" },
+  { id: "2", author: "Equipo Foro Agora", type: "announcement", title: "Nueva sede confirmada: INJU Centro", date: "2025-06-05" },
   { id: "3", author: "Martín G.", type: "analysis", title: "Mi primer DCF: Coca-Cola", date: "2025-06-03" },
-  { id: "4", author: "Equipo InvertíUY", type: "announcement", title: "Material de Módulo 2 disponible", date: "2025-06-01" },
+  { id: "4", author: "Equipo Foro Agora", type: "announcement", title: "Material de Módulo 2 disponible", date: "2025-06-01" },
 ];
 
 export const mockGlossary: GlossaryTerm[] = [

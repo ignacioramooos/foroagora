@@ -321,7 +321,7 @@ const AuthPage = () => {
                 <div className="flex items-start gap-3 pt-2">
                   <input type="checkbox" checked={onboardingData.acceptedTerms} onChange={(e) => set("acceptedTerms", e.target.checked)} className="mt-1 w-4 h-4" />
                   <label className="text-sm text-muted-foreground">
-                    Acepto que InvertíUY es un movimiento educativo sin fines de lucro y acepto los términos de uso. *
+                    Acepto que Foro Agora es un movimiento educativo sin fines de lucro y acepto los términos de uso. *
                   </label>
                 </div>
               </div>
@@ -364,7 +364,7 @@ const AuthPage = () => {
           {step === "login" ? "Iniciar sesión" : "Crear cuenta"}
         </h1>
         <p className="text-muted-foreground text-sm mb-8">
-          {step === "login" ? "Ingresá a tu cuenta de InvertíUY." : "Registrate para acceder al programa."}
+          {step === "login" ? "Ingresá a tu cuenta de Foro Agora." : "Registrate para acceder al programa."}
         </p>
 
         <button onClick={handleGoogleLogin}

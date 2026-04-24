@@ -50,8 +50,8 @@ USING (auth.uid() = user_id);
 -- Seed some sample events
 INSERT INTO public.events (title, description, speaker_name, speaker_role, event_date, location, spots_total, spots_taken) VALUES
 ('Clase Magistral: Análisis de Apple', 'Analizamos en profundidad el modelo de negocio de Apple, sus ventajas competitivas y cómo valuar la empresa usando métricas fundamentales. Ideal para quienes quieren entender cómo piensan los grandes inversores.', 'Nico', 'Analista Senior', now() + interval '10 days', 'Sede INJU', 30, 22),
-('Workshop: Tu Primer DCF', 'Taller práctico donde vas a construir tu primer modelo de Discounted Cash Flow paso a paso. Traé tu notebook y muchas ganas de aprender.', 'Valentina R.', 'Mentora InvertíUY', now() + interval '17 days', 'Sede INJU', 25, 8),
-('Charla Abierta: Invertir desde Uruguay', '¿Cómo abrís una cuenta de broker? ¿Qué impuestos pagás? Respondemos las preguntas más comunes sobre invertir siendo residente uruguayo.', 'Martín G.', 'Co-fundador InvertíUY', now() + interval '25 days', 'Online (Zoom)', 100, 45),
+('Workshop: Tu Primer DCF', 'Taller práctico donde vas a construir tu primer modelo de Discounted Cash Flow paso a paso. Traé tu notebook y muchas ganas de aprender.', 'Valentina R.', 'Mentora Foro Agora', now() + interval '17 days', 'Sede INJU', 25, 8),
+('Charla Abierta: Invertir desde Uruguay', '¿Cómo abrís una cuenta de broker? ¿Qué impuestos pagás? Respondemos las preguntas más comunes sobre invertir siendo residente uruguayo.', 'Martín G.', 'Co-fundador Foro Agora', now() + interval '25 days', 'Online (Zoom)', 100, 45),
 ('Análisis Fundamental — Clase 3', 'Tercera clase del módulo de Análisis Fundamental. Cubrimos estados de resultados, márgenes y cómo interpretar la rentabilidad operativa.', 'Nico', 'Analista Senior', now() + interval '5 days', 'Sede INJU', 30, 28);
 
 -- Trigger for updated_at

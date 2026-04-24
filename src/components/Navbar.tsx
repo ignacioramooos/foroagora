@@ -47,7 +47,7 @@ const Navbar = () => {
       >
         <div className="container flex items-center justify-between h-16">
           <Link to="/" className="text-lg font-heading font-semibold tracking-tight text-foreground">
-            InvertíUY
+            Foro Agora
           </Link>
 
           <div className="hidden md:flex items-center gap-8">

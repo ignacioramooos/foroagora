@@ -520,7 +520,7 @@ const PortfolioTab = () => {
 
       {/* Disclaimer */}
       <p className="text-xs text-muted-foreground text-center pt-4">
-        Este portafolio es simulado con fines educativos. No constituye asesoramiento financiero ni involucra dinero real. InvertíUY no es un broker ni servicio de inversión.
+        Este portafolio es simulado con fines educativos. No constituye asesoramiento financiero ni involucra dinero real. Foro Agora no es un broker ni servicio de inversión.
       </p>
     </div>
   );

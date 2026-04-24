@@ -115,7 +115,7 @@ const GlossaryContent = () => {
           <p className="text-sm text-muted-foreground">
             ¿Querés que lo agreguemos?{" "}
             <a
-              href="mailto:contacto@invertiuy.com?subject=Sugerencia de término para el glosario"
+              href="mailto:contacto@foroagora.com?subject=Sugerencia de término para el glosario"
               className="text-foreground underline underline-offset-2"
             >
               Escribinos

@@ -18,8 +18,8 @@ ON public.community_posts FOR INSERT
 WITH CHECK (true);
 
 INSERT INTO public.community_posts (title, author, type) VALUES
-('¡Bienvenidos a la primera cohorte de InvertíUY!', 'Equipo InvertíUY', 'announcement'),
+('¡Bienvenidos a la primera cohorte de Foro Agora!', 'Equipo Foro Agora', 'announcement'),
 ('Análisis de MercadoLibre (MELI) — por Nicolás', 'Nicolás Sales', 'analysis'),
-('Próxima clase: Cash Flow Statement', 'Equipo InvertíUY', 'announcement'),
+('Próxima clase: Cash Flow Statement', 'Equipo Foro Agora', 'announcement'),
 ('Mi tesis sobre Apple — ratio P/E y FCF', 'Estudiante', 'analysis'),
-('Nuevo material: guía de valoración por múltiplos', 'Equipo InvertíUY', 'announcement');
+('Nuevo material: guía de valoración por múltiplos', 'Equipo Foro Agora', 'announcement');

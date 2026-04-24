@@ -1,10 +1,10 @@
-# InvertiUY Project Overview
+# Foro Agora Project Overview
 
 Last updated: 2026-04-23
 
 ## 1. Executive Summary
 
-InvertiUY is a React + Supabase web platform focused on financial education for youth in Uruguay. It combines:
+Foro Agora is a React + Supabase web platform focused on financial education for youth in Uruguay. It combines:
 
 - Public-facing pages for mission, program, registration, and partnerships.
 - Authentication and onboarding.

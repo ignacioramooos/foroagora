@@ -10,7 +10,7 @@ import teamPhoto from "@/assets/team-photo.jpeg";
 
 const team = [
   { name: "Nicolás Sales", age: 17, role: "Co-fundador & Instructor", bio: "El que sabe. Especialista en análisis fundamental y mercados financieros.", photo: teamNicolas },
-  { name: "Juan Ignacio Ramos", age: 18, role: "Co-fundador", bio: "Apasionado por las finanzas y la educación. Lidera la visión y estrategia de InvertíUY.", photo: teamIgnacio },
+  { name: "Juan Ignacio Ramos", age: 18, role: "Co-fundador", bio: "Apasionado por las finanzas y la educación. Lidera la visión y estrategia de Foro Agora.", photo: teamIgnacio },
 ];
 
 const ImpactSection = () => {
@@ -100,7 +100,7 @@ const AboutPage = () => (
             </div>
           </div>
           <div className="md:col-span-2">
-            <img src={teamPhoto} alt="El equipo de InvertíUY" className="rounded-lg w-full h-full object-cover" />
+            <img src={teamPhoto} alt="El equipo de Foro Agora" className="rounded-lg w-full h-full object-cover" />
           </div>
         </div>
       </div>
