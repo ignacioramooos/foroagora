@@ -21,6 +21,7 @@ import DashboardPage from "./pages/DashboardPage";
 import AdminPage from "./pages/AdminPage";
 import AuthPage from "./pages/AuthPage";
 import RankingPage from "./pages/RankingPage";
+import ImpactPage from "./pages/ImpactPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ const AppRoutes = () => {
       <Route path="/partners" element={<PublicPage><PartnersPage /></PublicPage>} />
       <Route path="/brokers" element={<PublicPage><BrokersPage /></PublicPage>} />
       <Route path="/ranking" element={<PublicPage><RankingPage /></PublicPage>} />
+      <Route path="/impacto" element={<PublicPage><ImpactPage /></PublicPage>} />
       <Route path="/auth" element={<AuthPage />} />
     </>
   );

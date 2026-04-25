@@ -10,6 +10,7 @@ const navLinks = [
   { label: "Programa", path: "/programa" },
   { label: "Recursos", path: "/recursos" },
   { label: "Glosario", path: "/glosario" },
+  { label: "Impacto", path: "/impacto" },
   { label: "Brokers", path: "/brokers" },
   { label: "Partners", path: "/partners" },
   { label: "Contacto", path: "/contacto" },

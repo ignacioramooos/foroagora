@@ -24,6 +24,15 @@ interface AuthContextType {
   loading: boolean;
 }
 
+interface ProfileSnapshot {
+  display_name?: string | null;
+  onboarding_completed?: boolean | null;
+  streak: number;
+  completedClasses: number;
+  totalClasses: number;
+  publishedTheses: number;
+}
+
 const AuthContext = createContext<AuthContextType>({
   isLoggedIn: false,
   user: null,
@@ -37,18 +46,50 @@ const AuthContext = createContext<AuthContextType>({
 
 const buildProfile = (
   supabaseUser: SupabaseUser,
-  profileData?: { display_name?: string | null; onboarding_completed?: boolean | null },
-  stats?: { completedClasses: number; publishedTheses: number }
+  profileData: ProfileSnapshot
 ): UserProfile => ({
   id: supabaseUser.id,
-  name: profileData?.display_name || supabaseUser.user_metadata?.display_name || supabaseUser.email?.split("@")[0] || "Usuario",
+  name: profileData.display_name || supabaseUser.user_metadata?.display_name || supabaseUser.email?.split("@")[0] || "Usuario",
   email: supabaseUser.email || "",
-  streak: 0,
-  completedClasses: stats?.completedClasses ?? 0,
-  totalClasses: 12,
-  publishedTheses: stats?.publishedTheses ?? 0,
-  onboardingCompleted: profileData?.onboarding_completed ?? false,
+  streak: profileData.streak,
+  completedClasses: profileData.completedClasses,
+  totalClasses: profileData.totalClasses,
+  publishedTheses: profileData.publishedTheses,
+  onboardingCompleted: profileData.onboarding_completed ?? false,
 });
+
+const toISODate = (value: Date) => value.toISOString().slice(0, 10);
+
+const calculateCurrentStreak = (completedAtValues: Array<string | null>) => {
+  const completedDays = new Set(
+    completedAtValues
+      .filter((value): value is string => Boolean(value))
+      .map((value) => toISODate(new Date(value)))
+  );
+
+  if (completedDays.size === 0) {
+    return 0;
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  let cursor = new Date(today);
+  if (!completedDays.has(toISODate(cursor))) {
+    cursor.setDate(cursor.getDate() - 1);
+    if (!completedDays.has(toISODate(cursor))) {
+      return 0;
+    }
+  }
+
+  let streak = 0;
+  while (completedDays.has(toISODate(cursor))) {
+    streak += 1;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+
+  return streak;
+};
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
@@ -56,36 +97,86 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = useCallback(async (supabaseUser: SupabaseUser) => {
+    let displayName: string | null = null;
+    let onboardingCompleted = false;
+    let streak = 0;
     let completedClasses = 0;
+    let totalClasses = 0;
     let publishedTheses = 0;
 
     try {
-      const { count } = await supabase
+      const { data, count, error } = await supabase
         .from("lesson_progress")
-        .select("*", { count: "exact", head: true })
+        .select("completed_at", { count: "exact" })
         .eq("user_id", supabaseUser.id)
         .not("completed_at", "is", null);
+
+      if (error) {
+        throw error;
+      }
+
       completedClasses = count ?? 0;
+      streak = calculateCurrentStreak((data ?? []).map((row: { completed_at: string | null }) => row.completed_at));
     } catch {
+      streak = 0;
       completedClasses = 0;
     }
 
     try {
-      const { count } = await supabase
+      const { count, error } = await supabase
+        .from("lessons")
+        .select("id", { count: "exact", head: true });
+
+      if (error) {
+        throw error;
+      }
+
+      totalClasses = count ?? 0;
+    } catch {
+      totalClasses = 0;
+    }
+
+    try {
+      const { count, error } = await supabase
         .from("certificates")
         .select("*", { count: "exact", head: true })
         .eq("user_id", supabaseUser.id);
+
+      if (error) {
+        throw error;
+      }
+
       publishedTheses = count ?? 0;
     } catch {
       publishedTheses = 0;
     }
 
-    const { data } = await supabase
-      .from("profiles")
-      .select("display_name, onboarding_completed")
-      .eq("user_id", supabaseUser.id)
-      .single();
-    setUser(buildProfile(supabaseUser, data, { completedClasses, publishedTheses }));
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("display_name, onboarding_completed")
+        .eq("user_id", supabaseUser.id)
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      displayName = data.display_name;
+      onboardingCompleted = data.onboarding_completed ?? false;
+    } catch {
+      displayName = null;
+      onboardingCompleted = false;
+    }
+
+    setUser(buildProfile(supabaseUser, {
+      display_name: displayName,
+      onboarding_completed: onboardingCompleted,
+      streak,
+      completedClasses,
+      totalClasses,
+      publishedTheses,
+    }));
   }, []);
 
   const refreshProfile = useCallback(async () => {

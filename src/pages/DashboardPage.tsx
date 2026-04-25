@@ -15,7 +15,7 @@ const DashboardPage = () => {
 
   const renderTab = () => {
     switch (activeTab) {
-      case "home": return <DashboardHome />;
+      case "home": return <DashboardHome onTabChange={setActiveTab} />;
       case "content": return <ContentLibrary />;
       case "portfolio": return <PortfolioTab />;
       case "progress": return <LearningRoadmap />;
@@ -24,7 +24,7 @@ const DashboardPage = () => {
       case "theses": return <ThesisBuilder />;
       case "events": return <EventsSection />;
       case "settings": return <DashboardSettings />;
-      default: return <DashboardHome />;
+      default: return <DashboardHome onTabChange={setActiveTab} />;
     }
   };
 

@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { mockModules } from "@/lib/mockData";
-import { Flame, BookOpen, FileText, Target, MapPin, Clock, CalendarDays, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Flame, BookOpen, FileText, Target, MapPin, Clock, CalendarDays, ArrowRight, CheckCircle2, BarChart3, Wallet, CalendarCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { DashboardTab } from "@/components/dashboard/DashboardLayout";
 
 interface RegisteredEvent {
   id: string;
@@ -22,12 +23,61 @@ interface CommunityPost {
   created_at: string;
 }
 
-const DashboardHome = () => {
+interface DashboardHomeProps {
+  onTabChange?: (tab: DashboardTab) => void;
+}
+
+const Sparkline = ({ points }: { points: number[] }) => {
+  if (points.length === 0) {
+    return <div className="h-9 rounded-md bg-secondary/70" />;
+  }
+
+  const width = 140;
+  const height = 36;
+  const min = Math.min(...points);
+  const max = Math.max(...points);
+  const range = Math.max(max - min, 1);
+  const stepX = points.length > 1 ? width / (points.length - 1) : width;
+
+  const polylinePoints = points
+    .map((value, idx) => {
+      const x = idx * stepX;
+      const y = height - ((value - min) / range) * height;
+      return `${x},${y}`;
+    })
+    .join(" ");
+
+  const areaPoints = `${polylinePoints} ${width},${height} 0,${height}`;
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} className="h-9 w-full" aria-hidden>
+      <defs>
+        <linearGradient id="sparklineGradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="hsl(var(--accent))" stopOpacity="0.25" />
+          <stop offset="100%" stopColor="hsl(var(--accent))" stopOpacity="0.02" />
+        </linearGradient>
+      </defs>
+      <polygon points={areaPoints} fill="url(#sparklineGradient)" />
+      <polyline
+        fill="none"
+        stroke="hsl(var(--accent))"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        points={polylinePoints}
+      />
+    </svg>
+  );
+};
+
+const DashboardHome = ({ onTabChange }: DashboardHomeProps) => {
   const { user, session } = useAuth();
   const [myEvents, setMyEvents] = useState<RegisteredEvent[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [communityPosts, setCommunityPosts] = useState<CommunityPost[]>([]);
   const [loadingCommunity, setLoadingCommunity] = useState(true);
+  const [progressTrend, setProgressTrend] = useState<number[]>([]);
+  const [thesisTrend, setThesisTrend] = useState<number[]>([]);
 
   useEffect(() => {
     if (!session?.user) {
@@ -85,9 +135,54 @@ const DashboardHome = () => {
     fetchCommunity();
   }, []);
 
+  useEffect(() => {
+    const fetchTrends = async () => {
+      if (!session?.user) {
+        setProgressTrend([]);
+        setThesisTrend([]);
+        return;
+      }
+
+      const { data: lessons } = await supabase
+        .from("lesson_progress")
+        .select("completed_at")
+        .eq("user_id", session.user.id)
+        .not("completed_at", "is", null)
+        .order("completed_at", { ascending: true })
+        .limit(24);
+
+      const progressPoints = (lessons ?? []).reduce<number[]>((acc, row) => {
+        acc.push((acc[acc.length - 1] ?? 0) + 1);
+        return acc;
+      }, []);
+      setProgressTrend(progressPoints.slice(-8));
+
+      const { data: certificates } = await supabase
+        .from("certificates")
+        .select("issued_at")
+        .eq("user_id", session.user.id)
+        .order("issued_at", { ascending: true })
+        .limit(24);
+
+      const thesisPoints = (certificates ?? []).reduce<number[]>((acc) => {
+        acc.push((acc[acc.length - 1] ?? 0) + 1);
+        return acc;
+      }, []);
+      setThesisTrend(thesisPoints.slice(-8));
+    };
+
+    fetchTrends();
+  }, [session]);
+
   if (!user) return null;
 
-  const progressPercent = Math.round((user.completedClasses / user.totalClasses) * 100);
+  const firstName = user.name.split(" ")[0] || user.name;
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Buenos días" : "Buenas tardes";
+
+  const progressPercent = user.totalClasses > 0
+    ? Math.round((user.completedClasses / user.totalClasses) * 100)
+    : 0;
   const currentModule = mockModules.find((m) => m.status === "in_progress");
 
   const formatDate = (iso: string) => {
@@ -111,11 +206,33 @@ const DashboardHome = () => {
       {/* Welcome */}
       <div className="mb-10">
         <h1 className="text-2xl md:text-3xl text-foreground mb-1">
-          Hola, {user.name}!
+          {greeting}, {firstName}!
         </h1>
         <p className="text-muted-foreground flex items-center gap-2">
           Tu racha actual: {user.streak} días <Flame size={16} className="text-orange-500" />
         </p>
+      </div>
+
+      {/* Quick actions */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-10">
+        <button
+          onClick={() => onTabChange?.("content")}
+          className="h-11 rounded-md border border-border bg-background text-sm font-heading font-medium text-foreground transition-colors hover:bg-secondary"
+        >
+          <span className="inline-flex items-center gap-2"><BarChart3 size={15} /> Ir a Clases</span>
+        </button>
+        <button
+          onClick={() => onTabChange?.("portfolio")}
+          className="h-11 rounded-md border border-border bg-background text-sm font-heading font-medium text-foreground transition-colors hover:bg-secondary"
+        >
+          <span className="inline-flex items-center gap-2"><Wallet size={15} /> Ir a Portafolio</span>
+        </button>
+        <button
+          onClick={() => onTabChange?.("events")}
+          className="h-11 rounded-md border border-border bg-background text-sm font-heading font-medium text-foreground transition-colors hover:bg-secondary"
+        >
+          <span className="inline-flex items-center gap-2"><CalendarCheck size={15} /> Ir a Eventos</span>
+        </button>
       </div>
 
       {/* Stats */}
@@ -131,12 +248,18 @@ const DashboardHome = () => {
           <div className="mt-3 h-1.5 bg-secondary rounded-full overflow-hidden">
             <div className="h-full bg-foreground rounded-full transition-all" style={{ width: `${progressPercent}%` }} />
           </div>
+          <div className="mt-3">
+            <Sparkline points={progressTrend} />
+          </div>
         </div>
         <div className="border border-border rounded-lg p-5">
           <div className="flex items-center gap-2 text-muted-foreground text-sm font-heading mb-3">
             <FileText size={16} /> Tesis Publicadas
           </div>
           <span className="text-3xl font-heading font-semibold text-foreground">{user.publishedTheses}</span>
+          <div className="mt-3">
+            <Sparkline points={thesisTrend} />
+          </div>
         </div>
         <div className="border border-border rounded-lg p-5">
           <div className="flex items-center gap-2 text-muted-foreground text-sm font-heading mb-3">
