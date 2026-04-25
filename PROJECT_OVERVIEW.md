@@ -13,7 +13,7 @@ Foro Agora is a React + Supabase web platform focused on financial education for
 - Supabase-backed persistence and role-based access controls.
 - Supabase Edge Functions for stock quote/history data used in the portfolio simulator.
 
-Current state is strong for live demo and core operations. Several modules are already production-oriented, while a few areas remain intentionally lightweight (for example, some progress logic and selected dashboard widgets).
+Current state is strong for live demo and core operations. Several modules are already production-oriented, while a few areas remain intentionally lightweight (for example, 일부 progress logic and selected dashboard widgets).
 
 ## 2. Product Purpose and Positioning
 
