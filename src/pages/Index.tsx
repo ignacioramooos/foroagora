@@ -64,8 +64,8 @@ const Hero = () => {
             </SectionFade>
           </div>
           <SectionFade delay={0.2}>
-            <div className="hidden md:flex justify-end items-center relative w-full h-96 -mr-20">
-              <StoneTrail className="w-48 h-full" />
+            <div className="hidden md:block relative w-[18rem] lg:w-[22rem] h-[34rem] lg:h-[40rem] -mr-24 lg:-mr-32 -mb-24 self-end pointer-events-none">
+              <StoneTrail className="absolute inset-x-0 bottom-0 w-full h-[120%] text-foreground" />
             </div>
           </SectionFade>
         </div>
