@@ -6,7 +6,6 @@ import LiveStudentCounter from "@/components/LiveStudentCounter";
 import CohortCountdown from "@/components/CohortCountdown";
 import CapacityBar from "@/components/CapacityBar";
 import NewsletterSignup from "@/components/NewsletterSignup";
-import StonePathLogo from "@/components/StonePathLogo";
 import CoreValues from "@/components/CoreValues";
 import ForoAgoraPattern from "@/components/ForoAgoraPattern";
 import { supabase } from "@/integrations/supabase/client";
@@ -65,11 +64,12 @@ const Hero = () => {
             </SectionFade>
           </div>
           <SectionFade delay={0.2}>
-            <div className="hidden md:flex justify-center items-center relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary-blue/10 to-secondary-cyan/10 rounded-3xl blur-xl" />
-              <div className="relative bg-background border border-border rounded-3xl p-8">
-                <StonePathLogo className="h-[26rem] lg:h-[30rem] w-auto text-primary-blue" />
-              </div>
+            <div className="hidden md:flex justify-center items-center relative h-96">
+              <ForoAgoraPattern 
+                className="absolute right-0 top-1/2 -translate-y-1/2 w-64 h-96" 
+                ovals={6}
+                color="blue"
+              />
             </div>
           </SectionFade>
         </div>
