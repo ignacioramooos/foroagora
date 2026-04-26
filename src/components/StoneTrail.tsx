@@ -4,17 +4,17 @@ interface StoneTrailProps {
 
 /**
  * Animated stone-trail isotype.
- * Stones cycle downward continuously while preserving the brand silhouette
- * (positions, sizes and spacing extracted from the original logo asset).
- * Inverts in dark mode.
+ * Each stone-slot stays fixed in space (preserving the brand silhouette).
+ * A travelling "wave" makes each stone fade out as it shifts up toward the
+ * previous slot, then it reappears at its own slot — producing a one-way
+ * downward flow (disappear at top, reappear at bottom).
  */
 const StoneTrail = ({ className = "" }: StoneTrailProps) => {
-  // Original logo dimensions (px) — used as SVG viewBox to preserve aspect ratio.
+  // Original logo dimensions (px) — preserve aspect ratio via viewBox.
   const VB_W = 704;
   const VB_H = 1502;
 
-  // Stones extracted from the original asset (cx, cy, rx, ry in viewBox units).
-  // Order: top → bottom (smallest → largest).
+  // Stone slots extracted from the original asset (top → bottom).
   const stones = [
     { cx: 193.5, cy: 22.5, rx: 80.5, ry: 22.5 },
     { cx: 199.0, cy: 148.5, rx: 109, ry: 55.5 },
@@ -24,7 +24,8 @@ const StoneTrail = ({ className = "" }: StoneTrailProps) => {
     { cx: 351.5, cy: 1309.0, rx: 351.5, ry: 192 },
   ];
 
-  const cycle = 5; // seconds for full advance cycle
+  const cycle = 6; // total seconds per stone to traverse one slot upward
+  const n = stones.length;
 
   return (
     <div
@@ -37,8 +38,11 @@ const StoneTrail = ({ className = "" }: StoneTrailProps) => {
         className="w-full h-full"
       >
         {stones.map((s, i) => {
-          // Stagger each stone so the trail appears to march downward.
-          const delay = -(i / stones.length) * cycle;
+          // Distance to the previous (above) slot — last (top) stone fades out without moving.
+          const prev = i === 0 ? null : stones[i - 1];
+          const dy = prev ? prev.cy - s.cy : -s.cy * 0.4; // top stone drifts up off-canvas
+          // Stagger so only one stone is visibly travelling at a time.
+          const delay = -(i / n) * cycle;
           return (
             <ellipse
               key={i}
@@ -48,20 +52,28 @@ const StoneTrail = ({ className = "" }: StoneTrailProps) => {
               ry={s.ry}
               fill="hsl(var(--foreground))"
               style={{
-                animation: `stone-advance ${cycle}s ease-in-out ${delay}s infinite`,
+                animation: `stone-flow-${i} ${cycle}s linear ${delay}s infinite`,
                 transformBox: "fill-box",
                 transformOrigin: "center",
+                ['--dy' as never]: `${dy}px`,
               }}
             />
           );
         })}
       </svg>
       <style>{`
-        @keyframes stone-advance {
-          0%, 100% { transform: translateY(0); opacity: 1; }
-          45%      { transform: translateY(28px); opacity: 0.85; }
-          90%      { transform: translateY(0); opacity: 1; }
-        }
+        ${stones
+          .map(
+            (_, i) => `
+          @keyframes stone-flow-${i} {
+            0%   { transform: translateY(0);            opacity: 0; }
+            15%  { transform: translateY(0);            opacity: 1; }
+            75%  { transform: translateY(var(--dy));    opacity: 1; }
+            100% { transform: translateY(var(--dy));    opacity: 0; }
+          }
+        `,
+          )
+          .join('\n')}
       `}</style>
     </div>
   );
