@@ -27,7 +27,7 @@ const StoneTrail = ({ className = "" }: StoneTrailProps) => {
     { cx: 351.5, cy: 2150, rx: 351.5, ry: 192 },
   ];
 
-  const cycle = 6; // total seconds per stone to traverse one slot upward
+  const cycle = 14; // total seconds per stone to traverse one slot upward
   const n = stones.length;
 
   return (
