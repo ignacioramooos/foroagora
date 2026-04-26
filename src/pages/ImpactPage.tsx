@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import SectionFade from "@/components/SectionFade";
+import CoreValues from "@/components/CoreValues";
 import { supabase } from "@/integrations/supabase/client";
-import { Activity, BookOpen, GraduationCap, Layers } from "lucide-react";
+import { Activity, BookOpen, GraduationCap, Layers, Sparkles } from "lucide-react";
 
 interface ImpactStats {
   students: number;
@@ -121,15 +122,18 @@ const ImpactPage = () => {
       <section className="relative">
         <div className="absolute inset-0 -z-10">
           <div className="absolute -top-24 left-1/2 h-[22rem] w-[22rem] -translate-x-1/2 rounded-full bg-accent/15 blur-3xl" />
-          <div className="absolute top-44 -left-24 h-64 w-64 rounded-full bg-foreground/10 blur-3xl" />
-          <div className="absolute top-64 -right-24 h-64 w-64 rounded-full bg-secondary blur-3xl" />
+          <div className="absolute top-44 -left-24 h-64 w-64 rounded-full bg-primary-blue/10 blur-3xl" />
+          <div className="absolute top-64 -right-24 h-64 w-64 rounded-full bg-secondary-cyan/10 blur-3xl" />
         </div>
 
         <div className="container max-w-6xl">
           <SectionFade>
-            <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
-              Impacto público
-            </p>
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles size={16} className="text-primary-blue" />
+              <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground">
+                Impacto público
+              </p>
+            </div>
             <h1 className="text-4xl md:text-6xl leading-[0.95] text-foreground max-w-4xl mb-6">
               Impacto de Foro Agora en tiempo real
             </h1>
@@ -141,31 +145,31 @@ const ImpactPage = () => {
 
           <SectionFade delay={0.08}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-10">
-              <div className="rounded-2xl border border-border bg-background/80 backdrop-blur p-6">
+              <div className="rounded-2xl border border-border bg-gradient-to-br from-blue-50/50 to-background/80 dark:from-blue-950/30 dark:to-background/80 backdrop-blur p-6 hover:shadow-lg transition-all">
                 <p className="text-xs uppercase tracking-widest font-heading text-muted-foreground mb-3">Estudiantes</p>
                 <p className="text-4xl font-heading text-foreground mb-3">
                   <LiveCounter value={stats.students} />
                 </p>
                 <p className="text-sm text-muted-foreground inline-flex items-center gap-2">
-                  <GraduationCap size={14} /> Registros totales en perfiles
+                  <GraduationCap size={14} className="text-primary-blue" /> Registros totales en perfiles
                 </p>
               </div>
-              <div className="rounded-2xl border border-border bg-background/80 backdrop-blur p-6">
+              <div className="rounded-2xl border border-border bg-gradient-to-br from-cyan-50/50 to-background/80 dark:from-cyan-950/30 dark:to-background/80 backdrop-blur p-6 hover:shadow-lg transition-all">
                 <p className="text-xs uppercase tracking-widest font-heading text-muted-foreground mb-3">Cohortes activas</p>
                 <p className="text-4xl font-heading text-foreground mb-3">
                   <LiveCounter value={stats.activeCohorts} />
                 </p>
                 <p className="text-sm text-muted-foreground inline-flex items-center gap-2">
-                  <Layers size={14} /> Cohortes con estado activo
+                  <Layers size={14} className="text-secondary-cyan" /> Cohortes con estado activo
                 </p>
               </div>
-              <div className="rounded-2xl border border-border bg-background/80 backdrop-blur p-6">
+              <div className="rounded-2xl border border-border bg-gradient-to-br from-amber-50/50 to-background/80 dark:from-amber-950/30 dark:to-background/80 backdrop-blur p-6 hover:shadow-lg transition-all">
                 <p className="text-xs uppercase tracking-widest font-heading text-muted-foreground mb-3">Contenido publicado</p>
                 <p className="text-4xl font-heading text-foreground mb-3">
                   <LiveCounter value={stats.publishedContent} />
                 </p>
                 <p className="text-sm text-muted-foreground inline-flex items-center gap-2">
-                  <BookOpen size={14} /> Clases y recursos visibles
+                  <BookOpen size={14} className="text-amber-600 dark:text-amber-400" /> Clases y recursos visibles
                 </p>
               </div>
             </div>
@@ -204,7 +208,9 @@ const ImpactPage = () => {
                         title={`${point.name}: ${count}`}
                       >
                         <div
-                          className={`rounded-full border border-background shadow-sm ${count > 0 ? "bg-accent" : "bg-muted"}`}
+                          className={`rounded-full border border-background shadow-sm transition-all ${
+                            count > 0 ? "bg-gradient-to-br from-primary-blue to-secondary-cyan" : "bg-muted"
+                          }`}
                           style={{ width: `${size}px`, height: `${size}px`, opacity: count > 0 ? 0.95 : 0.55 }}
                         />
                       </div>
@@ -227,7 +233,7 @@ const ImpactPage = () => {
                           <span className="text-muted-foreground">{count}</span>
                         </div>
                         <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
-                          <div className="h-full rounded-full bg-accent" style={{ width: `${pct}%` }} />
+                          <div className="h-full rounded-full bg-gradient-to-r from-primary-blue to-secondary-cyan" style={{ width: `${pct}%` }} />
                         </div>
                       </div>
                     );
@@ -239,6 +245,22 @@ const ImpactPage = () => {
               </div>
             </SectionFade>
           </div>
+        </div>
+      </section>
+
+      <section className="pt-16 md:pt-24 pb-8">
+        <div className="container max-w-6xl">
+          <SectionFade>
+            <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
+              Nuestros principios
+            </p>
+            <h2 className="text-3xl md:text-4xl text-foreground mb-12">
+              Los valores que guían nuestro impacto
+            </h2>
+          </SectionFade>
+          <SectionFade delay={0.1}>
+            <CoreValues layout="inline" />
+          </SectionFade>
         </div>
       </section>
     </div>

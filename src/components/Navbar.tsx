@@ -43,14 +43,17 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 bg-background ${
-          scrolled ? "border-b border-border" : ""
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 bg-background/80 backdrop-blur-md ${
+          scrolled ? "border-b border-border/60 shadow-sm" : ""
         }`}
       >
         <div className="container flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2 text-lg font-heading font-semibold tracking-tight text-foreground">
-            <StonePathLogo className="h-7 w-auto" />
-            <span>Foro Agora</span>
+          <Link to="/" className="flex items-center gap-2.5 text-lg font-heading font-semibold tracking-tight text-foreground hover:opacity-80 transition-opacity">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary-blue to-secondary-cyan rounded-lg blur opacity-0 hover:opacity-75 transition-opacity" />
+              <StonePathLogo className="h-6 w-auto relative bg-background rounded-lg p-1 text-primary-blue" />
+            </div>
+            <span className="hidden sm:inline">Foro Agora</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-8">

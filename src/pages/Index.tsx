@@ -7,8 +7,10 @@ import CohortCountdown from "@/components/CohortCountdown";
 import CapacityBar from "@/components/CapacityBar";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import StonePathLogo from "@/components/StonePathLogo";
+import CoreValues from "@/components/CoreValues";
+import ForoAgoraPattern from "@/components/ForoAgoraPattern";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowRight, MapPin, Calendar, Users, ChevronDown } from "lucide-react";
+import { ArrowRight, MapPin, Calendar, Users, ChevronDown, Sparkles } from "lucide-react";
 
 const Hero = () => {
   const [showScrollHint, setShowScrollHint] = useState(true);
@@ -25,13 +27,22 @@ const Hero = () => {
   }, []);
 
   return (
-    <section className="relative pt-32 md:pt-44 pb-20 md:pb-28">
+    <section className="relative pt-32 md:pt-44 pb-20 md:pb-28 overflow-hidden">
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-blue/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 -left-20 w-96 h-96 bg-secondary-cyan/5 rounded-full blur-3xl" />
+      </div>
+
       <div className="container">
         <div className="grid md:grid-cols-[1fr_auto] gap-12 md:gap-16 items-center">
           <div>
             <SectionFade>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-blue/10 border border-primary-blue/20 mb-6">
+                <Sparkles size={14} className="text-primary-blue" />
+                <span className="text-xs font-heading font-semibold text-primary-blue">Educación financiera accesible</span>
+              </div>
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-semibold text-foreground leading-[0.95] max-w-4xl mb-8">
-                Aprendé a analizar empresas e invertir con criterio propio, <u>Gratis</u>.
+                Aprendé a analizar empresas e invertir con criterio propio, <span className="bg-gradient-to-r from-primary-blue to-secondary-cyan bg-clip-text text-transparent">Gratis</span>.
               </h1>
             </SectionFade>
             <SectionFade delay={0.1}>
@@ -45,14 +56,20 @@ const Hero = () => {
               </div>
             </SectionFade>
             <SectionFade delay={0.15}>
-              <Button asChild variant="cta" size="cta">
-                <Link to="/registro">Inscribite</Link>
+              <Button asChild variant="cta" size="cta" className="bg-primary-blue hover:bg-blue-700">
+                <Link to="/registro" className="gap-2">
+                  Inscribite ahora
+                  <ArrowRight size={16} />
+                </Link>
               </Button>
             </SectionFade>
           </div>
           <SectionFade delay={0.2}>
-            <div className="hidden md:flex justify-center items-center">
-              <StonePathLogo className="h-[26rem] lg:h-[30rem] w-auto text-foreground" />
+            <div className="hidden md:flex justify-center items-center relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary-blue/20 to-secondary-cyan/20 rounded-3xl blur-2xl" />
+              <div className="relative bg-background/80 backdrop-blur-sm rounded-3xl p-8 border border-border">
+                <StonePathLogo className="h-[26rem] lg:h-[30rem] w-auto text-primary-blue" />
+              </div>
             </div>
           </SectionFade>
         </div>
@@ -68,12 +85,14 @@ const Hero = () => {
 };
 
 const ProblemSection = () => (
-  <section className="py-14 md:py-20">
+  <section className="py-14 md:py-20 relative">
+    <div className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-secondary-cyan/5 to-transparent" />
+    
     <div className="container">
       <div className="grid md:grid-cols-5 gap-10 md:gap-12 items-start">
         <div className="md:col-span-2">
-          <div className="border border-border rounded-lg p-10">
-            <span className="text-6xl md:text-7xl font-heading font-semibold text-foreground leading-none block mb-3">
+          <div className="border border-border rounded-lg p-10 bg-card hover:shadow-md transition-all">
+            <span className="text-6xl md:text-7xl font-heading font-semibold text-primary-blue leading-none block mb-3">
               80%
             </span>
             <p className="text-muted-foreground text-base">
@@ -154,6 +173,36 @@ const ValueProp = () => (
           ))}
         </div>
       </div>
+    </div>
+  </section>
+);
+
+const OurValues = () => (
+  <section className="relative py-16 md:py-24 overflow-hidden">
+    <div className="absolute inset-0 -z-10 opacity-30">
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary-blue/10 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-secondary-cyan/10 rounded-full blur-3xl" />
+    </div>
+
+    <div className="container">
+      <SectionFade>
+        <div className="flex items-center gap-2 mb-4">
+          <Sparkles size={16} className="text-primary-blue" />
+          <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground">
+            Nuestros principios
+          </p>
+        </div>
+        <h2 className="text-3xl md:text-4xl text-foreground mb-4">
+          Educamos hoy para transformar el mañana
+        </h2>
+        <p className="text-muted-foreground text-lg max-w-2xl mb-12">
+          Cada decisión que tomamos está guiada por nuestros valores fundamentales, que reflejan nuestro compromiso con la educación de calidad y el impacto real.
+        </p>
+      </SectionFade>
+
+      <SectionFade delay={0.1}>
+        <CoreValues />
+      </SectionFade>
     </div>
   </section>
 );
@@ -256,16 +305,32 @@ const UpcomingClasses = () => {
 };
 
 const FinalCTA = () => (
-  <section className="py-16 md:py-24 border-t border-border">
+  <section className="relative py-16 md:py-24 border-t border-border overflow-hidden">
+    <div className="absolute inset-0 -z-10">
+      <div className="absolute top-0 left-0 w-96 h-96 bg-primary-blue/10 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 right-0 w-80 h-80 bg-secondary-cyan/10 rounded-full blur-3xl" />
+    </div>
+
     <div className="container">
       <div className="max-w-4xl">
         <h2 className="text-3xl md:text-5xl text-foreground leading-tight mb-6">
           El mejor momento para aprender a invertir era ayer.
-          El segundo mejor es hoy.
+          <br />
+          <span className="bg-gradient-to-r from-primary-blue to-secondary-cyan bg-clip-text text-transparent">
+            El segundo mejor es hoy.
+          </span>
         </h2>
-        <div className="mt-10">
-          <Button asChild variant="cta" size="cta">
-            <Link to="/registro">Empezá acá</Link>
+        <div className="mt-10 flex flex-col sm:flex-row gap-4">
+          <Button asChild variant="cta" size="cta" className="bg-primary-blue hover:bg-blue-700">
+            <Link to="/registro" className="gap-2">
+              Empezá acá
+              <ArrowRight size={16} />
+            </Link>
+          </Button>
+          <Button asChild variant="outline" size="cta">
+            <Link to="/impacto">
+              Ver impacto
+            </Link>
           </Button>
         </div>
       </div>
@@ -278,6 +343,7 @@ const Index = () => (
     <Hero />
     <ProblemSection />
     <ValueProp />
+    <OurValues />
     <HowItWorks />
     <UpcomingClasses />
     <FinalCTA />
