@@ -4,29 +4,33 @@ interface StonePathLogoProps {
 }
 
 /**
- * Foro Agora isotype: a stacked path of stones representing the educational journey.
- * Built with pure SVG. Uses currentColor so it inherits text color
- * (contrasts perfectly in both light and dark mode).
+ * Foro Agora isotype: 6 stones in perspective forming an educational path.
+ * Each stone is a pure flat ellipse. Distant stones (top) are small with tight
+ * spacing; near stones (bottom) are wider with growing gaps — a path receding
+ * into the horizon.
+ *
+ * Pure SVG, fill="currentColor" → contrasts in light & dark mode.
  */
 const StonePathLogo = ({ className, size }: StonePathLogoProps) => {
-  // Stones: from smallest at top to largest at bottom
-  // [cy, rx, ry] positioned within a 200x400 viewBox
+  // [cy, rx, ry] inside a 200x560 viewBox. Centered on cx=100.
+  // Calibrated against the brand reference: 6 stones, growing exponentially
+  // in width and in vertical gap from top to bottom.
   const stones: Array<[number, number, number]> = [
-    [40, 22, 9],     // 1 - smallest
-    [70, 30, 11],    // 2
-    [104, 42, 14],   // 3
-    [144, 56, 18],   // 4
-    [192, 72, 22],   // 5
-    [248, 88, 27],   // 6
-    [318, 96, 32],   // 7 - largest
+    [60, 18, 7],     // 1 - farthest
+    [92, 26, 9],     // 2 - close to #1 (tight gap)
+    [142, 40, 13],   // 3
+    [212, 58, 18],   // 4
+    [310, 78, 24],   // 5
+    [440, 92, 30],   // 6 - nearest, widest
   ];
 
   return (
     <svg
-      viewBox="0 0 200 400"
+      viewBox="0 0 200 520"
       xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="xMidYMid meet"
       className={className}
-      style={size ? { width: size, height: size * 2 } : undefined}
+      style={size ? { width: size, height: size * 2.6 } : undefined}
       aria-label="Foro Agora"
       role="img"
     >
