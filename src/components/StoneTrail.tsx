@@ -11,17 +11,20 @@ interface StoneTrailProps {
  */
 const StoneTrail = ({ className = "" }: StoneTrailProps) => {
   // Original logo dimensions (px) — preserve aspect ratio via viewBox.
+  // Height expanded vs. source asset to allow much larger vertical spacing
+  // between stones while keeping their cx/rx/ry intact.
   const VB_W = 704;
-  const VB_H = 1502;
+  const VB_H = 2400;
 
-  // Stone slots extracted from the original asset (top → bottom).
+  // Stone slots (top → bottom). cx/rx/ry preserved from the brand asset;
+  // cy values are spaced out for a more dramatic vertical rhythm.
   const stones = [
-    { cx: 193.5, cy: 22.5, rx: 80.5, ry: 22.5 },
-    { cx: 199.0, cy: 148.5, rx: 109, ry: 55.5 },
-    { cx: 313.5, cy: 334.5, rx: 139.5, ry: 64.5 },
-    { cx: 205.5, cy: 570.5, rx: 205.5, ry: 97.5 },
-    { cx: 268.0, cy: 896.5, rx: 268, ry: 137.5 },
-    { cx: 351.5, cy: 1309.0, rx: 351.5, ry: 192 },
+    { cx: 193.5, cy: 60,   rx: 80.5,  ry: 22.5 },
+    { cx: 199.0, cy: 280,  rx: 109,   ry: 55.5 },
+    { cx: 313.5, cy: 600,  rx: 139.5, ry: 64.5 },
+    { cx: 205.5, cy: 1000, rx: 205.5, ry: 97.5 },
+    { cx: 268.0, cy: 1500, rx: 268,   ry: 137.5 },
+    { cx: 351.5, cy: 2150, rx: 351.5, ry: 192 },
   ];
 
   const cycle = 6; // total seconds per stone to traverse one slot upward
