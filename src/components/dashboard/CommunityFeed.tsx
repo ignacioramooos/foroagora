@@ -17,7 +17,7 @@ const CommunityFeed = () => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from("community_posts")
         .select("id, author, type, title, created_at")
         .eq("is_published", true)

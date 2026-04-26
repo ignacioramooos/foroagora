@@ -37,10 +37,12 @@ Deno.serve(async (req) => {
     const timestamps = result.timestamp || [];
     const closes = result.indicators?.quote?.[0]?.close || [];
 
-    const data = timestamps.map((ts: number, i: number) => ({
-      date: new Date(ts * 1000).toISOString().split("T")[0],
-      close: closes[i] != null ? Math.round(closes[i] * 100) / 100 : null,
-    })).filter((d): d is { date: string; close: number } => d.close !== null);
+    const data = timestamps
+      .map((ts: number, i: number) => ({
+        date: new Date(ts * 1000).toISOString().split("T")[0],
+        close: closes[i] != null ? Math.round(closes[i] * 100) / 100 : null,
+      }))
+      .filter((d: { date: string; close: number | null }): d is { date: string; close: number } => d.close !== null);
 
     return new Response(JSON.stringify({ ticker, data }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

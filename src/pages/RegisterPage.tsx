@@ -56,7 +56,7 @@ const RegisterPage = () => {
     setLoading(true);
     setErrors((prev) => ({ ...prev, submit: "" }));
 
-    const { error } = await supabase.from("class_registrations").insert({
+    const { error } = await (supabase as any).from("class_registrations").insert({
       name: form.name,
       age: Number(form.age),
       school: form.school,

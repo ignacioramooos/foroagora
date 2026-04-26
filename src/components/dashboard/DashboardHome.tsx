@@ -119,7 +119,7 @@ const DashboardHome = ({ onTabChange }: DashboardHomeProps) => {
     const fetchCommunity = async () => {
       setLoadingCommunity(true);
       try {
-        const { data } = await supabase
+        const { data } = await (supabase as any)
           .from("community_posts")
           .select("id, author, type, title, created_at")
           .eq("is_published", true)
