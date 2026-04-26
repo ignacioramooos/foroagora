@@ -6,6 +6,7 @@ import LiveStudentCounter from "@/components/LiveStudentCounter";
 import CohortCountdown from "@/components/CohortCountdown";
 import CapacityBar from "@/components/CapacityBar";
 import NewsletterSignup from "@/components/NewsletterSignup";
+import StonePathLogo from "@/components/StonePathLogo";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, MapPin, Calendar, Users, ChevronDown } from "lucide-react";
 
@@ -26,26 +27,35 @@ const Hero = () => {
   return (
     <section className="relative pt-32 md:pt-44 pb-20 md:pb-28">
       <div className="container">
-        <SectionFade>
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-semibold text-foreground leading-[0.95] max-w-4xl mb-8">
-            Aprendé a analizar empresas e invertir con criterio propio, <u>Gratis</u>.
-          </h1>
-        </SectionFade>
-        <SectionFade delay={0.1}>
-          <p className="text-lg text-muted-foreground max-w-lg mb-8 leading-relaxed">
-            Clases presenciales de análisis fundamental para estudiantes en Uruguay. Sin costos. Sin trading. Sin experiencia previa.
-          </p>
-        </SectionFade>
-        <SectionFade delay={0.12}>
-          <div className="mb-12">
-            <LiveStudentCounter />
+        <div className="grid md:grid-cols-[1fr_auto] gap-12 md:gap-16 items-center">
+          <div>
+            <SectionFade>
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-semibold text-foreground leading-[0.95] max-w-4xl mb-8">
+                Aprendé a analizar empresas e invertir con criterio propio, <u>Gratis</u>.
+              </h1>
+            </SectionFade>
+            <SectionFade delay={0.1}>
+              <p className="text-lg text-muted-foreground max-w-lg mb-8 leading-relaxed">
+                Clases presenciales de análisis fundamental para estudiantes en Uruguay. Sin costos. Sin trading. Sin experiencia previa.
+              </p>
+            </SectionFade>
+            <SectionFade delay={0.12}>
+              <div className="mb-12">
+                <LiveStudentCounter />
+              </div>
+            </SectionFade>
+            <SectionFade delay={0.15}>
+              <Button asChild variant="cta" size="cta">
+                <Link to="/registro">Inscribite</Link>
+              </Button>
+            </SectionFade>
           </div>
-        </SectionFade>
-        <SectionFade delay={0.15}>
-          <Button asChild variant="cta" size="cta">
-            <Link to="/registro">Inscribite</Link>
-          </Button>
-        </SectionFade>
+          <SectionFade delay={0.2}>
+            <div className="hidden md:flex justify-center items-center">
+              <StonePathLogo className="h-[26rem] lg:h-[30rem] w-auto text-foreground" />
+            </div>
+          </SectionFade>
+        </div>
       </div>
 
       {showScrollHint && (
