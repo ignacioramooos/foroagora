@@ -38,11 +38,12 @@ const StoneTrail = ({ className = "" }: StoneTrailProps) => {
         className="w-full h-full"
       >
         {stones.map((s, i) => {
-          // Distance to the next (below) slot — last (bottom) stone drifts off-canvas.
-          const next = i === n - 1 ? null : stones[i + 1];
-          const dy = next ? next.cy - s.cy : (VB_H - s.cy) * 1.2;
-          // Stagger from bottom → top so the wave reads as a single downward flow.
-          const delay = -((n - 1 - i) / n) * cycle;
+          // Stones travel UPWARD: each shifts to the previous slot, the top one
+          // drifts off the top edge. New stones appear at the bottom slot.
+          const prev = i === 0 ? null : stones[i - 1];
+          const dy = prev ? prev.cy - s.cy : -(s.cy + s.ry * 2);
+          // Stagger top → bottom so the wave reads as one continuous upward flow.
+          const delay = -(i / n) * cycle;
           return (
             <ellipse
               key={i}
