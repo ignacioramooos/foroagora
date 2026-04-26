@@ -7,7 +7,7 @@ import CohortCountdown from "@/components/CohortCountdown";
 import CapacityBar from "@/components/CapacityBar";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import CoreValues from "@/components/CoreValues";
-import ForoAgoraPattern from "@/components/ForoAgoraPattern";
+import StoneTrail from "@/components/StoneTrail";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, MapPin, Calendar, Users, ChevronDown, Sparkles } from "lucide-react";
 
@@ -64,12 +64,8 @@ const Hero = () => {
             </SectionFade>
           </div>
           <SectionFade delay={0.2}>
-            <div className="hidden md:flex justify-center items-center relative h-96">
-              <ForoAgoraPattern 
-                className="absolute right-0 top-1/2 -translate-y-1/2 w-64 h-96" 
-                ovals={6}
-                color="blue"
-              />
+            <div className="hidden md:flex justify-end items-center relative w-full h-96 -mr-20">
+              <StoneTrail className="w-48 h-full" />
             </div>
           </SectionFade>
         </div>
