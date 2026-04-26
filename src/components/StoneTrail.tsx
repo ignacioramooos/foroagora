@@ -28,7 +28,7 @@ const StoneTrail = ({ className = "" }: StoneTrailProps) => {
 
   return (
     <div
-      className={`relative select-none dark:invert ${className}`}
+      className={`relative select-none ${className}`}
       aria-hidden="true"
     >
       <svg
