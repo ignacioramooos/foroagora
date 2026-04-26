@@ -120,10 +120,10 @@ const ImpactPage = () => {
   return (
     <div className="min-h-screen bg-background pt-24 md:pt-32 pb-20 overflow-hidden">
       <section className="relative">
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute -top-24 left-1/2 h-[22rem] w-[22rem] -translate-x-1/2 rounded-full bg-accent/15 blur-3xl" />
-          <div className="absolute top-44 -left-24 h-64 w-64 rounded-full bg-primary-blue/10 blur-3xl" />
-          <div className="absolute top-64 -right-24 h-64 w-64 rounded-full bg-secondary-cyan/10 blur-3xl" />
+        <div className="absolute inset-0 -z-10 opacity-50">
+          <div className="absolute -top-24 left-1/2 h-[22rem] w-[22rem] -translate-x-1/2 rounded-full bg-accent/15 blur-2xl" />
+          <div className="absolute top-44 -left-24 h-64 w-64 rounded-full bg-primary-blue/15 blur-2xl" />
+          <div className="absolute top-64 -right-24 h-64 w-64 rounded-full bg-secondary-cyan/15 blur-2xl" />
         </div>
 
         <div className="container max-w-6xl">
@@ -145,7 +145,7 @@ const ImpactPage = () => {
 
           <SectionFade delay={0.08}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-10">
-              <div className="rounded-2xl border border-border bg-gradient-to-br from-blue-50/50 to-background/80 dark:from-blue-950/30 dark:to-background/80 backdrop-blur p-6 hover:shadow-lg transition-all">
+              <div className="rounded-2xl border border-border bg-card p-6 hover:shadow-lg transition-all">
                 <p className="text-xs uppercase tracking-widest font-heading text-muted-foreground mb-3">Estudiantes</p>
                 <p className="text-4xl font-heading text-foreground mb-3">
                   <LiveCounter value={stats.students} />
@@ -154,7 +154,7 @@ const ImpactPage = () => {
                   <GraduationCap size={14} className="text-primary-blue" /> Registros totales en perfiles
                 </p>
               </div>
-              <div className="rounded-2xl border border-border bg-gradient-to-br from-cyan-50/50 to-background/80 dark:from-cyan-950/30 dark:to-background/80 backdrop-blur p-6 hover:shadow-lg transition-all">
+              <div className="rounded-2xl border border-border bg-card p-6 hover:shadow-lg transition-all">
                 <p className="text-xs uppercase tracking-widest font-heading text-muted-foreground mb-3">Cohortes activas</p>
                 <p className="text-4xl font-heading text-foreground mb-3">
                   <LiveCounter value={stats.activeCohorts} />
@@ -163,7 +163,7 @@ const ImpactPage = () => {
                   <Layers size={14} className="text-secondary-cyan" /> Cohortes con estado activo
                 </p>
               </div>
-              <div className="rounded-2xl border border-border bg-gradient-to-br from-amber-50/50 to-background/80 dark:from-amber-950/30 dark:to-background/80 backdrop-blur p-6 hover:shadow-lg transition-all">
+              <div className="rounded-2xl border border-border bg-card p-6 hover:shadow-lg transition-all">
                 <p className="text-xs uppercase tracking-widest font-heading text-muted-foreground mb-3">Contenido publicado</p>
                 <p className="text-4xl font-heading text-foreground mb-3">
                   <LiveCounter value={stats.publishedContent} />
@@ -192,9 +192,8 @@ const ImpactPage = () => {
 
           <div className="grid lg:grid-cols-3 gap-6">
             <SectionFade className="lg:col-span-2" delay={0.06}>
-              <div className="relative rounded-2xl border border-border bg-gradient-to-br from-secondary/60 to-background p-6 md:p-8 min-h-[26rem]">
-                <div className="absolute inset-4 rounded-xl border border-border/60" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,hsl(var(--border))_1px,transparent_0)] [background-size:20px_20px] opacity-20" />
+              <div className="relative rounded-2xl border border-border bg-card p-6 md:p-8 min-h-[26rem]">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,hsl(var(--border))_1px,transparent_0)] [background-size:20px_20px] opacity-10 rounded-2xl" />
 
                 <div className="relative h-full">
                   {departmentPoints.map((point) => {
@@ -221,7 +220,7 @@ const ImpactPage = () => {
             </SectionFade>
 
             <SectionFade delay={0.12}>
-              <div className="rounded-2xl border border-border bg-background p-6">
+              <div className="rounded-2xl border border-border bg-card p-6">
                 <h3 className="font-heading text-lg text-foreground mb-5">Top departamentos</h3>
                 <div className="space-y-4">
                   {rankedDepartments.slice(0, 8).map(([department, count]) => {

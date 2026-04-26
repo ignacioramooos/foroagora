@@ -28,9 +28,9 @@ const Hero = () => {
 
   return (
     <section className="relative pt-32 md:pt-44 pb-20 md:pb-28 overflow-hidden">
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-blue/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 -left-20 w-96 h-96 bg-secondary-cyan/5 rounded-full blur-3xl" />
+      <div className="absolute inset-0 -z-10 opacity-50">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-blue/15 rounded-full blur-2xl" />
+        <div className="absolute top-1/2 -left-20 w-96 h-96 bg-secondary-cyan/15 rounded-full blur-2xl" />
       </div>
 
       <div className="container">
@@ -66,8 +66,8 @@ const Hero = () => {
           </div>
           <SectionFade delay={0.2}>
             <div className="hidden md:flex justify-center items-center relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary-blue/20 to-secondary-cyan/20 rounded-3xl blur-2xl" />
-              <div className="relative bg-background/80 backdrop-blur-sm rounded-3xl p-8 border border-border">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary-blue/10 to-secondary-cyan/10 rounded-3xl blur-xl" />
+              <div className="relative bg-background border border-border rounded-3xl p-8">
                 <StonePathLogo className="h-[26rem] lg:h-[30rem] w-auto text-primary-blue" />
               </div>
             </div>
@@ -86,8 +86,6 @@ const Hero = () => {
 
 const ProblemSection = () => (
   <section className="py-14 md:py-20 relative">
-    <div className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-secondary-cyan/5 to-transparent" />
-    
     <div className="container">
       <div className="grid md:grid-cols-5 gap-10 md:gap-12 items-start">
         <div className="md:col-span-2">
@@ -179,9 +177,9 @@ const ValueProp = () => (
 
 const OurValues = () => (
   <section className="relative py-16 md:py-24 overflow-hidden">
-    <div className="absolute inset-0 -z-10 opacity-30">
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary-blue/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-secondary-cyan/10 rounded-full blur-3xl" />
+    <div className="absolute inset-0 -z-10 opacity-50">
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary-blue/15 rounded-full blur-2xl" />
+      <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-secondary-cyan/15 rounded-full blur-2xl" />
     </div>
 
     <div className="container">
@@ -306,9 +304,9 @@ const UpcomingClasses = () => {
 
 const FinalCTA = () => (
   <section className="relative py-16 md:py-24 border-t border-border overflow-hidden">
-    <div className="absolute inset-0 -z-10">
-      <div className="absolute top-0 left-0 w-96 h-96 bg-primary-blue/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-0 w-80 h-80 bg-secondary-cyan/10 rounded-full blur-3xl" />
+    <div className="absolute inset-0 -z-10 opacity-50">
+      <div className="absolute top-0 left-0 w-96 h-96 bg-primary-blue/15 rounded-full blur-2xl" />
+      <div className="absolute bottom-0 right-0 w-80 h-80 bg-secondary-cyan/15 rounded-full blur-2xl" />
     </div>
 
     <div className="container">

@@ -43,16 +43,13 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 bg-background/80 backdrop-blur-md ${
-          scrolled ? "border-b border-border/60 shadow-sm" : ""
+        className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-200 bg-background border-b border-transparent ${
+          scrolled ? "border-border shadow-sm" : ""
         }`}
       >
         <div className="container flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2.5 text-lg font-heading font-semibold tracking-tight text-foreground hover:opacity-80 transition-opacity">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary-blue to-secondary-cyan rounded-lg blur opacity-0 hover:opacity-75 transition-opacity" />
-              <StonePathLogo className="h-6 w-auto relative bg-background rounded-lg p-1 text-primary-blue" />
-            </div>
+            <StonePathLogo className="h-6 w-auto text-primary-blue" />
             <span className="hidden sm:inline">Foro Agora</span>
           </Link>
 
@@ -73,7 +70,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-3">
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
+              className="p-2 rounded-md text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Toggle theme"
               title="Atajo: M"
             >

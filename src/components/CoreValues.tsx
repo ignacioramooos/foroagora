@@ -70,9 +70,9 @@ const CoreValues = ({ layout = 'grid', className = '' }: CoreValuesProps) => {
         {values.map((value) => (
           <div
             key={value.id}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/20 border border-secondary/40 hover:border-secondary/60 transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-card border border-border hover:border-foreground/20 transition-colors"
           >
-            <span className={`bg-gradient-to-br ${value.color} bg-clip-text text-transparent font-heading font-semibold`}>
+            <span className="text-sm font-heading font-semibold text-foreground">
               {value.label}
             </span>
           </div>
@@ -86,23 +86,19 @@ const CoreValues = ({ layout = 'grid', className = '' }: CoreValuesProps) => {
       {values.map((value) => (
         <div
           key={value.id}
-          className="group relative rounded-2xl border border-border bg-card p-6 hover:shadow-lg transition-all duration-300 overflow-hidden"
+          className="relative rounded-xl border border-border bg-card p-6 hover:border-foreground/20 transition-colors"
         >
-          <div className={`absolute inset-0 bg-gradient-to-br ${value.color} opacity-0 group-hover:opacity-5 transition-opacity`} />
-          
-          <div className="relative">
-            <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${value.color} text-white flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-              {value.icon}
-            </div>
-            
-            <h3 className="text-lg font-heading font-semibold text-foreground mb-2">
-              {value.label}
-            </h3>
-            
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {value.description}
-            </p>
+          <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${value.color} text-white flex items-center justify-center mb-4`}>
+            {value.icon}
           </div>
+          
+          <h3 className="text-base font-heading font-semibold text-foreground mb-2">
+            {value.label}
+          </h3>
+          
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {value.description}
+          </p>
         </div>
       ))}
     </div>
