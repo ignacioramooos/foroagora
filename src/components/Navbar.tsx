@@ -4,6 +4,7 @@ import { Menu, X, LogIn, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import StonePathLogo from "@/components/StonePathLogo";
 
 const navLinks = [
   { label: "Nosotros", path: "/nosotros" },
@@ -47,8 +48,9 @@ const Navbar = () => {
         }`}
       >
         <div className="container flex items-center justify-between h-16">
-          <Link to="/" className="text-lg font-heading font-semibold tracking-tight text-foreground">
-            Foro Agora
+          <Link to="/" className="flex items-center gap-2 text-lg font-heading font-semibold tracking-tight text-foreground">
+            <StonePathLogo className="h-7 w-auto" />
+            <span>Foro Agora</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
