@@ -7,7 +7,6 @@ import CohortCountdown from "@/components/CohortCountdown";
 import CapacityBar from "@/components/CapacityBar";
 import CoreValues from "@/components/CoreValues";
 import { supabase } from "@/integrations/supabase/client";
-import teamPhoto from "@/assets/team-photo.jpeg";
 import { ArrowRight, Calendar, MapPin, Users } from "lucide-react";
 
 const testimonials = [
@@ -25,6 +24,72 @@ const InjuLogo = () => (
       <p className="text-4xl font-black leading-none tracking-normal md:text-5xl">INJU</p>
       <p className="mt-2 max-w-[24rem] text-base font-black uppercase leading-tight tracking-wide text-foreground/70 md:text-xl">Instituto Nacional de la Juventud</p>
       <p className="mt-1 text-base font-bold text-blue-pop md:text-xl">Uruguay</p>
+    </div>
+  </div>
+);
+
+const incomeStatementRows = [
+  ["Ingresos", "14.5B", "+29%"],
+  ["Costo de ventas", "7.7B", "+24%"],
+  ["Ganancia bruta", "6.8B", "+36%"],
+  ["Gastos operativos", "4.1B", "+18%"],
+  ["Resultado operativo", "2.7B", "+78%"],
+  ["Ganancia neta", "1.9B", "+71%"],
+  ["Flujo de caja libre", "2.4B", "+43%"],
+];
+
+const StockTickerAnimation = () => (
+  <div className="absolute inset-x-0 bottom-6 mx-auto h-[76%] w-[92%] overflow-hidden rounded-[2rem] border-2 border-blue-pop bg-[#0b0d10] shadow-[0_30px_80px_rgba(0,0,0,0.16)]">
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(59,130,246,0.34),transparent_30%),radial-gradient(circle_at_88%_12%,rgba(255,200,0,0.22),transparent_34%),linear-gradient(135deg,rgba(255,255,255,0.12),transparent_45%)]" />
+    <div className="absolute inset-x-0 top-0 z-10 flex items-center border-b border-white/10 bg-black/20 px-5 py-4 text-white/70 backdrop-blur-sm">
+      <div className="flex items-center gap-2">
+        <span className="h-3 w-3 rounded-full bg-[#ff4b16]" />
+        <span className="h-3 w-3 rounded-full bg-[#ffc800]" />
+        <span className="h-3 w-3 rounded-full bg-[#3b82f6]" />
+      </div>
+    </div>
+    <div className="relative h-full px-5 pb-5 pt-20">
+      <div className="meli-ticker-card absolute left-1/2 top-1/2 w-[72%] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/15 bg-white/[0.09] p-5 backdrop-blur-md">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="font-heading text-4xl font-black leading-none text-white">MELI</p>
+            <p className="mt-2 font-heading text-sm font-semibold leading-none text-white/55">MercadoLibre Inc.</p>
+          </div>
+          <span className="rounded-full bg-emerald-400/15 px-3 py-1.5 font-heading text-sm font-black text-emerald-300">+0.9%</span>
+        </div>
+        <div className="mt-5 flex items-end justify-between">
+          <div>
+            <p className="font-heading text-xs font-bold uppercase tracking-[0.18em] text-white/45">Precio</p>
+            <p className="mt-1 font-heading text-2xl font-black leading-none text-white">USD 1,624</p>
+          </div>
+          <div className="flex h-16 w-32 items-end gap-2">
+            {[28, 44, 36, 58, 50, 72, 64].map((height) => (
+              <span key={height} className="stock-ticker-bar flex-1 rounded-t-full bg-blue-pop" style={{ height: `${height}%` }} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="income-window absolute inset-x-5 bottom-5 top-16 overflow-hidden rounded-3xl border border-white/15 bg-[#f8fbff] text-[#0b1320] shadow-2xl">
+        <div className="relative z-10 flex items-center justify-between border-b border-black/10 bg-white px-4 py-3 shadow-sm">
+          <div>
+            <p className="font-heading text-sm font-black leading-none text-[#0b1320]">Estado de resultados de MELI</p>
+            <p className="mt-1 font-heading text-xs font-semibold leading-none text-[#0b1320]/55">Resultados anuales · USD</p>
+          </div>
+          <span className="income-close flex h-7 w-7 items-center justify-center rounded-full bg-[#0b1320] font-heading text-sm font-black leading-none text-white">×</span>
+        </div>
+        <div className="income-scroll relative z-0 px-4 py-3">
+          {incomeStatementRows.map(([label, value, change]) => (
+            <div key={label} className="grid grid-cols-[1fr_auto_auto] items-center gap-3 border-b border-black/10 py-3 font-heading">
+              <span className="text-sm font-bold text-[#0b1320]">{label}</span>
+              <span className="text-sm font-black text-[#0b1320]">{value}</span>
+              <span className="rounded-full bg-emerald-100 px-2 py-1 text-xs font-black text-emerald-700">{change}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <span className="stock-cursor" aria-hidden="true" />
     </div>
   </div>
 );
@@ -49,7 +114,7 @@ const Hero = () => {
             <SectionFade>
               <p className="font-hand text-3xl md:text-4xl text-blue-pop mb-4">Educación financiera accesible</p>
               <h1 className="max-w-3xl text-5xl md:text-6xl lg:text-[4.6rem] font-black leading-[0.92] tracking-normal text-foreground mb-7">
-                Aprendé a analizar empresas e invertir con criterio propio, gratis.
+                Aprendé a analizar empresas e invertir con criterio propio, <strong className="font-black">gratis.</strong>
               </h1>
             </SectionFade>
             <SectionFade delay={0.1}>
@@ -87,11 +152,7 @@ const Hero = () => {
                 <span className="h-10 w-2 rotate-[-12deg] rounded-full bg-current" />
                 <span className="h-8 w-2 rotate-[18deg] rounded-full bg-current" />
               </div>
-              <img
-                src={teamPhoto}
-                alt="Estudiantes de Foro Agora en clase"
-                className="absolute inset-x-0 bottom-6 mx-auto h-[76%] w-[92%] rounded-[2rem] object-cover object-center shadow-[0_30px_80px_rgba(0,0,0,0.16)]"
-              />
+              <StockTickerAnimation />
               <div className="absolute bottom-0 left-8 rounded-full bg-blue-pop px-6 py-5 text-center text-sm font-heading font-black uppercase leading-tight text-white shadow-xl rotate-[-8deg]">
                 Para estudiantes
                 <br />

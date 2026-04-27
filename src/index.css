@@ -151,4 +151,151 @@
   .text-orange-pop {
     color: #ff4b16;
   }
+  .stock-ticker-bar {
+    animation: ticker-bar-rise 2.8s ease-in-out infinite;
+    opacity: 0.78;
+    transform-origin: bottom;
+  }
+  .meli-ticker-card {
+    animation: meli-card-loop 10s ease-in-out infinite;
+  }
+  .income-window {
+    animation: income-window-loop 10s ease-in-out infinite;
+    transform-origin: 54% 42%;
+  }
+  .income-scroll {
+    animation: income-scroll-loop 10s ease-in-out infinite;
+  }
+  .income-close {
+    animation: income-close-loop 10s ease-in-out infinite;
+  }
+  .stock-cursor {
+    animation: stock-cursor-loop 10s ease-in-out infinite;
+    filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.26));
+    background-image: url("data:image/svg+xml,%3Csvg width='96' height='96' viewBox='0 0 96 96' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M27 13L75 53H49L27 83V13Z' stroke='%23ffc800' stroke-width='10' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    height: 3rem;
+    left: 58%;
+    position: absolute;
+    top: 56%;
+    width: 3rem;
+    z-index: 30;
+  }
+}
+
+@keyframes meli-card-loop {
+  0%,
+  21%,
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  24%,
+  84% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.94);
+  }
+}
+
+@keyframes income-window-loop {
+  0%,
+  22%,
+  87%,
+  100% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.94);
+  }
+  28%,
+  78% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  84% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+}
+
+@keyframes income-scroll-loop {
+  0%,
+  32% {
+    transform: translateY(0);
+  }
+  72%,
+  100% {
+    transform: translateY(-7.7rem);
+  }
+}
+
+@keyframes income-close-loop {
+  0%,
+  72%,
+  100% {
+    transform: scale(1);
+  }
+  79% {
+    transform: scale(0.82);
+  }
+}
+
+@keyframes stock-cursor-loop {
+  0% {
+    opacity: 0;
+    transform: translate(-6.5rem, -2.2rem) scale(0.95);
+  }
+  8% {
+    opacity: 1;
+    transform: translate(-2.1rem, -0.4rem) scale(1);
+  }
+  17% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(0, 0) scale(0.82);
+  }
+  24% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  36% {
+    opacity: 1;
+    transform: translate(2.2rem, 2.2rem) scale(1);
+  }
+  66% {
+    opacity: 1;
+    transform: translate(2.2rem, 8.2rem) scale(1);
+  }
+  76% {
+    opacity: 1;
+    transform: translate(14.2rem, -9.8rem) scale(1);
+  }
+  79% {
+    opacity: 1;
+    transform: translate(14.2rem, -9.8rem) scale(0.82);
+  }
+  84% {
+    opacity: 1;
+    transform: translate(14.2rem, -9.8rem) scale(1);
+  }
+  92%,
+  100% {
+    opacity: 0;
+    transform: translate(16rem, -10.5rem) scale(0.96);
+  }
+}
+
+@keyframes ticker-bar-rise {
+  0%,
+  100% {
+    transform: scaleY(0.46);
+    opacity: 0.45;
+  }
+  48% {
+    transform: scaleY(1);
+    opacity: 0.95;
+  }
 }
