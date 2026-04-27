@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import SectionFade from "@/components/SectionFade";
-import { CheckCircle2, Building2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -21,6 +21,21 @@ const orgTypes = [
   "Medio de Comunicación",
   "Otro",
 ];
+
+const InjuPartnerCard = () => (
+  <div className="flex min-h-28 items-center gap-5 rounded-lg border border-border bg-card px-6 py-5">
+    <div className="flex h-20 w-20 shrink-0 items-center justify-center bg-[#5f18ea] p-2">
+      <span className="font-hand text-4xl font-bold leading-none text-white">Inju!</span>
+    </div>
+    <div>
+      <h3 className="font-heading text-2xl font-black text-foreground">INJU</h3>
+      <p className="mt-1 max-w-sm text-sm font-heading font-bold uppercase tracking-wide text-muted-foreground">
+        Instituto Nacional de la Juventud
+      </p>
+      <p className="mt-1 text-sm font-heading font-semibold text-blue-pop">Uruguay</p>
+    </div>
+  </div>
+);
 
 const PartnersPage = () => {
   const [sent, setSent] = useState(false);
@@ -80,22 +95,22 @@ const PartnersPage = () => {
   return (
     <>
       {/* Hero */}
-      <section className="pt-32 md:pt-40 pb-16 bg-foreground">
+      <section className="pt-32 md:pt-40 pb-16 bg-white text-foreground dark:bg-black dark:text-white">
         <div className="container">
           <SectionFade>
-            <p className="text-xs font-heading font-medium uppercase tracking-widest text-primary-foreground/50 mb-6">
+            <p className="text-xs font-heading font-medium uppercase tracking-widest text-foreground/55 dark:text-white/60 mb-6">
               Alianzas
             </p>
-            <h1 className="text-3xl md:text-5xl text-primary-foreground max-w-3xl mb-6">
+            <h1 className="text-3xl md:text-5xl text-foreground dark:text-white max-w-3xl mb-6">
               Sumá tu organización al movimiento
             </h1>
-            <p className="text-primary-foreground/60 text-lg max-w-xl mb-8">
+            <p className="text-foreground/65 dark:text-white/70 text-lg max-w-xl mb-8">
               Apoyá el acceso a educación financiera real para jóvenes en Uruguay.
             </p>
             <Button
               variant="cta"
               size="cta"
-              className="bg-primary-foreground text-foreground hover:bg-primary-foreground/90"
+              className="bg-foreground text-background hover:bg-foreground/85 dark:bg-white dark:text-black dark:hover:bg-white/90"
               onClick={() => document.getElementById("form-section")?.scrollIntoView({ behavior: "smooth" })}
             >
               Quiero ser aliado
@@ -128,26 +143,18 @@ const PartnersPage = () => {
           <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-4">
             Nuestros aliados
           </p>
-          {partners.length > 0 ? (
-            <div className="flex flex-wrap gap-4">
-              {partners.map((p) => (
-                <div key={p.id} className="border border-border rounded-md h-16 px-8 flex items-center justify-center">
-                  {p.logo_url ? (
-                    <img src={p.logo_url} alt={p.name} className="h-8 object-contain" />
-                  ) : (
-                    <span className="text-muted-foreground font-heading text-sm">{p.name}</span>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 border border-dashed border-border rounded-lg">
-              <Building2 size={32} className="mx-auto text-muted-foreground/30 mb-3" />
-              <p className="text-muted-foreground font-heading">
-                Sé nuestro primer aliado institucional.
-              </p>
-            </div>
-          )}
+          <div className="grid gap-4 md:grid-cols-2">
+            <InjuPartnerCard />
+            {partners.map((p) => (
+              <div key={p.id} className="flex min-h-28 items-center justify-center rounded-lg border border-border bg-card px-8 py-5">
+                {p.logo_url ? (
+                  <img src={p.logo_url} alt={p.name} className="h-12 object-contain" />
+                ) : (
+                  <span className="text-muted-foreground font-heading text-sm">{p.name}</span>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

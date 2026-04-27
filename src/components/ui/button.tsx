@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-heading font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-heading font-bold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -15,15 +15,15 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-secondary",
         link: "text-foreground underline-offset-4 hover:underline",
-        cta: "bg-foreground text-background font-semibold hover:bg-foreground/80 transition-colors",
-        "cta-outline": "border border-foreground text-foreground font-medium hover:bg-foreground hover:text-background transition-colors",
+        cta: "bg-sun text-foreground shadow-[0_8px_0_rgba(0,0,0,0.12)] hover:bg-[#ffd633] transition-colors",
+        "cta-outline": "border-2 border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors",
       },
       size: {
         default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
+        sm: "h-9 px-4",
+        lg: "h-11 px-8",
         icon: "h-10 w-10",
-        cta: "h-11 px-8 rounded-md text-sm",
+        cta: "h-12 px-8 text-sm",
       },
     },
     defaultVariants: {

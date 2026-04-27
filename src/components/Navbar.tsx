@@ -4,17 +4,15 @@ import { Menu, X, LogIn, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import StonePathLogo from "@/components/StonePathLogo";
+import logoMark from "@/assets/stone-trail-logo.png";
 
 const navLinks = [
-  { label: "Nosotros", path: "/nosotros" },
-  { label: "Programa", path: "/programa" },
-  { label: "Recursos", path: "/recursos" },
-  { label: "Glosario", path: "/glosario" },
+  { label: "Inicio", path: "/" },
+  { label: "Sobre nosotros", path: "/nosotros" },
+  { label: "Clases", path: "/programa" },
   { label: "Impacto", path: "/impacto" },
-  { label: "Brokers", path: "/brokers" },
+  { label: "Recursos", path: "/recursos" },
   { label: "Partners", path: "/partners" },
-  { label: "Contacto", path: "/contacto" },
 ];
 
 const Navbar = () => {
@@ -43,23 +41,27 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-200 bg-background border-b border-transparent ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-200 bg-background/92 backdrop-blur border-b border-transparent ${
           scrolled ? "border-border shadow-sm" : ""
         }`}
       >
-        <div className="container flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2.5 text-lg font-heading font-semibold tracking-tight text-foreground hover:opacity-80 transition-opacity">
-            <StonePathLogo className="h-6 w-auto text-primary-blue" />
-            <span className="hidden sm:inline">Foro Agora</span>
+        <div className="container flex items-center justify-between h-20">
+          <Link to="/" className="flex items-center gap-3 text-2xl font-heading font-black leading-none text-foreground hover:opacity-80 transition-opacity">
+            <img src={logoMark} alt="" className="h-14 w-11 object-contain object-center dark:invert" />
+            <span className="hidden sm:inline">
+              Foro
+              <br />
+              Agora
+            </span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-8">
             {navLinks.map((l) => (
               <Link
                 key={l.path}
                 to={l.path}
-                className={`text-sm font-heading font-medium transition-colors ${
-                  location.pathname === l.path ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                className={`text-sm font-heading font-semibold transition-colors ${
+                  location.pathname === l.path ? "text-orange-pop" : "text-foreground/70 hover:text-foreground"
                 }`}
               >
                 {l.label}
@@ -67,10 +69,10 @@ const Navbar = () => {
             ))}
           </div>
 
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-3">
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-md text-muted-foreground hover:text-foreground transition-colors"
+              className="p-2 rounded-full text-foreground/60 hover:text-foreground transition-colors"
               aria-label="Toggle theme"
               title="Atajo: M"
             >
@@ -78,23 +80,23 @@ const Navbar = () => {
             </button>
             {isLoggedIn ? (
               <>
-                <span className="text-xs text-muted-foreground font-heading mr-1">
+                <span className="text-xs text-foreground/60 font-heading mr-1">
                   Hola, {user?.name?.split(" ")[0] ?? ""}
                 </span>
                 <Button asChild variant="cta" size="sm">
                   <Link to="/dashboard">Dashboard</Link>
                 </Button>
-                <Button variant="ghost" size="sm" onClick={logout} className="text-muted-foreground">
+                <Button variant="ghost" size="sm" onClick={logout} className="text-foreground/60">
                   Salir
                 </Button>
               </>
             ) : (
               <>
-                <Button asChild variant="ghost" size="sm" className="text-muted-foreground gap-1.5">
+                <Button asChild variant="ghost" size="sm" className="text-foreground/60 gap-1.5">
                   <Link to="/auth"><LogIn size={14} /> Log In</Link>
                 </Button>
                 <Button asChild variant="cta" size="sm">
-                  <Link to="/registro">Inscribite</Link>
+                  <Link to="/registro">Quiero participar</Link>
                 </Button>
               </>
             )}
@@ -102,7 +104,7 @@ const Navbar = () => {
 
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden text-foreground p-2 -mr-2"
+            className="lg:hidden text-foreground p-2 -mr-2"
             aria-label="Menu"
           >
             {mobileOpen ? <X size={24} /> : <Menu size={24} />}
@@ -110,19 +112,19 @@ const Navbar = () => {
         </div>
       </nav>
 
-      <div className="fixed top-16 left-0 right-0 z-50 h-[2px] bg-transparent pointer-events-none">
-        <div className="h-full bg-foreground transition-[width] duration-75" style={{ width: `${scrollProgress}%` }} />
+      <div className="fixed top-20 left-0 right-0 z-50 h-[3px] bg-transparent pointer-events-none">
+        <div className="h-full bg-sun transition-[width] duration-75" style={{ width: `${scrollProgress}%` }} />
       </div>
 
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 bg-background flex flex-col pt-20 pb-8 px-6 md:hidden">
+        <div className="fixed inset-0 z-40 bg-background flex flex-col pt-24 pb-8 px-6 lg:hidden">
           <div className="flex flex-col gap-6 flex-1">
             {navLinks.map((l) => (
               <Link
                 key={l.path}
                 to={l.path}
                 className={`text-2xl font-heading font-semibold transition-colors ${
-                  location.pathname === l.path ? "text-foreground" : "text-muted-foreground"
+                  location.pathname === l.path ? "text-orange-pop" : "text-foreground/70"
                 }`}
               >
                 {l.label}
