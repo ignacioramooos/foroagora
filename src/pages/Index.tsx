@@ -145,18 +145,20 @@ const Hero = () => {
 
           <SectionFade delay={0.2}>
             <div className="relative min-h-[420px] md:min-h-[500px]">
-              <div className="absolute left-8 right-0 top-6 h-[70%] rounded-[52%] bg-sun" />
-              <div className="absolute -right-5 top-2 h-24 w-32 rounded-[50%] border-[14px] border-blue-pop border-l-transparent border-b-transparent rotate-[-22deg]" />
-              <div className="absolute left-2 top-14 flex gap-3 text-orange-pop">
-                <span className="h-14 w-2 rotate-[-28deg] rounded-full bg-current" />
-                <span className="h-10 w-2 rotate-[-12deg] rounded-full bg-current" />
-                <span className="h-8 w-2 rotate-[18deg] rounded-full bg-current" />
-              </div>
-              <StockTickerAnimation />
-              <div className="absolute bottom-0 left-8 rounded-full bg-blue-pop px-6 py-5 text-center text-sm font-heading font-black uppercase leading-tight text-white shadow-xl rotate-[-8deg]">
-                Para estudiantes
-                <br />
-                de Uruguay
+              <div className="absolute inset-x-0 bottom-24 top-auto h-[420px] md:bottom-36 md:h-[500px]">
+                <div className="absolute left-8 right-0 top-6 h-[70%] rounded-[52%] bg-sun" />
+                <div className="absolute -right-5 top-2 h-24 w-32 rounded-[50%] border-[14px] border-blue-pop border-l-transparent border-b-transparent rotate-[-22deg]" />
+                <div className="absolute left-2 top-14 flex gap-3 text-orange-pop">
+                  <span className="h-14 w-2 rotate-[-28deg] rounded-full bg-current" />
+                  <span className="h-10 w-2 rotate-[-12deg] rounded-full bg-current" />
+                  <span className="h-8 w-2 rotate-[18deg] rounded-full bg-current" />
+                </div>
+                <StockTickerAnimation />
+                <div className="absolute bottom-0 left-8 rounded-full bg-blue-pop px-6 py-5 text-center text-sm font-heading font-black uppercase leading-tight text-white shadow-xl rotate-[-8deg]">
+                  Para estudiantes
+                  <br />
+                  de Uruguay
+                </div>
               </div>
             </div>
           </SectionFade>
