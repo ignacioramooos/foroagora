@@ -41,14 +41,8 @@ const incomeStatementRows = [
 const StockTickerAnimation = () => (
   <div className="absolute inset-x-0 bottom-6 mx-auto h-[76%] w-[92%] overflow-hidden rounded-[2rem] border-2 border-blue-pop bg-[#0b0d10] shadow-[0_30px_80px_rgba(0,0,0,0.16)]">
     <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(59,130,246,0.34),transparent_30%),radial-gradient(circle_at_88%_12%,rgba(255,200,0,0.22),transparent_34%),linear-gradient(135deg,rgba(255,255,255,0.12),transparent_45%)]" />
-    <div className="absolute inset-x-0 top-0 z-10 flex items-center border-b border-white/10 bg-black/20 px-5 py-4 text-white/70 backdrop-blur-sm">
-      <div className="flex items-center gap-2">
-        <span className="h-3 w-3 rounded-full bg-[#ff4b16]" />
-        <span className="h-3 w-3 rounded-full bg-[#ffc800]" />
-        <span className="h-3 w-3 rounded-full bg-[#3b82f6]" />
-      </div>
-    </div>
-    <div className="relative h-full px-5 pb-5 pt-20">
+    <div className="absolute inset-x-0 top-0 z-10 h-8 border-b border-white/10 bg-black/20 backdrop-blur-sm" />
+    <div className="relative h-full px-5 pb-5 pt-14">
       <div className="meli-ticker-card absolute left-1/2 top-1/2 w-[72%] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/15 bg-white/[0.09] p-5 backdrop-blur-md">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -70,7 +64,7 @@ const StockTickerAnimation = () => (
         </div>
       </div>
 
-      <div className="income-window absolute inset-x-5 bottom-5 top-16 overflow-hidden rounded-3xl border border-white/15 bg-[#f8fbff] text-[#0b1320] shadow-2xl">
+      <div className="income-window absolute inset-x-5 bottom-5 top-10 overflow-hidden rounded-3xl border border-white/15 bg-[#f8fbff] text-[#0b1320] shadow-2xl">
         <div className="relative z-10 flex items-center justify-between border-b border-black/10 bg-white px-4 py-3 shadow-sm">
           <div>
             <p className="font-heading text-sm font-black leading-none text-[#0b1320]">Estado de resultados de MELI</p>
@@ -146,13 +140,8 @@ const Hero = () => {
           <SectionFade delay={0.2}>
             <div className="relative min-h-[420px] md:min-h-[500px]">
               <div className="absolute inset-x-0 bottom-24 top-auto h-[420px] md:bottom-36 md:h-[500px]">
-                <div className="absolute left-8 right-0 top-6 h-[70%] rounded-[52%] bg-sun" />
+                <div className="absolute -left-16 -right-20 top-12 h-[90%] rotate-[5deg] rounded-[52%] border border-white/25 bg-[radial-gradient(circle_at_32%_24%,rgba(255,255,255,0.62),transparent_18%),linear-gradient(135deg,rgba(255,232,104,0.9),rgba(255,197,0,0.78)_55%,rgba(255,221,84,0.62))] shadow-[inset_0_3px_18px_rgba(255,255,255,0.5),inset_0_-26px_44px_rgba(255,178,0,0.24),0_24px_70px_rgba(255,200,0,0.28)] backdrop-blur-sm" />
                 <div className="absolute -right-5 top-2 h-24 w-32 rounded-[50%] border-[14px] border-blue-pop border-l-transparent border-b-transparent rotate-[-22deg]" />
-                <div className="absolute left-2 top-14 flex gap-3 text-orange-pop">
-                  <span className="h-14 w-2 rotate-[-28deg] rounded-full bg-current" />
-                  <span className="h-10 w-2 rotate-[-12deg] rounded-full bg-current" />
-                  <span className="h-8 w-2 rotate-[18deg] rounded-full bg-current" />
-                </div>
                 <StockTickerAnimation />
                 <div className="absolute bottom-0 left-8 rounded-full bg-blue-pop px-6 py-5 text-center text-sm font-heading font-black uppercase leading-tight text-white shadow-xl rotate-[-8deg]">
                   Para estudiantes
