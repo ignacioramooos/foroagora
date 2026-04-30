@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import SectionFade from "@/components/SectionFade";
 import LiveStudentCounter from "@/components/LiveStudentCounter";
 import CohortCountdown from "@/components/CohortCountdown";
@@ -326,26 +327,37 @@ const PartnersStrip = () => (
 );
 
 const UpcomingClasses = () => {
-  const [cohort, setCohort] = useState<{ start_date: string; location: string; max_capacity: number } | null>(null);
+  const [classSession, setClassSession] = useState<{
+    id: string;
+    title: string;
+    module_number: number;
+    class_date: string;
+    location: string;
+    max_capacity: number;
+  } | null>(null);
+  const [warningOpen, setWarningOpen] = useState(false);
 
   useEffect(() => {
     const fetch = async () => {
-      const { data } = await supabase
-        .from("cohorts")
-        .select("start_date, location, max_capacity")
+      const { data } = await (supabase as any)
+        .from("class_sessions")
+        .select("id, title, module_number, class_date, location, max_capacity")
         .eq("is_active", true)
-        .gte("start_date", new Date().toISOString())
-        .order("start_date", { ascending: true })
+        .gte("class_date", new Date().toISOString())
+        .order("class_date", { ascending: true })
         .limit(1);
-      if (data && data.length > 0) setCohort(data[0]);
+      if (data && data.length > 0) setClassSession(data[0]);
     };
     fetch();
   }, []);
 
-  if (!cohort) return null;
+  if (!classSession) return null;
 
-  const startDate = new Date(cohort.start_date);
+  const startDate = new Date(classSession.class_date);
   const dateStr = startDate.toLocaleDateString("es-UY", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  const timeStr = startDate.toLocaleTimeString("es-UY", { hour: "2-digit", minute: "2-digit" });
+  const registerUrl = `/registro?class=${classSession.id}`;
+  const requiresModuleWarning = classSession.module_number > 1;
 
   return (
     <section className="py-16 md:py-24 bg-blue-soft">
@@ -355,34 +367,62 @@ const UpcomingClasses = () => {
             <p className="font-hand text-3xl text-blue-pop">Próximas clases</p>
             <h2 className="mt-2 text-4xl md:text-5xl font-black">Próxima clase</h2>
             <p className="text-foreground/70 text-lg leading-relaxed mt-4 mb-6">
-              Las clases son presenciales, en grupos reducidos.
+              Las clases son presenciales, con fecha, hora y cupos definidos.
             </p>
             <CohortCountdown />
           </div>
           <div className="rounded-[1.5rem] border-2 border-foreground bg-card p-8 shadow-[10px_10px_0_#ffc800]">
+            <h3 className="mb-4 text-2xl font-black">{classSession.title}</h3>
             <div className="space-y-4 mb-6">
               <div className="flex items-center gap-3 text-foreground/70">
                 <MapPin size={16} className="shrink-0 text-blue-pop" />
-                <span>{cohort.location}</span>
+                <span>{classSession.location}</span>
               </div>
               <div className="flex items-center gap-3 text-foreground/70">
                 <Calendar size={16} className="shrink-0 text-orange-pop" />
-                <span className="capitalize">{dateStr}</span>
+                <span className="capitalize">{dateStr}, {timeStr}</span>
               </div>
               <div className="flex items-center gap-3 text-foreground/70">
                 <Users size={16} className="shrink-0 text-blue-pop" />
-                <span>{cohort.max_capacity} lugares</span>
+                <span>Módulo {classSession.module_number} · {classSession.max_capacity} lugares</span>
               </div>
             </div>
             <div className="mb-6">
               <CapacityBar />
             </div>
-            <Button asChild variant="cta" size="cta" className="w-full">
-              <Link to="/registro">Inscribite</Link>
-            </Button>
+            {requiresModuleWarning ? (
+              <Button variant="cta" size="cta" className="w-full" onClick={() => setWarningOpen(true)}>
+                Inscribite
+              </Button>
+            ) : (
+              <Button asChild variant="cta" size="cta" className="w-full">
+                <Link to={registerUrl}>Inscribite</Link>
+              </Button>
+            )}
           </div>
         </div>
       </div>
+      <Dialog open={warningOpen} onOpenChange={setWarningOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Esta clase empieza en módulo {classSession.module_number}</DialogTitle>
+            <DialogDescription>
+              Si es tu primera vez, tené en cuenta que la clase anterior ya está grabada y subida en la sección de clases. Podés verla antes de asistir.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-2">
+            <Button variant="outline" onClick={() => setWarningOpen(false)}>
+              No, no quiero registrarme
+            </Button>
+            <Button asChild variant="cta">
+              <Link to={registerUrl}>Sí, quiero registrarme</Link>
+            </Button>
+            <Button asChild variant="secondary">
+              <Link to="/auth">Ver clases grabadas --&gt;</Link>
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };

@@ -6,7 +6,7 @@ import { Activity, BookOpen, GraduationCap, Layers, Sparkles } from "lucide-reac
 
 interface ImpactStats {
   students: number;
-  activeCohorts: number;
+  activeClasses: number;
   publishedContent: number;
 }
 
@@ -65,20 +65,20 @@ const LiveCounter = ({ value }: { value: number }) => {
 
 const ImpactPage = () => {
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState<ImpactStats>({ students: 0, activeCohorts: 0, publishedContent: 0 });
+  const [stats, setStats] = useState<ImpactStats>({ students: 0, activeClasses: 0, publishedContent: 0 });
   const [departmentCounts, setDepartmentCounts] = useState<Record<string, number>>({});
 
   const fetchImpactData = async () => {
-    const [studentsRes, cohortsRes, contentRes, departmentsRes] = await Promise.all([
+    const [studentsRes, classesRes, contentRes, departmentsRes] = await Promise.all([
       supabase.from("profiles").select("id", { count: "exact", head: true }),
-      supabase.from("cohorts").select("id", { count: "exact", head: true }).eq("is_active", true),
+      (supabase as any).from("class_sessions").select("id", { count: "exact", head: true }).eq("is_active", true),
       supabase.from("content_items").select("id", { count: "exact", head: true }).eq("is_published", true),
       supabase.from("profiles").select("department").not("department", "is", null),
     ]);
 
     setStats({
       students: studentsRes.count ?? 0,
-      activeCohorts: cohortsRes.count ?? 0,
+      activeClasses: classesRes.count ?? 0,
       publishedContent: contentRes.count ?? 0,
     });
 
@@ -101,7 +101,7 @@ const ImpactPage = () => {
     const channel = supabase
       .channel("impact-live")
       .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, fetchImpactData)
-      .on("postgres_changes", { event: "*", schema: "public", table: "cohorts" }, fetchImpactData)
+      .on("postgres_changes", { event: "*", schema: "public", table: "class_sessions" }, fetchImpactData)
       .on("postgres_changes", { event: "*", schema: "public", table: "content_items" }, fetchImpactData)
       .subscribe();
 
@@ -139,7 +139,7 @@ const ImpactPage = () => {
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl">
               Este tablero se actualiza directamente desde nuestra base de datos para mostrar crecimiento de estudiantes,
-              cohortes activas y contenido publicado.
+              clases activas y contenido publicado.
             </p>
           </SectionFade>
 
@@ -155,12 +155,12 @@ const ImpactPage = () => {
                 </p>
               </div>
               <div className="rounded-2xl border border-border bg-card p-6 hover:shadow-lg transition-all">
-                <p className="text-xs uppercase tracking-widest font-heading text-muted-foreground mb-3">Cohortes activas</p>
+                <p className="text-xs uppercase tracking-widest font-heading text-muted-foreground mb-3">Clases activas</p>
                 <p className="text-4xl font-heading text-foreground mb-3">
-                  <LiveCounter value={stats.activeCohorts} />
+                  <LiveCounter value={stats.activeClasses} />
                 </p>
                 <p className="text-sm text-muted-foreground inline-flex items-center gap-2">
-                  <Layers size={14} className="text-secondary-cyan" /> Cohortes con estado activo
+                  <Layers size={14} className="text-secondary-cyan" /> Clases presenciales con estado activo
                 </p>
               </div>
               <div className="rounded-2xl border border-border bg-card p-6 hover:shadow-lg transition-all">

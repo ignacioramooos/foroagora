@@ -8,24 +8,25 @@ const CapacityBar = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      const { data: cohorts } = await supabase
-        .from("cohorts")
-        .select("max_capacity")
+      const { data: classes } = await (supabase as any)
+        .from("class_sessions")
+        .select("id, max_capacity")
         .eq("is_active", true)
-        .gte("start_date", new Date().toISOString())
-        .order("start_date", { ascending: true })
+        .gte("class_date", new Date().toISOString())
+        .order("class_date", { ascending: true })
         .limit(1);
 
-      if (!cohorts || cohorts.length === 0) {
+      if (!classes || classes.length === 0) {
         setLoading(false);
         return;
       }
 
-      setMaxCapacity(cohorts[0].max_capacity);
+      setMaxCapacity(classes[0].max_capacity);
 
-      const { count } = await supabase
-        .from("profiles")
-        .select("*", { count: "exact", head: true });
+      const { count } = await (supabase as any)
+        .from("class_registrations")
+        .select("*", { count: "exact", head: true })
+        .eq("class_id", classes[0].id);
 
       setTaken(count ?? 0);
       setLoading(false);

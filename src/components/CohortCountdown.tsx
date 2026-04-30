@@ -15,21 +15,21 @@ const CohortCountdown = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCohort = async () => {
-      const { data } = await supabase
-        .from("cohorts")
-        .select("start_date")
+    const fetchClass = async () => {
+      const { data } = await (supabase as any)
+        .from("class_sessions")
+        .select("class_date")
         .eq("is_active", true)
-        .gte("start_date", new Date().toISOString())
-        .order("start_date", { ascending: true })
+        .gte("class_date", new Date().toISOString())
+        .order("class_date", { ascending: true })
         .limit(1);
 
       if (data && data.length > 0) {
-        setTargetDate(new Date(data[0].start_date));
+        setTargetDate(new Date(data[0].class_date));
       }
       setLoading(false);
     };
-    fetchCohort();
+    fetchClass();
   }, []);
 
   useEffect(() => {
@@ -61,7 +61,7 @@ const CohortCountdown = () => {
   if (expired) {
     return (
       <p className="text-sm font-heading font-medium text-accent">
-        ¡Inscripciones abiertas para el próximo cohorte!
+        ¡Inscripciones abiertas para la próxima clase!
       </p>
     );
   }

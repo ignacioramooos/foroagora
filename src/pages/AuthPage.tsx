@@ -53,12 +53,16 @@ interface OnboardingData {
 const AuthPage = () => {
   const { isLoggedIn, user, login, signup, refreshProfile, loading } = useAuth();
   const [step, setStep] = useState<FlowStep>(() => {
+    const params = new URLSearchParams(window.location.search);
     if (window.location.search.includes("reset-password=true") || window.location.hash.includes("type=recovery")) {
       return "reset-password";
     }
+    if (params.get("mode") === "signup") {
+      return "signup";
+    }
     return "login";
   });
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => new URLSearchParams(window.location.search).get("email") || "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
