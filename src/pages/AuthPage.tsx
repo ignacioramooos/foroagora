@@ -28,7 +28,17 @@ const interestOptions = [
 
 const ageRanges = ["Menor de 15", "15 a 18", "19 a 25", "Más de 25"];
 
-type FlowStep = "login" | "signup" | "step-1" | "step-2" | "step-3" | "email-confirmation";
+type FlowStep =
+  | "login"
+  | "signup"
+  | "forgot-password"
+  | "reset-password"
+  | "reset-sent"
+  | "password-updated"
+  | "step-1"
+  | "step-2"
+  | "step-3"
+  | "email-confirmation";
 
 interface OnboardingData {
   fullName: string;
@@ -42,7 +52,12 @@ interface OnboardingData {
 
 const AuthPage = () => {
   const { isLoggedIn, user, login, signup, refreshProfile, loading } = useAuth();
-  const [step, setStep] = useState<FlowStep>("login");
+  const [step, setStep] = useState<FlowStep>(() => {
+    if (window.location.search.includes("reset-password=true") || window.location.hash.includes("type=recovery")) {
+      return "reset-password";
+    }
+    return "login";
+  });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -70,12 +85,12 @@ const AuthPage = () => {
   if (loading) return null;
 
   // If logged in and onboarding completed, go to dashboard
-  if (isLoggedIn && user?.onboardingCompleted && !completingProfile) {
+  if (isLoggedIn && user?.onboardingCompleted && !completingProfile && step !== "reset-password" && step !== "password-updated") {
     return <Navigate to="/dashboard" replace />;
   }
 
   // If logged in but onboarding NOT completed (Google OAuth case), show profile steps
-  if (isLoggedIn && user && !user.onboardingCompleted && !completingProfile) {
+  if (isLoggedIn && user && !user.onboardingCompleted && !completingProfile && step !== "reset-password" && step !== "password-updated") {
     setCompletingProfile(true);
     setOnboardingData((prev) => ({
       ...prev,
@@ -122,6 +137,57 @@ const AuthPage = () => {
     const result = await login(email, password);
     if (result.error) setError(result.error);
     setSubmitting(false);
+  };
+
+  const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    if (!email.trim()) {
+      setError("Ingresá tu email");
+      return;
+    }
+
+    setSubmitting(true);
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth?reset-password=true`,
+    });
+    setSubmitting(false);
+
+    if (resetError) {
+      setError(resetError.message);
+      return;
+    }
+
+    setStep("reset-sent");
+  };
+
+  const handleUpdatePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    if (password.length < 8) {
+      setError("La contraseña debe tener al menos 8 caracteres");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError("Las contraseñas no coinciden");
+      return;
+    }
+
+    setSubmitting(true);
+    const { error: updateError } = await supabase.auth.updateUser({ password });
+    if (updateError) {
+      setError(updateError.message);
+      setSubmitting(false);
+      return;
+    }
+
+    await supabase.auth.signOut();
+    setPassword("");
+    setConfirmPassword("");
+    setSubmitting(false);
+    setStep("password-updated");
   };
 
   const handleSignupSubmit = async (e: React.FormEvent) => {
@@ -204,6 +270,48 @@ const AuthPage = () => {
   };
 
   const inputClass = "w-full h-12 px-4 rounded-md border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring/50 transition-shadow font-heading";
+
+  if (step === "reset-sent") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-6">
+        <div className="max-w-sm w-full text-center">
+          <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center mx-auto mb-6">
+            <CheckCircle2 size={40} className="text-foreground" />
+          </div>
+          <h1 className="text-2xl font-heading font-semibold text-foreground mb-3">
+            Revisá tu email
+          </h1>
+          <p className="text-sm text-muted-foreground mb-8">
+            Si existe una cuenta con <strong className="text-foreground">{email}</strong>, Supabase enviará un link para verificar tu email y crear una nueva contraseña.
+          </p>
+          <Button variant="cta-outline" size="cta" onClick={() => { setStep("login"); setError(""); }}>
+            Volver a iniciar sesión
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (step === "password-updated") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-6">
+        <div className="max-w-sm w-full text-center">
+          <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center mx-auto mb-6">
+            <CheckCircle2 size={40} className="text-foreground" />
+          </div>
+          <h1 className="text-2xl font-heading font-semibold text-foreground mb-3">
+            Contraseña actualizada
+          </h1>
+          <p className="text-sm text-muted-foreground mb-8">
+            Ya podés iniciar sesión con tu nueva contraseña.
+          </p>
+          <Button variant="cta" size="cta" onClick={() => { setStep("login"); setError(""); }}>
+            Iniciar sesión
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   // Email confirmation screen
   if (step === "email-confirmation") {
@@ -361,47 +469,65 @@ const AuthPage = () => {
         </Link>
 
         <h1 className="text-2xl font-heading font-semibold text-foreground mb-1">
-          {step === "login" ? "Iniciar sesión" : "Crear cuenta"}
+          {step === "login" ? "Iniciar sesión" : step === "forgot-password" ? "Recuperar contraseña" : step === "reset-password" ? "Nueva contraseña" : "Crear cuenta"}
         </h1>
         <p className="text-muted-foreground text-sm mb-8">
-          {step === "login" ? "Ingresá a tu cuenta de Foro Agora." : "Registrate para acceder al programa."}
+          {step === "login"
+            ? "Ingresá a tu cuenta de Foro Agora."
+            : step === "forgot-password"
+              ? "Te enviaremos un link de verificación para cambiarla."
+              : step === "reset-password"
+                ? "Ingresá una contraseña nueva para tu cuenta."
+                : "Registrate para acceder al programa."}
         </p>
 
-        <button onClick={handleGoogleLogin}
-          className="w-full h-12 rounded-md border border-border bg-background text-foreground text-sm font-heading font-medium flex items-center justify-center gap-3 hover:bg-secondary transition-colors mb-6">
-          <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-            <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
-            <path d="M3.964 10.706A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" fill="#FBBC05"/>
-            <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.962L3.964 7.294C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-          </svg>
-          Continuar con Google
-        </button>
+        {(step === "login" || step === "signup") && (
+          <>
+            <button onClick={handleGoogleLogin}
+              className="w-full h-12 rounded-md border border-border bg-background text-foreground text-sm font-heading font-medium flex items-center justify-center gap-3 hover:bg-secondary transition-colors mb-6">
+              <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+                <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+                <path d="M3.964 10.706A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" fill="#FBBC05"/>
+                <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.962L3.964 7.294C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+              </svg>
+              Continuar con Google
+            </button>
 
-        <div className="flex items-center gap-3 mb-6">
-          <div className="flex-1 h-px bg-border" />
-          <span className="text-xs text-muted-foreground font-heading">o con email</span>
-          <div className="flex-1 h-px bg-border" />
-        </div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="flex-1 h-px bg-border" />
+              <span className="text-xs text-muted-foreground font-heading">o con email</span>
+              <div className="flex-1 h-px bg-border" />
+            </div>
+          </>
+        )}
 
-        <form onSubmit={step === "login" ? handleLoginSubmit : handleSignupSubmit} className="space-y-4">
+        <form onSubmit={step === "login" ? handleLoginSubmit : step === "forgot-password" ? handleForgotPasswordSubmit : step === "reset-password" ? handleUpdatePasswordSubmit : handleSignupSubmit} className="space-y-4">
           {step === "signup" && (
             <div>
               <label className="block text-sm font-heading font-medium text-foreground mb-1.5">Nombre</label>
               <input className={inputClass} value={name} onChange={(e) => setName(e.target.value)} placeholder="Tu nombre" />
             </div>
           )}
-          <div>
-            <label className="block text-sm font-heading font-medium text-foreground mb-1.5">Email</label>
-            <input type="email" className={inputClass} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@email.com" required />
-          </div>
-          <div>
-            <label className="block text-sm font-heading font-medium text-foreground mb-1.5">Contraseña</label>
-            <input type="password" className={inputClass} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={8} />
-          </div>
-          {step === "signup" && (
+          {step !== "reset-password" && (
             <div>
-              <label className="block text-sm font-heading font-medium text-foreground mb-1.5">Confirmar contraseña</label>
+              <label className="block text-sm font-heading font-medium text-foreground mb-1.5">Email</label>
+              <input type="email" className={inputClass} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@email.com" required />
+            </div>
+          )}
+          {(step === "login" || step === "signup" || step === "reset-password") && (
+            <div>
+              <label className="block text-sm font-heading font-medium text-foreground mb-1.5">
+                {step === "reset-password" ? "Nueva contraseña" : "Contraseña"}
+              </label>
+              <input type="password" className={inputClass} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={8} />
+            </div>
+          )}
+          {(step === "signup" || step === "reset-password") && (
+            <div>
+              <label className="block text-sm font-heading font-medium text-foreground mb-1.5">
+                {step === "reset-password" ? "Confirmar nueva contraseña" : "Confirmar contraseña"}
+              </label>
               <input type="password" className={inputClass} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="••••••••" required minLength={8} />
             </div>
           )}
@@ -410,13 +536,19 @@ const AuthPage = () => {
 
           <Button type="submit" variant="cta" size="cta" className="w-full" disabled={submitting}>
             {submitting && <Loader2 size={16} className="animate-spin" />}
-            {step === "login" ? "Entrar" : "Crear cuenta"}
+            {step === "login" ? "Entrar" : step === "forgot-password" ? "Enviar link" : step === "reset-password" ? "Actualizar contraseña" : "Crear cuenta"}
           </Button>
         </form>
 
         <p className="text-sm text-muted-foreground text-center mt-6">
           {step === "login" ? (
-            <>¿No tenés cuenta? <button onClick={() => { setStep("signup"); setError(""); }} className="text-foreground font-medium hover:underline">Registrate</button></>
+            <>
+              <button onClick={() => { setStep("forgot-password"); setError(""); }} className="text-foreground font-medium hover:underline">Olvidé mi contraseña</button>
+              <span className="mx-2">·</span>
+              ¿No tenés cuenta? <button onClick={() => { setStep("signup"); setError(""); }} className="text-foreground font-medium hover:underline">Registrate</button>
+            </>
+          ) : step === "forgot-password" || step === "reset-password" ? (
+            <>¿Ya tenés cuenta? <button onClick={() => { setStep("login"); setError(""); }} className="text-foreground font-medium hover:underline">Iniciá sesión</button></>
           ) : (
             <>¿Ya tenés cuenta? <button onClick={() => { setStep("login"); setError(""); }} className="text-foreground font-medium hover:underline">Iniciá sesión</button></>
           )}

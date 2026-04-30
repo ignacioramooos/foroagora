@@ -220,7 +220,7 @@ const PortfolioTab = () => {
   }
 
   // ─── Trade Panel Content ───
-  const TradePanel = () => (
+  const renderTradePanel = () => (
     <Card>
       <CardContent className="p-4 space-y-4">
         <h3 className="text-sm font-heading font-medium uppercase tracking-widest text-muted-foreground">Operar</h3>
@@ -233,7 +233,14 @@ const PortfolioTab = () => {
           <div className="space-y-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-              <Input placeholder="Buscar empresa o ticker..." value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setSelectedStock(null); }} className="pl-9" />
+              <Input
+                type="search"
+                autoComplete="off"
+                placeholder="Buscar empresa o ticker..."
+                value={searchQuery}
+                onChange={e => { setSearchQuery(e.target.value); setSelectedStock(null); }}
+                className="h-11 rounded-lg pl-9 pr-3 text-sm"
+              />
               {filteredStocks.length > 0 && !selectedStock && (
                 <div className="absolute z-20 w-full mt-1 bg-background border border-border rounded-md shadow-lg max-h-48 overflow-y-auto">
                   {filteredStocks.map(s => (
@@ -488,7 +495,7 @@ const PortfolioTab = () => {
 
         {/* Trade Panel (desktop) */}
         <div className="hidden lg:block">
-          <TradePanel />
+          {renderTradePanel()}
         </div>
       </div>
 
@@ -508,7 +515,7 @@ const PortfolioTab = () => {
               <h3 className="font-heading font-semibold">Operar</h3>
               <Button size="icon" variant="ghost" onClick={() => setMobileTradeOpen(false)}><X size={18} /></Button>
             </div>
-            <TradePanel />
+            {renderTradePanel()}
           </div>
         </div>
       )}
