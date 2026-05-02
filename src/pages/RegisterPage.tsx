@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import SectionFade from "@/components/SectionFade";
 import { CheckCircle2, MapPin, Calendar, Gift, Users, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,14 +15,33 @@ const departments = [
 
 const hearOptions = ["Instagram", "Un amigo/a", "Mi liceo", "LinkedIn", "Google", "Otro"];
 
+interface ClassSession {
+  id: string;
+  title: string;
+  module_number: number;
+  class_date: string;
+  location: string;
+  max_capacity: number;
+}
+
 const RegisterPage = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [classesLoading, setClassesLoading] = useState(true);
+  const [classes, setClasses] = useState<ClassSession[]>([]);
+  const [selectedClassId, setSelectedClassId] = useState(searchParams.get("class") || "");
+  const [moduleWarningOpen, setModuleWarningOpen] = useState(false);
+  const [moduleWarningAccepted, setModuleWarningAccepted] = useState(false);
+  const [accountPromptOpen, setAccountPromptOpen] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [form, setForm] = useState({
     name: "", age: "", school: "", department: "", email: "", phone: "", hearAbout: "", why: "", consent: false,
   });
+
+  const selectedClass = classes.find((c) => c.id === selectedClassId) || null;
 
   useEffect(() => {
     if (user) {
@@ -31,6 +52,42 @@ const RegisterPage = () => {
       }));
     }
   }, [user]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fallback = window.setTimeout(() => {
+      if (!cancelled) setClassesLoading(false);
+    }, 5000);
+
+    const fetchClasses = async () => {
+      const { data, error } = await (supabase as any)
+        .from("class_sessions")
+        .select("id, title, module_number, class_date, location, max_capacity")
+        .eq("is_active", true)
+        .gte("class_date", new Date().toISOString())
+        .order("class_date", { ascending: true });
+
+      if (error) {
+        if (cancelled) return;
+        setClasses([]);
+        setClassesLoading(false);
+        return;
+      }
+
+      if (cancelled) return;
+      const sessions = (data || []) as ClassSession[];
+      setClasses(sessions);
+      if (!selectedClassId && sessions.length > 0) {
+        setSelectedClassId(sessions[0].id);
+      }
+      setClassesLoading(false);
+    };
+    fetchClasses();
+    return () => {
+      cancelled = true;
+      window.clearTimeout(fallback);
+    };
+  }, [selectedClassId]);
 
   const set = (field: string, value: string | boolean) => {
     setForm((p) => ({ ...p, [field]: value }));
@@ -44,19 +101,18 @@ const RegisterPage = () => {
     if (!form.school.trim()) e.school = "Campo requerido";
     if (!form.department) e.department = "Seleccioná un departamento";
     if (!form.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) e.email = "Email inválido";
+    if (!selectedClassId) e.class = "Seleccioná una clase";
     if (!form.consent) e.consent = "Debés aceptar para continuar";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = async (ev: React.FormEvent) => {
-    ev.preventDefault();
-    if (!validate()) return;
-
+  const submitRegistration = async () => {
     setLoading(true);
     setErrors((prev) => ({ ...prev, submit: "" }));
 
     const { error } = await (supabase as any).from("class_registrations").insert({
+      class_id: selectedClassId,
       name: form.name,
       age: Number(form.age),
       school: form.school,
@@ -75,7 +131,38 @@ const RegisterPage = () => {
       return;
     }
 
-    setSubmitted(true);
+    setAccountPromptOpen(true);
+  };
+
+  const goToSignup = () => {
+    const params = new URLSearchParams({
+      mode: "signup",
+      email: form.email.trim(),
+    });
+    navigate(`/auth?${params.toString()}`);
+  };
+
+  const handleSubmit = async (ev: React.FormEvent) => {
+    ev.preventDefault();
+    if (!validate()) return;
+
+    if (selectedClass && selectedClass.module_number > 1 && !moduleWarningAccepted) {
+      setModuleWarningOpen(true);
+      return;
+    }
+
+    await submitRegistration();
+  };
+
+  const confirmModuleWarning = async () => {
+    setModuleWarningAccepted(true);
+    setModuleWarningOpen(false);
+    await submitRegistration();
+  };
+
+  const formatClassDate = (value: string) => {
+    const date = new Date(value);
+    return `${date.toLocaleDateString("es-UY", { weekday: "long", day: "numeric", month: "long" })}, ${date.toLocaleTimeString("es-UY", { hour: "2-digit", minute: "2-digit" })}`;
   };
 
   if (submitted) {
@@ -117,11 +204,32 @@ const RegisterPage = () => {
               Inscripción
             </p>
             <h1 className="text-3xl md:text-4xl text-foreground mb-2">
-              Inscribite al programa
+              Inscribite a una clase
             </h1>
             <p className="text-muted-foreground mb-8">Completá el formulario. Toma 2 minutos.</p>
 
             <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label className="block text-sm font-heading font-medium text-foreground mb-1.5">Clase *</label>
+                <select
+                  className={inputClass("class")}
+                  value={selectedClassId}
+                  disabled={classesLoading || classes.length === 0}
+                  onChange={(e) => {
+                    setSelectedClassId(e.target.value);
+                    setModuleWarningAccepted(false);
+                    setErrors((p) => ({ ...p, class: "" }));
+                  }}
+                >
+                  <option value="">{classesLoading ? "Cargando clases..." : classes.length === 0 ? "No hay clases disponibles" : "Seleccionar clase..."}</option>
+                  {classes.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.title} - Módulo {c.module_number} - {formatClassDate(c.class_date)}
+                    </option>
+                  ))}
+                </select>
+                {errors.class && <p className="text-destructive text-xs mt-1">{errors.class}</p>}
+              </div>
               <div>
                 <label className="block text-sm font-heading font-medium text-foreground mb-1.5">Nombre completo *</label>
                 <input className={inputClass("name")} value={form.name} onChange={(e) => set("name", e.target.value)} />
@@ -197,11 +305,15 @@ const RegisterPage = () => {
               <div className="space-y-4 text-sm">
                 <div className="flex items-start gap-3">
                   <Calendar size={16} className="text-muted-foreground mt-0.5 shrink-0" />
-                  <div><strong className="text-foreground font-heading">Próxima cohorte:</strong><br /><span className="text-muted-foreground">Sábados, Mayo 2025</span></div>
+                  <div><strong className="text-foreground font-heading">Clase seleccionada:</strong><br /><span className="text-muted-foreground">{selectedClass ? `${selectedClass.title} · Módulo ${selectedClass.module_number}` : "Seleccioná una clase"}</span></div>
                 </div>
                 <div className="flex items-start gap-3">
                   <MapPin size={16} className="text-muted-foreground mt-0.5 shrink-0" />
-                  <div><strong className="text-foreground font-heading">Ubicación:</strong><br /><span className="text-muted-foreground">Montevideo, Centro</span></div>
+                  <div><strong className="text-foreground font-heading">Ubicación:</strong><br /><span className="text-muted-foreground">{selectedClass?.location || "A confirmar"}</span></div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Calendar size={16} className="text-muted-foreground mt-0.5 shrink-0" />
+                  <div><strong className="text-foreground font-heading">Fecha y hora:</strong><br /><span className="text-muted-foreground">{selectedClass ? formatClassDate(selectedClass.class_date) : "A confirmar"}</span></div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Gift size={16} className="text-muted-foreground mt-0.5 shrink-0" />
@@ -222,6 +334,45 @@ const RegisterPage = () => {
           </div>
         </div>
       </div>
+      <Dialog open={moduleWarningOpen} onOpenChange={setModuleWarningOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Esta clase empieza en módulo {selectedClass?.module_number}</DialogTitle>
+            <DialogDescription>
+              Si es tu primera vez viniendo a clase, la clase anterior ya está grabada y subida en la sección de clases. Podés verla antes de asistir.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-2">
+            <Button variant="outline" onClick={() => setModuleWarningOpen(false)}>
+              No, no quiero registrarme
+            </Button>
+            <Button variant="cta" onClick={confirmModuleWarning} disabled={loading}>
+              Sí, quiero registrarme
+            </Button>
+            <Button asChild variant="secondary">
+              <Link to="/auth">Ver clases grabadas --&gt;</Link>
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={accountPromptOpen} onOpenChange={setAccountPromptOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>¿Querés crear una cuenta?</DialogTitle>
+            <DialogDescription>
+              Tu inscripción a la clase quedó registrada. Si creás una cuenta en Foro Agora, vas a poder acceder a clases grabadas y más materiales del programa.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-2">
+            <Button variant="cta" onClick={goToSignup}>
+              Sí, crear cuenta
+            </Button>
+            <Button variant="outline" onClick={() => { setAccountPromptOpen(false); setSubmitted(true); }}>
+              No, continuar sin cuenta
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

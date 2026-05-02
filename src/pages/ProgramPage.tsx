@@ -7,39 +7,33 @@ import { ArrowRight } from "lucide-react";
 const modules = [
   {
     id: "m1",
-    title: "Módulo 1: Fundamentos del mercado",
-    desc: "Qué es una acción y cómo se divide el capital de una empresa. Empresas públicas vs. privadas y qué es una IPO. Herramientas que vamos a usar (stockanalysis.com u otras equivalentes) y cómo se organiza el curso entre clases presenciales y recursos online.",
-    duration: "2 horas · Presencial",
+    title: "Módulo 1: Acciones y análisis fundamental",
+    desc: "Cómo funcionan las clases presenciales y los recursos online. Qué es una acción, por qué representa una parte de una empresa, qué diferencia a una compañía pública de una privada y qué es una IPO. Introducimos el enfoque del curso: fundamental investing, inspirado en Warren Buffett y Peter Lynch, para evaluar empresas por activos, pasivos, ingresos y crecimiento futuro. También diferenciamos este enfoque del trading y del quantitative investing.",
+    duration: "1h 20m · Presencial",
   },
   {
     id: "m2",
-    title: "Módulo 2: Qué es el fundamental investing",
-    desc: "El enfoque que vamos a enseñar: evaluar empresas por sus activos, pasivos, ingresos y crecimiento futuro. Diferencias con trading y quantitative investing. Los principios de inversión de Warren Buffett como marco conceptual.",
-    duration: "2 horas · Presencial",
+    title: "Módulo 2: Income Statement",
+    desc: "Aprendemos a leer el estado de resultados línea por línea: ingresos, costos, gastos y ganancias. Vemos por qué la contabilidad prorratea ciertos gastos y qué significan amortización y depreciación con ejemplos simples, como un auto. La idea es entender qué nos dice este estado financiero sobre la rentabilidad de una empresa y por qué muchas veces se mueve con inercia.",
+    duration: "1h 20m · Presencial",
   },
   {
     id: "m3",
-    title: "Módulo 3: Income Statement",
-    desc: "Cómo se construye el estado de resultados línea por línea. Por qué el accounting prorratea gastos: amortización y depreciación con ejemplos cotidianos. Por qué este estado se mueve con inercia y qué nos dice sobre la rentabilidad real.",
-    duration: "2 horas · Presencial",
+    title: "Módulo 3: Cash Flow Statement",
+    desc: "Vemos el flujo de caja, una de las partes que más buscan maximizar muchas empresas. Explicamos cash from operations, capex, free cash flow y net cash flow. Comparamos cómo se registra una inversión en el cash flow versus en el income statement, y usamos ejemplos como Amazon, Google y Apple si el tiempo lo permite.",
+    duration: "1h 20m · Presencial",
   },
   {
     id: "m4",
-    title: "Módulo 4: Cash Flow Statement",
-    desc: "El flujo de caja real, que la mayoría de empresas busca maximizar. Cash from operations, capex y free cash flow. Diferencia con el income statement (capex full vs. amortizado) y cómo llegar al net cash flow incluyendo SBC y financiamiento.",
-    duration: "2 horas · Presencial",
+    title: "Módulo 4: Balance Sheet y métricas de valuación",
+    desc: "Estudiamos activos, pasivos y patrimonio, con énfasis en por qué el balance sheet es especialmente importante para bancos. Introducimos book value y las principales métricas para evaluar acciones: P/E, Forward P/E, P/FCF, P/B, PEG y CAGR. También vemos alertas como impuestos extraordinarios y psicología de mercado: comprar cuando otros tienen miedo.",
+    duration: "1h 20m · Presencial",
   },
   {
     id: "m5",
-    title: "Módulo 5: Balance Sheet y métricas de valuación",
-    desc: "Activos y pasivos, especialmente importantes en bancos. Concepto de book value. Métricas para evaluar una acción: P/E, Forward P/E, P/FCF, P/B, PEG y CAGR — qué miden y cómo compararlas entre empresas.",
-    duration: "2 horas · Presencial",
-  },
-  {
-    id: "m6",
-    title: "Módulo 6: Psicología de mercado y decisiones",
-    desc: "Cómo aplicar todo lo aprendido para tomar decisiones con criterio propio. Sesgos comunes, gestión emocional y el principio de Buffett: 'be greedy when others are fearful'. Cierre con un caso práctico integrador.",
-    duration: "2 horas · Presencial",
+    title: "Módulo 5: Margin of safety, ETFs y cierre",
+    desc: "Integramos todo con el concepto de margin of safety: la diferencia entre el valor estimado de una empresa y el precio al que cotiza. Vemos cuándo tiene sentido ser compradores netos y cuándo el mercado puede estar pagando demasiado. Cerramos con conceptos extra: earnings calls, guidance, formatos de presentaciones, ETFs como SPY y VOO, las empresas más grandes del mundo y una instancia final de preguntas.",
+    duration: "1h 20m · Presencial",
   },
 ];
 
@@ -72,7 +66,7 @@ const ProgramPage = () => (
           Programa de estudio
         </p>
         <h2 className="text-3xl md:text-4xl text-foreground mb-10">
-          6 módulos. Todo lo esencial.
+          5 módulos. Todo lo esencial.
         </h2>
         <Accordion type="single" collapsible className="space-y-2">
           {modules.map((m) => (
@@ -104,7 +98,7 @@ const ProgramPage = () => (
             <ul className="space-y-3 text-muted-foreground text-sm">
               <li>Montevideo, Centro</li>
               <li>Sábados, 10:00 – 12:00</li>
-              <li>6 sesiones (1 por módulo)</li>
+              <li>5 sesiones de 1h 20m</li>
               <li>Sin costo</li>
             </ul>
           </div>

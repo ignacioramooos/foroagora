@@ -19,8 +19,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['"Source Serif 4"', 'Georgia', 'serif'],
+        sans: ['"Instrument Sans"', 'system-ui', 'sans-serif'],
         heading: ['"Instrument Sans"', 'system-ui', 'sans-serif'],
+        hand: ['"Caveat"', 'cursive'],
       },
       spacing: {
         "section-xs": "2rem",
@@ -38,7 +39,7 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
-          blue: "#2563EB",
+          blue: "#3B82F6",
           dark: "#111111",
         },
         secondary: {
@@ -47,6 +48,10 @@ export default {
           cyan: "#48D1C5",
           gray: "#333333",
         },
+        sun: "#FFC800",
+        "blue-pop": "#3B82F6",
+        "orange-pop": "#FF4B16",
+        "blue-soft": "#EEF7FF",
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
