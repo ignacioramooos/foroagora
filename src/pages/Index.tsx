@@ -19,19 +19,6 @@ const testimonials = [
   "Lo mejor es que podemos preguntar, debatir y participar.",
 ];
 
-const InjuLogo = () => (
-  <div className="flex w-full items-center gap-8 md:justify-end" aria-label="INJU, Instituto Nacional de la Juventud">
-    <div className="flex h-28 w-28 shrink-0 items-center justify-center bg-[#5f18ea] p-3">
-      <span className="font-hand text-5xl font-bold leading-none text-white">Inju!</span>
-    </div>
-    <div className="font-heading text-foreground">
-      <p className="text-4xl font-black leading-none tracking-normal md:text-5xl">INJU</p>
-      <p className="mt-2 max-w-[24rem] text-base font-black uppercase leading-tight tracking-wide text-foreground/70 md:text-xl">Instituto Nacional de la Juventud</p>
-      <p className="mt-1 text-base font-bold text-blue-pop md:text-xl">Uruguay</p>
-    </div>
-  </div>
-);
-
 const DEFAULT_CAROUSEL_TICKERS = ["AAPL", "MELI", "NU", "MSFT", "META", "SPY"];
 const stockNameByTicker = new Map(SUPPORTED_STOCKS.map((stock) => [stock.ticker, stock.name]));
 
@@ -465,22 +452,6 @@ const Testimonials = () => (
   </section>
 );
 
-const PartnersStrip = () => (
-  <section className="border-y border-border bg-background py-12 md:py-14">
-    <div className="container">
-      <div className="grid gap-8 md:grid-cols-[0.45fr_1.55fr] md:items-center">
-        <div>
-          <h2 className="text-2xl font-black leading-tight">Apoyado por:</h2>
-          <div className="mt-2 h-2 w-32 rounded-full bg-blue-pop" />
-        </div>
-        <div className="flex justify-start md:justify-end">
-          <InjuLogo />
-        </div>
-      </div>
-    </div>
-  </section>
-);
-
 const UpcomingClasses = () => {
   const [classSession, setClassSession] = useState<{
     id: string;
@@ -612,7 +583,6 @@ const FinalCTA = () => (
 const Index = () => (
   <>
     <Hero />
-    <PartnersStrip />
     <ProblemSection />
     <ValueProp />
     <OurValues />
