@@ -152,25 +152,25 @@
     color: #ff4b16;
   }
   .stock-ticker-bar {
-    animation: ticker-bar-rise 2.8s ease-in-out infinite;
+    animation: ticker-bar-rise 4.2s ease-in-out infinite;
     opacity: 0.78;
     transform-origin: bottom;
   }
   .stock-ticker-card {
-    animation: meli-card-loop 10s ease-in-out infinite;
+    animation: meli-card-loop 16s ease-in-out infinite;
   }
   .income-window {
-    animation: income-window-loop 10s ease-in-out infinite;
+    animation: income-window-loop 16s ease-in-out infinite;
     transform-origin: 54% 42%;
   }
   .income-scroll {
-    animation: income-scroll-loop 10s ease-in-out infinite;
+    animation: income-scroll-loop 16s ease-in-out infinite;
   }
   .income-close {
-    animation: income-close-loop 10s ease-in-out infinite;
+    animation: income-close-loop 16s ease-in-out infinite;
   }
   .stock-cursor {
-    animation: stock-cursor-loop 10s ease-in-out infinite;
+    animation: stock-cursor-loop 16s ease-in-out infinite;
     filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.26));
     background-image: url("data:image/svg+xml,%3Csvg width='96' height='96' viewBox='0 0 96 96' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M27 13L75 53H49L27 83V13Z' stroke='%23ffc800' stroke-width='10' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
     background-position: center;

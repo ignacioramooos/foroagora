@@ -24,9 +24,32 @@ const stockNameByTicker = new Map(SUPPORTED_STOCKS.map((stock) => [stock.ticker,
 
 const shuffleTickers = (tickers: string[]) => [...tickers].sort(() => Math.random() - 0.5);
 
+const demoQuoteByTicker: Record<string, Pick<StockQuote, "price" | "previousClose" | "changePercent">> = {
+  AAPL: { price: 213.49, previousClose: 211.38, changePercent: 1.0 },
+  MELI: { price: 2428.16, previousClose: 2391.72, changePercent: 1.52 },
+  NU: { price: 13.64, previousClose: 13.5, changePercent: 1.04 },
+  MSFT: { price: 473.31, previousClose: 467.7, changePercent: 1.2 },
+  META: { price: 609.46, previousClose: 602.31, changePercent: 1.19 },
+  SPY: { price: 560.89, previousClose: 556.2, changePercent: 0.84 },
+};
+
+const getDisplayQuote = (ticker: string | undefined, quote: StockQuote | undefined): StockQuote | undefined => {
+  if (!ticker) return quote;
+  if (quote && quote.price != null) return quote;
+
+  const demoQuote = demoQuoteByTicker[ticker];
+  if (!demoQuote) return quote;
+
+  return {
+    ticker,
+    companyName: stockNameByTicker.get(ticker) || ticker,
+    ...demoQuote,
+  };
+};
+
 const formatUsd = (value: number | null | undefined) =>
   value == null
-    ? "Cargando"
+    ? "--"
     : new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "USD",
@@ -44,11 +67,70 @@ const changeClassName = (value: number | null | undefined) =>
       : "bg-rose-400/15 text-rose-300";
 
 const tableChangeClassName = (value: string) =>
-  value.startsWith("-")
+  value === "TTM" || value === "USD" || value === "EPS"
+    ? "bg-slate-100 text-slate-600"
+    : value.startsWith("-")
     ? "bg-rose-100 text-rose-700"
     : value === "..."
       ? "bg-slate-100 text-slate-500"
       : "bg-emerald-100 text-emerald-700";
+
+const incomeStatementByTicker: Record<string, Array<[string, string, string]>> = {
+  AAPL: [
+    ["Ingresos", "$391.0B", "TTM"],
+    ["Costo de ingresos", "$210.4B", "54%"],
+    ["Utilidad bruta", "$180.7B", "46%"],
+    ["Gastos operativos", "$57.5B", "15%"],
+    ["Resultado operativo", "$123.2B", "32%"],
+    ["Resultado neto", "$93.7B", "24%"],
+    ["EPS diluido", "$6.08", "EPS"],
+  ],
+  MELI: [
+    ["Ingresos", "$20.8B", "TTM"],
+    ["Costo de ingresos", "$11.1B", "53%"],
+    ["Utilidad bruta", "$9.7B", "47%"],
+    ["Gastos operativos", "$6.8B", "33%"],
+    ["Resultado operativo", "$2.9B", "14%"],
+    ["Resultado neto", "$1.5B", "7%"],
+    ["EPS diluido", "$29.12", "EPS"],
+  ],
+  NU: [
+    ["Ingresos", "$11.5B", "TTM"],
+    ["Gastos financieros", "$3.2B", "28%"],
+    ["Margen bruto", "$8.3B", "72%"],
+    ["Gastos operativos", "$5.1B", "44%"],
+    ["Resultado operativo", "$3.2B", "28%"],
+    ["Resultado neto", "$2.0B", "17%"],
+    ["EPS diluido", "$0.41", "EPS"],
+  ],
+  MSFT: [
+    ["Ingresos", "$245.1B", "TTM"],
+    ["Costo de ingresos", "$74.1B", "30%"],
+    ["Utilidad bruta", "$171.0B", "70%"],
+    ["Gastos operativos", "$60.0B", "24%"],
+    ["Resultado operativo", "$111.0B", "45%"],
+    ["Resultado neto", "$88.1B", "36%"],
+    ["EPS diluido", "$11.80", "EPS"],
+  ],
+  META: [
+    ["Ingresos", "$164.5B", "TTM"],
+    ["Costo de ingresos", "$30.2B", "18%"],
+    ["Utilidad bruta", "$134.3B", "82%"],
+    ["Gastos operativos", "$72.2B", "44%"],
+    ["Resultado operativo", "$62.1B", "38%"],
+    ["Resultado neto", "$55.5B", "34%"],
+    ["EPS diluido", "$21.73", "EPS"],
+  ],
+  SPY: [
+    ["Ingresos agregados", "$2.1T", "TTM"],
+    ["Costo de ingresos", "$1.2T", "57%"],
+    ["Utilidad bruta", "$903B", "43%"],
+    ["Gastos operativos", "$433B", "21%"],
+    ["Resultado operativo", "$470B", "22%"],
+    ["Resultado neto", "$375B", "18%"],
+    ["EPS ponderado", "$241", "EPS"],
+  ],
+};
 
 const buildBarHeights = (ticker: string, changePercent: number | null | undefined) => {
   const seed = ticker.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
@@ -59,15 +141,16 @@ const buildBarHeights = (ticker: string, changePercent: number | null | undefine
   });
 };
 
-const buildMarketRows = (ticker: string, quote: StockQuote | undefined, sourceLabel: string) => [
-  ["Precio", formatUsd(quote?.price), formatPercent(quote?.changePercent)],
-  ["Cierre previo", formatUsd(quote?.previousClose), "Yahoo"],
-  ["Cambio diario", formatPercent(quote?.changePercent), formatPercent(quote?.changePercent)],
-  ["Fuente", "Yahoo Finance", "Live"],
-  ["Rotación", sourceLabel, ticker],
-  ["Actualización", "60s", quote?.error ? "Retry" : "OK"],
-  ["Modo", sourceLabel === "Dashboard" ? "Personal" : "Demo", sourceLabel],
-];
+const buildIncomeStatementRows = (ticker: string) =>
+  incomeStatementByTicker[ticker] ?? [
+    ["Ingresos", "$12.4B", "TTM"],
+    ["Costo de ingresos", "$6.8B", "55%"],
+    ["Utilidad bruta", "$5.6B", "45%"],
+    ["Gastos operativos", "$3.1B", "25%"],
+    ["Resultado operativo", "$2.5B", "20%"],
+    ["Resultado neto", "$1.8B", "15%"],
+    ["EPS diluido", "$4.20", "EPS"],
+  ];
 
 const DynamicStockTickerAnimation = () => {
   const { isLoggedIn, session, loading: authLoading } = useAuth();
@@ -152,23 +235,22 @@ const DynamicStockTickerAnimation = () => {
     if (carouselTickers.length <= 1) return;
     const rotationId = window.setInterval(() => {
       setActiveIndex((current) => (current + 1) % carouselTickers.length);
-    }, 6_000);
+    }, 9_500);
     return () => window.clearInterval(rotationId);
   }, [carouselTickers.length]);
 
   const activeTicker = carouselTickers[activeIndex % Math.max(carouselTickers.length, 1)];
   const quote = quotes.find((item) => item.ticker === activeTicker);
-  const companyName = quote?.companyName || stockNameByTicker.get(activeTicker) || activeTicker;
-  const sourceLabel = isLoggedIn ? "Dashboard" : "Demo";
-  const marketRows = buildMarketRows(activeTicker || "AGORA", quote, sourceLabel);
-  const barHeights = buildBarHeights(activeTicker || "AGORA", quote?.changePercent);
+  const displayQuote = getDisplayQuote(activeTicker, quote);
+  const companyName = displayQuote?.companyName || stockNameByTicker.get(activeTicker) || activeTicker;
+  const incomeStatementRows = buildIncomeStatementRows(activeTicker || "AGORA");
+  const barHeights = buildBarHeights(activeTicker || "AGORA", displayQuote?.changePercent);
   const isEmptyPersonalList = isLoggedIn && !authLoading && !savedLoading && carouselTickers.length === 0;
 
   return (
     <div className="absolute inset-x-0 bottom-6 mx-auto h-[76%] w-[92%] overflow-hidden rounded-[2rem] border-2 border-blue-pop bg-[#0b0d10] shadow-[0_30px_80px_rgba(0,0,0,0.16)]">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(59,130,246,0.34),transparent_30%),radial-gradient(circle_at_88%_12%,rgba(255,200,0,0.22),transparent_34%),linear-gradient(135deg,rgba(255,255,255,0.12),transparent_45%)]" />
-      <div className="absolute inset-x-0 top-0 z-10 flex h-8 items-center justify-between border-b border-white/10 bg-black/20 px-4 backdrop-blur-sm">
-        <span className="font-heading text-[0.62rem] font-black uppercase tracking-[0.22em] text-white/45">Yahoo Finance</span>
+      <div className="absolute inset-x-0 top-0 z-10 flex h-8 items-center justify-end border-b border-white/10 bg-black/20 px-4 backdrop-blur-sm">
         <span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_18px_rgba(110,231,183,0.8)]" />
       </div>
       <div className="relative h-full px-5 pb-5 pt-14">
@@ -187,14 +269,14 @@ const DynamicStockTickerAnimation = () => {
                   <p className="font-heading text-4xl font-black leading-none text-white">{activeTicker}</p>
                   <p className="mt-2 font-heading text-sm font-semibold leading-none text-white/55">{companyName}</p>
                 </div>
-                <span className={`rounded-full px-3 py-1.5 font-heading text-sm font-black ${changeClassName(quote?.changePercent)}`}>
-                  {formatPercent(quote?.changePercent)}
+                <span className={`rounded-full px-3 py-1.5 font-heading text-sm font-black ${changeClassName(displayQuote?.changePercent)}`}>
+                  {formatPercent(displayQuote?.changePercent)}
                 </span>
               </div>
               <div className="mt-5 flex items-end justify-between">
                 <div>
                   <p className="font-heading text-xs font-bold uppercase tracking-[0.18em] text-white/45">Precio</p>
-                  <p className="mt-1 font-heading text-2xl font-black leading-none text-white">{formatUsd(quote?.price)}</p>
+                  <p className="mt-1 font-heading text-2xl font-black leading-none text-white">{formatUsd(displayQuote?.price)}</p>
                 </div>
                 <div className="flex h-16 w-32 items-end gap-2">
                   {barHeights.map((height, index) => (
@@ -209,13 +291,13 @@ const DynamicStockTickerAnimation = () => {
         <div key={`window-${activeTicker || "empty"}`} className="income-window absolute inset-x-5 bottom-5 top-10 overflow-hidden rounded-3xl border border-white/15 bg-[#f8fbff] text-[#0b1320] shadow-2xl">
           <div className="relative z-10 flex items-center justify-between border-b border-black/10 bg-white px-4 py-3 shadow-sm">
             <div>
-              <p className="font-heading text-sm font-black leading-none text-[#0b1320]">Estado de mercado de {activeTicker || "tu lista"}</p>
-              <p className="mt-1 font-heading text-xs font-semibold leading-none text-[#0b1320]/55">Datos en vivo · USD</p>
+              <p className="font-heading text-sm font-black leading-none text-[#0b1320]">Estado de resultados de {activeTicker || "tu lista"}</p>
+              <p className="mt-1 font-heading text-xs font-semibold leading-none text-[#0b1320]/55">Ingresos y márgenes · USD</p>
             </div>
             <span className="income-close flex h-7 w-7 items-center justify-center rounded-full bg-[#0b1320] font-heading text-sm font-black leading-none text-white">×</span>
           </div>
           <div className="income-scroll relative z-0 px-4 py-3">
-            {marketRows.map(([label, value, change]) => (
+            {incomeStatementRows.map(([label, value, change]) => (
               <div key={label} className="grid grid-cols-[1fr_auto_auto] items-center gap-3 border-b border-black/10 py-3 font-heading">
                 <span className="text-sm font-bold text-[#0b1320]">{label}</span>
                 <span className="text-sm font-black text-[#0b1320]">{value}</span>
