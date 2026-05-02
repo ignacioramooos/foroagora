@@ -156,7 +156,7 @@
     opacity: 0.78;
     transform-origin: bottom;
   }
-  .meli-ticker-card {
+  .stock-ticker-card {
     animation: meli-card-loop 10s ease-in-out infinite;
   }
   .income-window {

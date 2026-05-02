@@ -51,10 +51,10 @@ const Footer = () => (
             <a href="https://instagram.com/foroagora" target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-foreground hover:bg-sun transition-colors" aria-label="Instagram"><Instagram size={18} /></a>
             <a href="https://linkedin.com/company/foroagora" target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-foreground hover:bg-sun transition-colors" aria-label="LinkedIn"><Linkedin size={18} /></a>
             <a href="https://youtube.com/@foroagora" target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-foreground hover:bg-sun transition-colors" aria-label="YouTube"><Youtube size={18} /></a>
-            <a href="mailto:hola@foroagora.org" className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-foreground hover:bg-sun transition-colors" aria-label="Email"><Mail size={18} /></a>
+            <a href="mailto:contacto@foroagora.org" className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-foreground hover:bg-sun transition-colors" aria-label="Email"><Mail size={18} /></a>
           </div>
           <p className="text-xs text-muted-foreground">
-            hola@foroagora.org
+            contacto@foroagora.org
           </p>
         </div>
       </div>

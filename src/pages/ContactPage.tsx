@@ -99,8 +99,8 @@ const ContactPage = () => {
             <div className="md:col-span-2">
               <h3 className="font-heading font-semibold text-foreground text-lg mb-6">También podés encontrarnos en:</h3>
               <div className="space-y-4">
-                <a href="mailto:hola@foroagora.org" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
-                  <Mail size={18} /> hola@foroagora.org
+                <a href="mailto:contacto@foroagora.org" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
+                  <Mail size={18} /> contacto@foroagora.org
                 </a>
                 <a href="https://instagram.com/foroagora" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
                   <Instagram size={18} /> @foroagora

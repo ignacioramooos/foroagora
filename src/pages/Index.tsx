@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -8,6 +8,8 @@ import CohortCountdown from "@/components/CohortCountdown";
 import CapacityBar from "@/components/CapacityBar";
 import CoreValues from "@/components/CoreValues";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { fetchStockPrices, SUPPORTED_STOCKS, type StockQuote } from "@/lib/stockData";
 import { ArrowRight, Calendar, MapPin, Users } from "lucide-react";
 
 const testimonials = [
@@ -29,65 +31,217 @@ const InjuLogo = () => (
   </div>
 );
 
-const incomeStatementRows = [
-  ["Ingresos", "14.5B", "+29%"],
-  ["Costo de ventas", "7.7B", "+24%"],
-  ["Ganancia bruta", "6.8B", "+36%"],
-  ["Gastos operativos", "4.1B", "+18%"],
-  ["Resultado operativo", "2.7B", "+78%"],
-  ["Ganancia neta", "1.9B", "+71%"],
-  ["Flujo de caja libre", "2.4B", "+43%"],
+const DEFAULT_CAROUSEL_TICKERS = ["AAPL", "MELI", "NU", "MSFT", "META", "SPY"];
+const stockNameByTicker = new Map(SUPPORTED_STOCKS.map((stock) => [stock.ticker, stock.name]));
+
+const shuffleTickers = (tickers: string[]) => [...tickers].sort(() => Math.random() - 0.5);
+
+const formatUsd = (value: number | null | undefined) =>
+  value == null
+    ? "Cargando"
+    : new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: value >= 100 ? 0 : 2,
+      }).format(value);
+
+const formatPercent = (value: number | null | undefined) =>
+  value == null ? "..." : `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
+
+const changeClassName = (value: number | null | undefined) =>
+  value == null
+    ? "bg-white/10 text-white/60"
+    : value >= 0
+      ? "bg-emerald-400/15 text-emerald-300"
+      : "bg-rose-400/15 text-rose-300";
+
+const tableChangeClassName = (value: string) =>
+  value.startsWith("-")
+    ? "bg-rose-100 text-rose-700"
+    : value === "..."
+      ? "bg-slate-100 text-slate-500"
+      : "bg-emerald-100 text-emerald-700";
+
+const buildBarHeights = (ticker: string, changePercent: number | null | undefined) => {
+  const seed = ticker.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  const momentum = Math.round((changePercent ?? 0) * 3);
+  return Array.from({ length: 7 }, (_, index) => {
+    const wave = (seed + index * 17 + momentum + index * index * 5) % 54;
+    return 28 + Math.abs(wave);
+  });
+};
+
+const buildMarketRows = (ticker: string, quote: StockQuote | undefined, sourceLabel: string) => [
+  ["Precio", formatUsd(quote?.price), formatPercent(quote?.changePercent)],
+  ["Cierre previo", formatUsd(quote?.previousClose), "Yahoo"],
+  ["Cambio diario", formatPercent(quote?.changePercent), formatPercent(quote?.changePercent)],
+  ["Fuente", "Yahoo Finance", "Live"],
+  ["Rotación", sourceLabel, ticker],
+  ["Actualización", "60s", quote?.error ? "Retry" : "OK"],
+  ["Modo", sourceLabel === "Dashboard" ? "Personal" : "Demo", sourceLabel],
 ];
 
-const StockTickerAnimation = () => (
-  <div className="absolute inset-x-0 bottom-6 mx-auto h-[76%] w-[92%] overflow-hidden rounded-[2rem] border-2 border-blue-pop bg-[#0b0d10] shadow-[0_30px_80px_rgba(0,0,0,0.16)]">
-    <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(59,130,246,0.34),transparent_30%),radial-gradient(circle_at_88%_12%,rgba(255,200,0,0.22),transparent_34%),linear-gradient(135deg,rgba(255,255,255,0.12),transparent_45%)]" />
-    <div className="absolute inset-x-0 top-0 z-10 h-8 border-b border-white/10 bg-black/20 backdrop-blur-sm" />
-    <div className="relative h-full px-5 pb-5 pt-14">
-      <div className="meli-ticker-card absolute left-1/2 top-1/2 w-[72%] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/15 bg-white/[0.09] p-5 backdrop-blur-md">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="font-heading text-4xl font-black leading-none text-white">MELI</p>
-            <p className="mt-2 font-heading text-sm font-semibold leading-none text-white/55">MercadoLibre Inc.</p>
-          </div>
-          <span className="rounded-full bg-emerald-400/15 px-3 py-1.5 font-heading text-sm font-black text-emerald-300">+0.9%</span>
+const DynamicStockTickerAnimation = () => {
+  const { isLoggedIn, session, loading: authLoading } = useAuth();
+  const [savedTickers, setSavedTickers] = useState<string[]>([]);
+  const [savedLoading, setSavedLoading] = useState(false);
+  const [demoTickers] = useState(() => shuffleTickers(DEFAULT_CAROUSEL_TICKERS));
+  const [quotes, setQuotes] = useState<StockQuote[]>([]);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchSavedTickers = async () => {
+      if (!isLoggedIn || !session?.user?.id) {
+        setSavedTickers([]);
+        return;
+      }
+
+      setSavedLoading(true);
+      const { data: portfolio } = await supabase
+        .from("portfolios")
+        .select("id")
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+
+      if (!portfolio) {
+        if (!cancelled) {
+          setSavedTickers([]);
+          setSavedLoading(false);
+        }
+        return;
+      }
+
+      const { data } = await supabase
+        .from("portfolio_holdings")
+        .select("ticker")
+        .eq("portfolio_id", portfolio.id);
+
+      if (!cancelled) {
+        const uniqueTickers = Array.from(new Set((data ?? []).map((row) => row.ticker.toUpperCase())));
+        setSavedTickers(uniqueTickers);
+        setSavedLoading(false);
+      }
+    };
+
+    fetchSavedTickers();
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoggedIn, session?.user?.id]);
+
+  const carouselTickers = useMemo(
+    () => (isLoggedIn ? savedTickers : demoTickers),
+    [demoTickers, isLoggedIn, savedTickers]
+  );
+
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [carouselTickers.join("|")]);
+
+  useEffect(() => {
+    if (!carouselTickers.length) {
+      setQuotes([]);
+      return;
+    }
+
+    let cancelled = false;
+    const refreshQuotes = async () => {
+      const nextQuotes = await fetchStockPrices(carouselTickers);
+      if (!cancelled) setQuotes(nextQuotes);
+    };
+
+    refreshQuotes();
+    const refreshId = window.setInterval(refreshQuotes, 60_000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(refreshId);
+    };
+  }, [carouselTickers]);
+
+  useEffect(() => {
+    if (carouselTickers.length <= 1) return;
+    const rotationId = window.setInterval(() => {
+      setActiveIndex((current) => (current + 1) % carouselTickers.length);
+    }, 6_000);
+    return () => window.clearInterval(rotationId);
+  }, [carouselTickers.length]);
+
+  const activeTicker = carouselTickers[activeIndex % Math.max(carouselTickers.length, 1)];
+  const quote = quotes.find((item) => item.ticker === activeTicker);
+  const companyName = quote?.companyName || stockNameByTicker.get(activeTicker) || activeTicker;
+  const sourceLabel = isLoggedIn ? "Dashboard" : "Demo";
+  const marketRows = buildMarketRows(activeTicker || "AGORA", quote, sourceLabel);
+  const barHeights = buildBarHeights(activeTicker || "AGORA", quote?.changePercent);
+  const isEmptyPersonalList = isLoggedIn && !authLoading && !savedLoading && carouselTickers.length === 0;
+
+  return (
+    <div className="absolute inset-x-0 bottom-6 mx-auto h-[76%] w-[92%] overflow-hidden rounded-[2rem] border-2 border-blue-pop bg-[#0b0d10] shadow-[0_30px_80px_rgba(0,0,0,0.16)]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(59,130,246,0.34),transparent_30%),radial-gradient(circle_at_88%_12%,rgba(255,200,0,0.22),transparent_34%),linear-gradient(135deg,rgba(255,255,255,0.12),transparent_45%)]" />
+      <div className="absolute inset-x-0 top-0 z-10 flex h-8 items-center justify-between border-b border-white/10 bg-black/20 px-4 backdrop-blur-sm">
+        <span className="font-heading text-[0.62rem] font-black uppercase tracking-[0.22em] text-white/45">Yahoo Finance</span>
+        <span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_18px_rgba(110,231,183,0.8)]" />
+      </div>
+      <div className="relative h-full px-5 pb-5 pt-14">
+        <div key={`card-${activeTicker || "empty"}`} className="stock-ticker-card absolute left-1/2 top-1/2 w-[72%] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/15 bg-white/[0.09] p-5 backdrop-blur-md">
+          {isEmptyPersonalList ? (
+            <div className="py-4">
+              <p className="font-heading text-3xl font-black leading-none text-white">Tu lista</p>
+              <p className="mt-3 font-heading text-sm font-semibold leading-tight text-white/60">
+                Agregá acciones en el dashboard para personalizar este carrusel.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="font-heading text-4xl font-black leading-none text-white">{activeTicker}</p>
+                  <p className="mt-2 font-heading text-sm font-semibold leading-none text-white/55">{companyName}</p>
+                </div>
+                <span className={`rounded-full px-3 py-1.5 font-heading text-sm font-black ${changeClassName(quote?.changePercent)}`}>
+                  {formatPercent(quote?.changePercent)}
+                </span>
+              </div>
+              <div className="mt-5 flex items-end justify-between">
+                <div>
+                  <p className="font-heading text-xs font-bold uppercase tracking-[0.18em] text-white/45">Precio</p>
+                  <p className="mt-1 font-heading text-2xl font-black leading-none text-white">{formatUsd(quote?.price)}</p>
+                </div>
+                <div className="flex h-16 w-32 items-end gap-2">
+                  {barHeights.map((height, index) => (
+                    <span key={`${activeTicker}-${height}-${index}`} className="stock-ticker-bar flex-1 rounded-t-full bg-blue-pop" style={{ height: `${height}%`, animationDelay: `${index * 90}ms` }} />
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
-        <div className="mt-5 flex items-end justify-between">
-          <div>
-            <p className="font-heading text-xs font-bold uppercase tracking-[0.18em] text-white/45">Precio</p>
-            <p className="mt-1 font-heading text-2xl font-black leading-none text-white">USD 1,624</p>
+
+        <div key={`window-${activeTicker || "empty"}`} className="income-window absolute inset-x-5 bottom-5 top-10 overflow-hidden rounded-3xl border border-white/15 bg-[#f8fbff] text-[#0b1320] shadow-2xl">
+          <div className="relative z-10 flex items-center justify-between border-b border-black/10 bg-white px-4 py-3 shadow-sm">
+            <div>
+              <p className="font-heading text-sm font-black leading-none text-[#0b1320]">Estado de mercado de {activeTicker || "tu lista"}</p>
+              <p className="mt-1 font-heading text-xs font-semibold leading-none text-[#0b1320]/55">Datos en vivo · USD</p>
+            </div>
+            <span className="income-close flex h-7 w-7 items-center justify-center rounded-full bg-[#0b1320] font-heading text-sm font-black leading-none text-white">×</span>
           </div>
-          <div className="flex h-16 w-32 items-end gap-2">
-            {[28, 44, 36, 58, 50, 72, 64].map((height) => (
-              <span key={height} className="stock-ticker-bar flex-1 rounded-t-full bg-blue-pop" style={{ height: `${height}%` }} />
+          <div className="income-scroll relative z-0 px-4 py-3">
+            {marketRows.map(([label, value, change]) => (
+              <div key={label} className="grid grid-cols-[1fr_auto_auto] items-center gap-3 border-b border-black/10 py-3 font-heading">
+                <span className="text-sm font-bold text-[#0b1320]">{label}</span>
+                <span className="text-sm font-black text-[#0b1320]">{value}</span>
+                <span className={`rounded-full px-2 py-1 text-xs font-black ${tableChangeClassName(change)}`}>{change}</span>
+              </div>
             ))}
           </div>
         </div>
-      </div>
 
-      <div className="income-window absolute inset-x-5 bottom-5 top-10 overflow-hidden rounded-3xl border border-white/15 bg-[#f8fbff] text-[#0b1320] shadow-2xl">
-        <div className="relative z-10 flex items-center justify-between border-b border-black/10 bg-white px-4 py-3 shadow-sm">
-          <div>
-            <p className="font-heading text-sm font-black leading-none text-[#0b1320]">Estado de resultados de MELI</p>
-            <p className="mt-1 font-heading text-xs font-semibold leading-none text-[#0b1320]/55">Resultados anuales · USD</p>
-          </div>
-          <span className="income-close flex h-7 w-7 items-center justify-center rounded-full bg-[#0b1320] font-heading text-sm font-black leading-none text-white">×</span>
-        </div>
-        <div className="income-scroll relative z-0 px-4 py-3">
-          {incomeStatementRows.map(([label, value, change]) => (
-            <div key={label} className="grid grid-cols-[1fr_auto_auto] items-center gap-3 border-b border-black/10 py-3 font-heading">
-              <span className="text-sm font-bold text-[#0b1320]">{label}</span>
-              <span className="text-sm font-black text-[#0b1320]">{value}</span>
-              <span className="rounded-full bg-emerald-100 px-2 py-1 text-xs font-black text-emerald-700">{change}</span>
-            </div>
-          ))}
-        </div>
+        <span className="stock-cursor" aria-hidden="true" />
       </div>
-
-      <span className="stock-cursor" aria-hidden="true" />
     </div>
-  </div>
-);
+  );
+};
 
 const Hero = () => {
   const [showScrollHint, setShowScrollHint] = useState(true);
@@ -143,7 +297,7 @@ const Hero = () => {
               <div className="absolute inset-x-0 bottom-24 top-auto h-[420px] md:bottom-36 md:h-[500px]">
                 <div className="absolute -left-16 -right-20 top-12 h-[90%] rotate-[5deg] rounded-[52%] border border-white/25 bg-[radial-gradient(circle_at_32%_24%,rgba(255,255,255,0.62),transparent_18%),linear-gradient(135deg,rgba(255,232,104,0.9),rgba(255,197,0,0.78)_55%,rgba(255,221,84,0.62))] shadow-[inset_0_3px_18px_rgba(255,255,255,0.5),inset_0_-26px_44px_rgba(255,178,0,0.24),0_24px_70px_rgba(255,200,0,0.28)] backdrop-blur-sm" />
                 <div className="absolute -right-5 top-2 h-24 w-32 rounded-[50%] border-[14px] border-blue-pop border-l-transparent border-b-transparent rotate-[-22deg]" />
-                <StockTickerAnimation />
+                <DynamicStockTickerAnimation />
                 <div className="absolute bottom-0 left-8 rounded-full bg-blue-pop px-6 py-5 text-center text-sm font-heading font-black uppercase leading-tight text-white shadow-xl rotate-[-8deg]">
                   Para estudiantes
                   <br />

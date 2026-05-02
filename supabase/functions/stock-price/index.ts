@@ -13,7 +13,7 @@ interface QuoteResult {
 }
 
 const cache = new Map<string, { data: QuoteResult; ts: number }>();
-const TTL = 3 * 60 * 1000; // 3 minutes
+const TTL = 55 * 1000;
 
 async function fetchQuote(ticker: string) {
   const cached = cache.get(ticker);

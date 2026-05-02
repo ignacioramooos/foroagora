@@ -9,8 +9,8 @@ import teamNicolas from "@/assets/team-nicolas.jpeg";
 import teamPhoto from "@/assets/team-photo.jpeg";
 
 const team = [
-  { name: "Nicolás Sales", age: 17, role: "Co-fundador & Instructor", bio: "El que sabe. Especialista en análisis fundamental y mercados financieros.", photo: teamNicolas },
-  { name: "Juan Ignacio Ramos", age: 18, role: "Co-fundador", bio: "Apasionado por las finanzas y la educación. Lidera la visión y estrategia de Foro Agora.", photo: teamIgnacio },
+  { name: "Nicolás Sales", age: 17, role: "Co-fundador & Instructor", email: "nicolas@foroagora.org", bio: "El que sabe. Especialista en análisis fundamental y mercados financieros.", photo: teamNicolas },
+  { name: "Juan Ignacio Ramos", age: 18, role: "Co-fundador", email: "ignacio@foroagora.org", bio: "Apasionado por las finanzas y la educación. Lidera la visión y estrategia de Foro Agora.", photo: teamIgnacio },
 ];
 
 const ImpactSection = () => {
@@ -121,6 +121,9 @@ const AboutPage = () => (
               <div className="pt-1">
                 <h3 className="font-heading font-semibold text-foreground text-lg">{m.name}</h3>
                 <span className="text-muted-foreground text-sm">{m.role} · {m.age} años</span>
+                <a href={`mailto:${m.email}`} className="mt-1 block text-sm font-heading font-semibold text-blue-pop hover:text-blue-pop/80">
+                  {m.email}
+                </a>
                 <p className="text-muted-foreground text-sm mt-2 leading-relaxed">{m.bio}</p>
               </div>
             </div>
