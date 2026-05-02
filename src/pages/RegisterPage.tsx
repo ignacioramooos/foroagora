@@ -6,6 +6,7 @@ import SectionFade from "@/components/SectionFade";
 import { CheckCircle2, MapPin, Calendar, Gift, Users, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { curriculumClassCount } from "@/lib/curriculum";
 
 const departments = [
   "Montevideo", "Canelones", "Maldonado", "Salto", "Colonia", "Paysandú",
@@ -224,7 +225,7 @@ const RegisterPage = () => {
                   <option value="">{classesLoading ? "Cargando clases..." : classes.length === 0 ? "No hay clases disponibles" : "Seleccionar clase..."}</option>
                   {classes.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {c.title} - Módulo {c.module_number} - {formatClassDate(c.class_date)}
+                      {c.title} - Clase {c.module_number} de {curriculumClassCount} - {formatClassDate(c.class_date)}
                     </option>
                   ))}
                 </select>
@@ -305,7 +306,7 @@ const RegisterPage = () => {
               <div className="space-y-4 text-sm">
                 <div className="flex items-start gap-3">
                   <Calendar size={16} className="text-muted-foreground mt-0.5 shrink-0" />
-                  <div><strong className="text-foreground font-heading">Clase seleccionada:</strong><br /><span className="text-muted-foreground">{selectedClass ? `${selectedClass.title} · Módulo ${selectedClass.module_number}` : "Seleccioná una clase"}</span></div>
+                  <div><strong className="text-foreground font-heading">Clase seleccionada:</strong><br /><span className="text-muted-foreground">{selectedClass ? `${selectedClass.title} · Clase ${selectedClass.module_number} de ${curriculumClassCount}` : "Seleccioná una clase"}</span></div>
                 </div>
                 <div className="flex items-start gap-3">
                   <MapPin size={16} className="text-muted-foreground mt-0.5 shrink-0" />
@@ -337,9 +338,9 @@ const RegisterPage = () => {
       <Dialog open={moduleWarningOpen} onOpenChange={setModuleWarningOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Esta clase empieza en módulo {selectedClass?.module_number}</DialogTitle>
+            <DialogTitle>Esta clase empieza en la clase {selectedClass?.module_number} del plan</DialogTitle>
             <DialogDescription>
-              Si es tu primera vez viniendo a clase, la clase anterior ya está grabada y subida en la sección de clases. Podés verla antes de asistir.
+              Si es tu primera vez viniendo a clase, la clase anterior puede estar grabada y subida en la sección de clases. Podés verla antes de asistir.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-2">

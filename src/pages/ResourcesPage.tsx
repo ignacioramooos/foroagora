@@ -2,96 +2,17 @@ import { useState } from "react";
 import SectionFade from "@/components/SectionFade";
 import { BookOpen, FileText, Play, ChevronDown, Download, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-type ClassResource = {
-  label: string;
-  type: "PDF" | "Plantilla" | "Lectura";
-};
+import { curriculumClasses, type CurriculumClass } from "@/lib/curriculum";
 
 type ClassVideo = {
-  id: string;
-  module: string;
-  title: string;
-  desc: string;
-  duration: string;
+  curriculum: CurriculumClass;
   videoUrl: string | null;
-  resources: ClassResource[];
 };
 
-const classes: ClassVideo[] = [
-  {
-    id: "m1",
-    module: "Módulo 1",
-    title: "Fundamentos del mercado",
-    desc: "Qué es una acción, empresas públicas vs. privadas, IPOs y herramientas que vamos a usar.",
-    duration: "Próximamente",
-    videoUrl: null,
-    resources: [
-      { label: "Guía: Cómo usar stockanalysis.com", type: "PDF" },
-      { label: "Glosario inicial de términos", type: "Lectura" },
-    ],
-  },
-  {
-    id: "m2",
-    module: "Módulo 2",
-    title: "Qué es el fundamental investing",
-    desc: "Diferencias con trading y quantitative investing. Los principios de Warren Buffett.",
-    duration: "Próximamente",
-    videoUrl: null,
-    resources: [
-      { label: "Carta a los accionistas de Berkshire (resumen)", type: "Lectura" },
-      { label: "Comparativa: trading vs. investing", type: "PDF" },
-    ],
-  },
-  {
-    id: "m3",
-    module: "Módulo 3",
-    title: "Income Statement",
-    desc: "Lectura línea por línea del estado de resultados. Amortización y depreciación con ejemplos.",
-    duration: "Próximamente",
-    videoUrl: null,
-    resources: [
-      { label: "Plantilla de análisis de Income Statement", type: "Plantilla" },
-      { label: "Guía: Cómo leer un Income Statement", type: "PDF" },
-    ],
-  },
-  {
-    id: "m4",
-    module: "Módulo 4",
-    title: "Cash Flow Statement",
-    desc: "Cash from operations, capex, free cash flow y net cash flow. Diferencias con el income statement.",
-    duration: "Próximamente",
-    videoUrl: null,
-    resources: [
-      { label: "Plantilla de Free Cash Flow", type: "Plantilla" },
-      { label: "Caso práctico: cash flow de una empresa real", type: "PDF" },
-    ],
-  },
-  {
-    id: "m5",
-    module: "Módulo 5",
-    title: "Balance Sheet y métricas de valuación",
-    desc: "Activos, pasivos, book value y métricas clave: P/E, P/FCF, P/B, PEG, CAGR.",
-    duration: "Próximamente",
-    videoUrl: null,
-    resources: [
-      { label: "Cheatsheet de métricas de valuación", type: "PDF" },
-      { label: "Plantilla de análisis fundamental", type: "Plantilla" },
-    ],
-  },
-  {
-    id: "m6",
-    module: "Módulo 6",
-    title: "Psicología de mercado y decisiones",
-    desc: "Sesgos comunes, gestión emocional y caso práctico integrador.",
-    duration: "Próximamente",
-    videoUrl: null,
-    resources: [
-      { label: "Lectura: Be greedy when others are fearful", type: "Lectura" },
-      { label: "Checklist de decisión de inversión", type: "PDF" },
-    ],
-  },
-];
+const classes: ClassVideo[] = curriculumClasses.map((curriculum) => ({
+  curriculum,
+  videoUrl: null,
+}));
 
 const books = [
   { title: "El inversor inteligente", author: "Benjamin Graham", pitch: "La biblia del value investing. Lectura obligatoria." },
@@ -107,6 +28,7 @@ const extractYouTubeId = (url: string) => {
 
 const ClassCard = ({ item, isOpen, onToggle }: { item: ClassVideo; isOpen: boolean; onToggle: () => void }) => {
   const youtubeId = item.videoUrl ? extractYouTubeId(item.videoUrl) : null;
+  const { curriculum } = item;
 
   return (
     <div className="border border-border rounded-lg overflow-hidden bg-background">
@@ -123,10 +45,10 @@ const ClassCard = ({ item, isOpen, onToggle }: { item: ClassVideo; isOpen: boole
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-xs font-heading font-medium uppercase tracking-widest text-muted-foreground mb-1">
-            {item.module} · {item.duration}
+            Clase {curriculum.classNumber} · {curriculum.duration} · Video próximamente
           </p>
-          <h3 className="font-heading font-semibold text-foreground text-lg mb-1">{item.title}</h3>
-          <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
+          <h3 className="font-heading font-semibold text-foreground text-lg mb-1">{curriculum.title}</h3>
+          <p className="text-muted-foreground text-sm leading-relaxed">{curriculum.summary}</p>
         </div>
         <ChevronDown
           size={18}
@@ -151,14 +73,14 @@ const ClassCard = ({ item, isOpen, onToggle }: { item: ClassVideo; isOpen: boole
                   className="w-full h-full"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
-                  title={item.title}
+                  title={curriculum.title}
                 />
               </div>
             ) : (
               <div className="aspect-video rounded-md border border-dashed border-border flex flex-col items-center justify-center text-center p-6">
                 <Lock size={20} className="text-muted-foreground mb-2" />
                 <p className="text-sm text-muted-foreground">
-                  Video disponible cuando se dicte el módulo.
+                  Video disponible cuando se dicte la clase.
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   Las clases se graban y se publican acá después de cada sesión.
@@ -173,7 +95,7 @@ const ClassCard = ({ item, isOpen, onToggle }: { item: ClassVideo; isOpen: boole
               Recursos adjuntos
             </p>
             <div className="divide-y divide-border border border-border rounded-md bg-background">
-              {item.resources.map((r) => (
+              {curriculum.resources.map((r) => (
                 <div
                   key={r.label}
                   className="flex items-center justify-between gap-4 p-4 hover:bg-secondary/40 transition-colors"
@@ -213,7 +135,7 @@ const ResourcesPage = () => {
               Aprendé a tu ritmo
             </h1>
             <p className="text-muted-foreground text-lg max-w-xl">
-              Videos de las clases y materiales adjuntos para profundizar en cada módulo.
+              Videos de las clases y materiales adjuntos para profundizar en cada tema del recorrido.
             </p>
           </SectionFade>
         </div>
@@ -223,15 +145,15 @@ const ResourcesPage = () => {
         <div className="container max-w-4xl">
           <h2 className="text-2xl md:text-3xl text-foreground mb-3 font-heading">Biblioteca de clases</h2>
           <p className="text-muted-foreground mb-10 max-w-2xl">
-            Tocá cualquier módulo para ver el video de la clase y los recursos adjuntos.
+            Tocá cualquier clase para ver el video y los recursos adjuntos.
           </p>
           <div className="space-y-3">
             {classes.map((c) => (
               <ClassCard
-                key={c.id}
+                key={c.curriculum.id}
                 item={c}
-                isOpen={openId === c.id}
-                onToggle={() => setOpenId(openId === c.id ? null : c.id)}
+                isOpen={openId === c.curriculum.id}
+                onToggle={() => setOpenId(openId === c.curriculum.id ? null : c.curriculum.id)}
               />
             ))}
           </div>

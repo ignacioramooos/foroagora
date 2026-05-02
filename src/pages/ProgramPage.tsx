@@ -2,40 +2,8 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import SectionFade from "@/components/SectionFade";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { curriculumClasses, curriculumClassCount } from "@/lib/curriculum";
 import { ArrowRight } from "lucide-react";
-
-const modules = [
-  {
-    id: "m1",
-    title: "Módulo 1: Acciones y análisis fundamental",
-    desc: "Cómo funcionan las clases presenciales y los recursos online. Qué es una acción, por qué representa una parte de una empresa, qué diferencia a una compañía pública de una privada y qué es una IPO. Introducimos el enfoque del curso: fundamental investing, inspirado en Warren Buffett y Peter Lynch, para evaluar empresas por activos, pasivos, ingresos y crecimiento futuro. También diferenciamos este enfoque del trading y del quantitative investing.",
-    duration: "1h 20m · Presencial",
-  },
-  {
-    id: "m2",
-    title: "Módulo 2: Income Statement",
-    desc: "Aprendemos a leer el estado de resultados línea por línea: ingresos, costos, gastos y ganancias. Vemos por qué la contabilidad prorratea ciertos gastos y qué significan amortización y depreciación con ejemplos simples, como un auto. La idea es entender qué nos dice este estado financiero sobre la rentabilidad de una empresa y por qué muchas veces se mueve con inercia.",
-    duration: "1h 20m · Presencial",
-  },
-  {
-    id: "m3",
-    title: "Módulo 3: Cash Flow Statement",
-    desc: "Vemos el flujo de caja, una de las partes que más buscan maximizar muchas empresas. Explicamos cash from operations, capex, free cash flow y net cash flow. Comparamos cómo se registra una inversión en el cash flow versus en el income statement, y usamos ejemplos como Amazon, Google y Apple si el tiempo lo permite.",
-    duration: "1h 20m · Presencial",
-  },
-  {
-    id: "m4",
-    title: "Módulo 4: Balance Sheet y métricas de valuación",
-    desc: "Estudiamos activos, pasivos y patrimonio, con énfasis en por qué el balance sheet es especialmente importante para bancos. Introducimos book value y las principales métricas para evaluar acciones: P/E, Forward P/E, P/FCF, P/B, PEG y CAGR. También vemos alertas como impuestos extraordinarios y psicología de mercado: comprar cuando otros tienen miedo.",
-    duration: "1h 20m · Presencial",
-  },
-  {
-    id: "m5",
-    title: "Módulo 5: Margin of safety, ETFs y cierre",
-    desc: "Integramos todo con el concepto de margin of safety: la diferencia entre el valor estimado de una empresa y el precio al que cotiza. Vemos cuándo tiene sentido ser compradores netos y cuándo el mercado puede estar pagando demasiado. Cerramos con conceptos extra: earnings calls, guidance, formatos de presentaciones, ETFs como SPY y VOO, las empresas más grandes del mundo y una instancia final de preguntas.",
-    duration: "1h 20m · Presencial",
-  },
-];
 
 const ProgramPage = () => (
   <>
@@ -66,17 +34,24 @@ const ProgramPage = () => (
           Programa de estudio
         </p>
         <h2 className="text-3xl md:text-4xl text-foreground mb-10">
-          5 módulos. Todo lo esencial.
+          {curriculumClassCount} clases. Todo lo esencial.
         </h2>
         <Accordion type="single" collapsible className="space-y-2">
-          {modules.map((m) => (
-            <AccordionItem key={m.id} value={m.id} className="border border-border rounded-lg px-6 overflow-hidden">
+          {curriculumClasses.map((item) => (
+            <AccordionItem key={item.id} value={item.id} className="border border-border rounded-lg px-6 overflow-hidden">
               <AccordionTrigger className="text-left font-heading font-semibold text-foreground hover:no-underline py-5">
-                {m.title}
+                Clase {item.classNumber}: {item.title}
               </AccordionTrigger>
               <AccordionContent className="pb-5">
-                <p className="text-muted-foreground leading-relaxed mb-2">{m.desc}</p>
-                <span className="text-xs text-muted-foreground font-heading">{m.duration}</span>
+                <p className="text-muted-foreground leading-relaxed mb-4">{item.summary}</p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {item.topics.map((topic) => (
+                    <div key={topic} className="rounded-md bg-secondary/50 px-3 py-2 text-sm text-muted-foreground">
+                      {topic}
+                    </div>
+                  ))}
+                </div>
+                <span className="mt-4 block text-xs text-muted-foreground font-heading">{item.duration}</span>
               </AccordionContent>
             </AccordionItem>
           ))}
@@ -98,7 +73,7 @@ const ProgramPage = () => (
             <ul className="space-y-3 text-muted-foreground text-sm">
               <li>Montevideo, Centro</li>
               <li>Sábados, 10:00 – 12:00</li>
-              <li>5 sesiones de 1h 20m</li>
+              <li>{curriculumClassCount} clases de 1h 20m</li>
               <li>Sin costo</li>
             </ul>
           </div>

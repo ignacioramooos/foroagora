@@ -9,6 +9,7 @@ import CapacityBar from "@/components/CapacityBar";
 import CoreValues from "@/components/CoreValues";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { curriculumClassCount } from "@/lib/curriculum";
 import { fetchStockPrices, SUPPORTED_STOCKS, type StockQuote } from "@/lib/stockData";
 import { ArrowRight, Calendar, MapPin, Users } from "lucide-react";
 
@@ -268,7 +269,7 @@ const Hero = () => {
             </SectionFade>
             <SectionFade delay={0.1}>
               <p className="text-base md:text-lg text-foreground/70 max-w-xl mb-8">
-                Clases presenciales de análisis fundamental para estudiantes en Uruguay. Sin costos. Sin trading. Sin experiencia previa.
+                {curriculumClassCount} clases presenciales de análisis fundamental para estudiantes en Uruguay. Sin costos. Sin trading. Sin experiencia previa.
               </p>
             </SectionFade>
             <SectionFade delay={0.12}>
@@ -538,7 +539,7 @@ const UpcomingClasses = () => {
               </div>
               <div className="flex items-center gap-3 text-foreground/70">
                 <Users size={16} className="shrink-0 text-blue-pop" />
-                <span>Módulo {classSession.module_number} · {classSession.max_capacity} lugares</span>
+                <span>Clase {classSession.module_number} del plan · {classSession.max_capacity} lugares</span>
               </div>
             </div>
             <div className="mb-6">
@@ -559,9 +560,9 @@ const UpcomingClasses = () => {
       <Dialog open={warningOpen} onOpenChange={setWarningOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Esta clase empieza en módulo {classSession.module_number}</DialogTitle>
+            <DialogTitle>Esta clase empieza en la clase {classSession.module_number} del plan</DialogTitle>
             <DialogDescription>
-              Si es tu primera vez, tené en cuenta que la clase anterior ya está grabada y subida en la sección de clases. Podés verla antes de asistir.
+              Si es tu primera vez, tené en cuenta que la clase anterior puede estar grabada y subida en la sección de clases. Podés verla antes de asistir.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-2">

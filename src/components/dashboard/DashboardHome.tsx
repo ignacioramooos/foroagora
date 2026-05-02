@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { mockModules } from "@/lib/mockData";
+import { buildCurriculumProgress, curriculumClassCount } from "@/lib/curriculum";
 import { Flame, BookOpen, FileText, Target, MapPin, Clock, CalendarDays, ArrowRight, CheckCircle2, BarChart3, Wallet, CalendarCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -180,10 +180,12 @@ const DashboardHome = ({ onTabChange }: DashboardHomeProps) => {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Buenos días" : "Buenas tardes";
 
-  const progressPercent = user.totalClasses > 0
-    ? Math.round((user.completedClasses / user.totalClasses) * 100)
+  const totalProgramClasses = user.totalClasses > 0 ? user.totalClasses : curriculumClassCount;
+  const completedProgramClasses = Math.min(user.completedClasses, totalProgramClasses);
+  const progressPercent = totalProgramClasses > 0
+    ? Math.round((completedProgramClasses / totalProgramClasses) * 100)
     : 0;
-  const currentModule = mockModules.find((m) => m.status === "in_progress");
+  const currentClass = buildCurriculumProgress(completedProgramClasses).find((item) => item.status === "in_progress");
 
   const formatDate = (iso: string) => {
     const d = new Date(iso);
@@ -243,7 +245,7 @@ const DashboardHome = ({ onTabChange }: DashboardHomeProps) => {
           </div>
           <div className="flex items-end gap-3">
             <span className="text-3xl font-heading font-semibold text-foreground">{progressPercent}%</span>
-            <span className="text-sm text-muted-foreground mb-1">{user.completedClasses}/{user.totalClasses} clases</span>
+            <span className="text-sm text-muted-foreground mb-1">{completedProgramClasses}/{totalProgramClasses} clases</span>
           </div>
           <div className="mt-3 h-1.5 bg-secondary rounded-full overflow-hidden">
             <div className="h-full bg-foreground rounded-full transition-all" style={{ width: `${progressPercent}%` }} />
@@ -266,7 +268,7 @@ const DashboardHome = ({ onTabChange }: DashboardHomeProps) => {
             <Target size={16} /> Próximo Hito
           </div>
           <span className="text-lg font-heading font-medium text-foreground">
-            {currentModule ? `Módulo: ${currentModule.title}` : "Completar programa"}
+            {currentClass ? `Clase ${currentClass.classNumber}: ${currentClass.shortTitle}` : "Completar programa"}
           </span>
         </div>
       </div>
