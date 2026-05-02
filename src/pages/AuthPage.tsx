@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Link, Navigate } from "react-router-dom";
 import { ArrowLeft, Loader2, CheckCircle2 } from "lucide-react";
-import { lovable } from "@/integrations/lovable/index";
 
 const departments = [
   "Artigas", "Canelones", "Cerro Largo", "Colonia", "Durazno", "Flores",
@@ -126,10 +125,13 @@ const AuthPage = () => {
 
   const handleGoogleLogin = async () => {
     setError("");
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin + "/auth",
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin + "/auth",
+      },
     });
-    if (result.error) {
+    if (error) {
       setError("Error al iniciar sesión con Google");
     }
   };
